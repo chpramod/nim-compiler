@@ -9,11 +9,12 @@ KeyW = ( 'ADDR', 'AND', 'AS', 'ASM', 'ATOMIC', 'BIND', 'BLOCK', 'BREAK', 'CASE',
 	'TRY', 'TUPLE', 'TYPE', 'USING', 'VAR', 'WHEN', 'WHILE', 'WITH', 'WITHOUT', 'XOR', 'YIELD')
 #Token Name list
 #Not written the ones with //
-tokens = KeyW + ('DIGIT','HEXDIGIT', 'OCTDIGIT' , 'BINDIGIT', 'HEX_LIT', 'DEC_LIT', 'OCT_LIT', 'BIN_LIT', 'EXPONENT', 'SYM_CHARS', 'SYM_START_CHARS', 'INVALID', 'EOF', 'SYMBOL', 'INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT',
-	'UINT16LIT', 'UINT32LIT', 'UINT64LIT', 'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
+tokens = KeyW + ('DIGIT','HEXDIGIT', 'OCTDIGIT' , 'BINDIGIT', 'HEX_LIT', 'DEC_LIT', 'OCT_LIT', 'BIN_LIT', 'EXPONENT', 'SYM_CHARS', 'SYM_START_CHARS',
+	'INVALID', 'EOF', 'SYMBOL', 'INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT', 'UINT16LIT',
+	'UINT32LIT', 'UINT64LIT', 'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
 	'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',	
 	'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'ACCENT')  
-                                                                                                                                                                                                                                     
+
 
         DIGIT           = r'([0-9])'
         HEXDIGIT        = r'({DIGIT}|[A-F]|[a-f])'
@@ -53,30 +54,28 @@ tokens = KeyW + ('DIGIT','HEXDIGIT', 'OCTDIGIT' , 'BINDIGIT', 'HEX_LIT', 'DEC_LI
 //        CHARLIT        = "tkCharLit"
 
 #Delimiters
-        PARLE          = r'\('
-        PARRI          = r'\)'
-        BRACKETLE      = r'\['
-        BRACKETRI      = r'\]'
-        CURLYLE        = r'\{'
-        CURLYRI        = r'\}'
-        BRACKETDOTLE   = r'\[\.'
-        BRACKETDOTRI   = r'\.\['
-        CURLYDOTLE     = r'\{\.'
-        CURLYDOTRI     = r'\.\}'
-        PARDOTLE       = r'\(\.'
-        PARDOTRI       = r'\.\)'
-        COMMA          = r'\,'
-        SEMICOLON      = r';'
-        COLON          = r':'
-        COLONCOLON     = r'::'
-        EQUALS         = r'='
-        DOT            = r'\.'
-        DOTDOT         = r'\.\.'
-
-
-        OPR            = r'([+-*/\\<>!?\^.|=%&$@~:\x80-\xFF]")'
-        COMMENT        = r'(#[^\r\n]*")'
-        ACCENT         = "`"
+        t_PARLE          = r'\('
+        t_PARRI          = r'\)'
+        t_BRACKETLE      = r'\['
+        t_BRACKETRI      = r'\]'
+        t_CURLYLE        = r'\{'
+        t_CURLYRI        = r'\}'
+        t_BRACKETDOTLE   = r'\[\.'
+        t_BRACKETDOTRI   = r'\.\['
+        t_CURLYDOTLE     = r'\{\.'
+        t_CURLYDOTRI     = r'\.\}'
+        t_PARDOTLE       = r'\(\.'
+        t_PARDOTRI       = r'\.\)'
+        t_COMMA          = r'\,'
+        t_SEMICOLON      = r';'
+        t_COLON          = r':'
+        t_COLONCOLON     = r'::'
+        t_EQUALS         = r'='
+        t_DOT            = r'\.'
+        t_DOTDOT         = r'\.\.'
+        t_OPR            = r'([+-*/\\<>!?\^.|=%&$@~:\x80-\xFF]")'
+        t_COMMENT        = r'(#[^\r\n]*")'
+        t_ACCENT         = r'`'
 //        INFIXOPR       = "tkInfixOpr"
 //        PREFIXOPR      = "tkPrefixOpr"
 //        POSTFIXOPR     = "tkPostfixOpr"
