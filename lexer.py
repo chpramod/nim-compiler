@@ -3,15 +3,17 @@
 #
 import ply.lex as lex        // After generating flex lexer delete this section somewhere after <YYINITIAL>
 
-#Token Name list
-#Not written the ones with //
-tokens = ('DIGIT','HEXDIGIT', 'OCTDIGIT' , 'BINDIGIT', 'HEX_LIT', 'DEC_LIT', 'OCT_LIT', 'BIN_LIT', 'EXPONENT', 'SYM_CHARS', 'SYM_START_CHARS', 'INVALID', 'EOF', 'SYMBOL', 'ADDR', 'AND', 'AS', 'ASM', 'ATOMIC', 'BIND', 'BLOCK', 'BREAK', 'CASE', 'CAST', 'CONCEPT', 'CONST', 'CONTINUE', 'CONVERTER', 'DEFER', 'DISCARD',
+KeyW = ( 'ADDR', 'AND', 'AS', 'ASM', 'ATOMIC', 'BIND', 'BLOCK', 'BREAK', 'CASE', 'CAST', 'CONCEPT', 'CONST', 'CONTINUE', 'CONVERTER', 'DEFER', 'DISCARD',
 	'DISTINCT', 'DIV', 'DO', 'ELIF', 'ELSE', 'END', 'ENUM', 'EXCEPT', 'EXPORT', 'FINALLY', 'FOR', 'FROM', 'FUNC', 'GENERIC', 'IF', 'IMPORT', 'IN', 'INCLUDE', 'INTERFACE', 'IS', 'ISNOT', 
 	'ITERATOR', 'LET', 'MACRO', 'METHOD', 'MIXIN', 'MOD', 'NIL', 'NOT', 'NOTIN', 'OBJECT', 'OF', 'OR', 'OUT', 'PROC', 'PTR', 'RAISE', 'REF', 'RETURN', 'SHL', 'SHR', 'STATIC', 'TEMPLATE',
-	'TRY', 'TUPLE', 'TYPE', 'USING', 'VAR', 'WHEN', 'WHILE', 'WITH', 'WITHOUT', 'XOR', 'YIELD', 'INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT',
+	'TRY', 'TUPLE', 'TYPE', 'USING', 'VAR', 'WHEN', 'WHILE', 'WITH', 'WITHOUT', 'XOR', 'YIELD')
+#Token Name list
+#Not written the ones with //
+tokens = KeyW + ('DIGIT','HEXDIGIT', 'OCTDIGIT' , 'BINDIGIT', 'HEX_LIT', 'DEC_LIT', 'OCT_LIT', 'BIN_LIT', 'EXPONENT', 'SYM_CHARS', 'SYM_START_CHARS', 'INVALID', 'EOF', 'SYMBOL', 'INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT',
 	'UINT16LIT', 'UINT32LIT', 'UINT64LIT', 'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
 	'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',	
-	'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'ACCENT')                                                                                                                                                                                                                                        
+	'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'ACCENT')  
+                                                                                                                                                                                                                                     
 
         DIGIT           = r'([0-9])'
         HEXDIGIT        = r'({DIGIT}|[A-F]|[a-f])'
@@ -29,76 +31,6 @@ tokens = ('DIGIT','HEXDIGIT', 'OCTDIGIT' , 'BINDIGIT', 'HEX_LIT', 'DEC_LIT', 'OC
 //        INVALID       = "tkInvalid"
 //        EOF           = "[EOF]"
         SYMBOL         = r'({SYM_START_CHARS}{SYM_CHARS}")'
-        ADDR           = "addr"
-        AND            = "and"
-        AS             = "as"
-        ASM            = "asm"
-        ATOMIC         = "atomic"
-        BIND           = "bind"
-        BLOCK          = "block"
-        BREAK          = "break"
-        CASE           = "case"
-        CAST           = "cast"
-        CONCEPT        = "concept"
-        CONST          = "const"
-        CONTINUE       = "continue"
-        CONVERTER      = "converter"
-        DEFER          = "defer"
-        DISCARD        = "discard"
-        DISTINCT       = "distinct"
-        DIV            = "div"
-        DO             = "do"
-        ELIF           = "elif"
-        ELSE           = "else"
-        END            = "end"
-        ENUM           = "enum"
-        EXCEPT         = "except"
-        EXPORT         = "export"
-        FINALLY        = "finally"
-        FOR            = "for"
-        FROM           = "from"
-        FUNC           = "func"
-        GENERIC        = "generic"
-        IF             = "if"
-        IMPORT         = "import"
-        IN             = "in"
-        INCLUDE        = "include"
-        INTERFACE      = "interface"
-        IS             = "is"
-        ISNOT          = "isnot"
-        ITERATOR       = "iterator"
-        LET            = "let"
-        MACRO          = "macro"
-        METHOD         = "method"
-        MIXIN          = "mixin"
-        MOD            = "mod"
-        NIL            = "nil"
-        NOT            = "not"
-        NOTIN          = "notin"
-        OBJECT         = "object"
-        OF             = "of"
-        OR             = "or"
-        OUT            = "out"
-        PROC           = "proc"
-        PTR            = "ptr"
-        RAISE          = "raise"
-        REF            = "ref"
-        RETURN         = "return"
-        SHL            = "shl"
-        SHR            = "shr"
-        STATIC         = "static"
-        TEMPLATE       = "template"
-        TRY            = "try"
-        TUPLE          = "tuple"
-        TYPE           = "type"
-        USING          = "using"
-        VAR            = "var"
-        WHEN           = "when"
-        WHILE          = "while"
-        WITH           = "with"
-        WITHOUT        = "without"
-        XOR            = "xor"
-        YIELD          = "yield"
         INTLIT         = r'({HEX_LIT}|{DEC_LIT}|{OCT_LIT}|{BIN_LIT}")'
         INT8LIT        = r'({INTLIT}'[iI]8")'
         INT16LIT       = r'({INTLIT}'[iI]16")'
@@ -119,25 +51,29 @@ tokens = ('DIGIT','HEXDIGIT', 'OCTDIGIT' , 'BINDIGIT', 'HEX_LIT', 'DEC_LIT', 'OC
 //        GSTRLIT        = "tkGStrLit"
 //        GTRIPLESTRLIT  = "tkGTripleStrLit"
 //        CHARLIT        = "tkCharLit"
-        PARLE          = "("
-        PARRI          = ")"
-        BRACKETLE      = "["
-        BRACKETRI      = "]"
-        CURLYLE        = "{"
-        CURLYRI        = "}"
-        BRACKETDOTLE   = "[."
-        BRACKETDOTRI   = ".]"
-        CURLYDOTLE     = "{."
-        CURLYDOTRI     = ".}"
-        PARDOTLE       = "(."
-        PARDOTRI       = ".)"
-        COMMA          = ","
-        SEMICOLON      = ";"
-        COLON          = ":"
-        COLONCOLON     = "::"
-        EQUALS         = "="
-        DOT            = "."
-        DOTDOT         = ".."
+
+#Delimiters
+        PARLE          = r'\('
+        PARRI          = r'\)'
+        BRACKETLE      = r'\['
+        BRACKETRI      = r'\]'
+        CURLYLE        = r'\{'
+        CURLYRI        = r'\}'
+        BRACKETDOTLE   = r'\[\.'
+        BRACKETDOTRI   = r'\.\['
+        CURLYDOTLE     = r'\{\.'
+        CURLYDOTRI     = r'\.\}'
+        PARDOTLE       = r'\(\.'
+        PARDOTRI       = r'\.\)'
+        COMMA          = r'\,'
+        SEMICOLON      = r';'
+        COLON          = r':'
+        COLONCOLON     = r'::'
+        EQUALS         = r'='
+        DOT            = r'\.'
+        DOTDOT         = r'\.\.'
+
+
         OPR            = r'([+-*/\\<>!?\^.|=%&$@~:\x80-\xFF]")'
         COMMENT        = r'(#[^\r\n]*")'
         ACCENT         = "`"
