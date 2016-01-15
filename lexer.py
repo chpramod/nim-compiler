@@ -113,8 +113,9 @@ tokens = [
 ########################################
 ############# COMMENTS #################
 ########################################
-def t_ignore_COMMENT(t):
-    r"//[^\n]+|"r"/\*[^(\*/)]+(\*/)"
+def t_comment(t):
+    r"[ ]*\043[^\n]*"  # \043 is '#'
+    pass
 
 ########################################
 ############# LINE NUMBER ##############
@@ -155,81 +156,6 @@ def t_BOOLEAN(t):
     return t
 
 ########################################
-############# OPERATORS ################
-########################################
-def t_OP_HINT(t):
-    r"::"
-    return t
-
-def t_OP_DOT(t):
-    r"\."
-    return t
-
-def t_OP_EQUALS(t):
-    r"===|"r"=="
-    return t
-
-def t_OP_NOT_EQUALS(t):
-    r"!==|"r"!="
-    return t
-
-def t_OP_ASSIGNMENT(t):
-    r"=|"r"\+=|"r"-=|"r"\*=|"r"/=|"r"%="
-    return t
-
-def t_OP_NOT(t):
-    r"!"
-    return t
-
-def t_OP_COLON(t):
-    r":"
-    return t
-
-def t_OP_PLUS(t):
-    r"\+"
-    return t
-
-def t_OP_MINUS(t):
-    r"-"
-    return t
-
-def t_OP_MULTIPLICATION(t):
-    r"\*"
-    return t
-
-def t_OP_DIVISION(t):
-    r"/"
-    return t
-
-def t_OP_MODULUS(t):
-    r"%"
-    return t
-
-def t_OP_GREATER_THEN_E(t):
-    r">="
-    return t
-
-def t_OP_GREATER_THEN(t):
-    r">"
-    return t
-
-def t_OP_LESS_THEN_E(t):
-    r"<="
-    return t
-
-def t_OP_LESS_THEN(t):
-    r"<"
-    return t
-
-def t_OP_AND(t):
-    r"&&"
-    return t
-
-def t_OP_OR(t):
-    r"\|\|"
-    return t
-
-########################################
 ############# IDENTIFIER ###############
 ########################################
 def t_IDENTIFIER(t):
@@ -237,41 +163,6 @@ def t_IDENTIFIER(t):
     t.type = reserved.get(t.value,'IDENTIFIER')    # Check for reserved words
     return t
 
-########################################
-############# SEPERATORS ###############
-########################################
-# RegEx for SEPERATORS
-def t_SEP_SEMICOLON(t):
-    r";"
-    return t
-
-def t_SEP_OPEN_BRACE(t):
-    r"\{"
-    return t
-
-def t_SEP_CLOSE_BRACE(t):
-    r"\}"
-    return t
-
-def t_SEP_OPEN_BRACKET(t):
-    r"\["
-    return t
-
-def t_SEP_CLOSE_BRACKET(t):
-    r"\]"
-    return t
-
-def t_SEP_OPEN_PARENTHESIS(t):
-    r"\("
-    return t
-
-def t_SEP_CLOSE_PARENTHESIS(t):
-    r"\)"
-    return t
-
-def t_SEP_COMMA(t):
-    r","
-    return t
 
 ########################################
 ############# ERROR ####################
@@ -368,7 +259,7 @@ if __name__ == "__main__":
 
 
         OPR            = r'([+-*/\\<>!?\^.|=%&$@~:\x80-\xFF]")'
-        COMMENT        = r'(#[^\r\n]*")'
+#        COMMENT        = r'(#[^\r\n]*")'
         ACCENT         = "`"
 //        INFIXOPR       = "tkInfixOpr"
 //        PREFIXOPR      = "tkPrefixOpr"
