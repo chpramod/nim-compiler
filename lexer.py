@@ -107,13 +107,13 @@ tokens = [
         'DIGIT','HEXDIGIT', 'OCTDIGIT' , 'BINDIGIT', 'HEX_LIT', 'DEC_LIT', 'OCT_LIT', 'BIN_LIT', 'EXPONENT', 'SYM_CHARS', 'SYM_START_CHARS', 'INVALID', 'EOF', 'SYMBOL', 'INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT',
     'UINT16LIT', 'UINT32LIT', 'UINT64LIT', 'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
     'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',   
-    'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'ACCENT'
+    'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'ACCENT', 'IDENTIFIER'
         ] + list(reserved.values())
 
 ########################################
 ############# COMMENTS #################
 ########################################
-def t_comment(t):
+def t_COMMENT(t):
     r"[ ]*\043[^\n]*"  # \043 is '#'
     pass
 
@@ -131,7 +131,7 @@ def t_newline(t):
 ########################################
 ############# WHITESPACE ###############
 ########################################
-t_ignore_WHITESPACE = r"\s"
+#t_ignore_WHITESPACE = r"\s"
 
 ########################################
 ############# TYPES ####################
