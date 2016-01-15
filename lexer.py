@@ -1,14 +1,14 @@
 #Nim-Compiler Lexer file
 # lexer.py
 #
-import ply.lex as lex        // After generating flex lexer delete this section somewhere after <YYINITIAL>
+import ply.lex as lex        # After generating flex lexer delete this section somewhere after <YYINITIAL>
 
 KeyW = ( 'ADDR', 'AND', 'AS', 'ASM', 'ATOMIC', 'BIND', 'BLOCK', 'BREAK', 'CASE', 'CAST', 'CONCEPT', 'CONST', 'CONTINUE', 'CONVERTER', 'DEFER', 'DISCARD',
 	'DISTINCT', 'DIV', 'DO', 'ELIF', 'ELSE', 'END', 'ENUM', 'EXCEPT', 'EXPORT', 'FINALLY', 'FOR', 'FROM', 'FUNC', 'GENERIC', 'IF', 'IMPORT', 'IN', 'INCLUDE', 'INTERFACE', 'IS', 'ISNOT', 
 	'ITERATOR', 'LET', 'MACRO', 'METHOD', 'MIXIN', 'MOD', 'NIL', 'NOT', 'NOTIN', 'OBJECT', 'OF', 'OR', 'OUT', 'PROC', 'PTR', 'RAISE', 'REF', 'RETURN', 'SHL', 'SHR', 'STATIC', 'TEMPLATE',
 	'TRY', 'TUPLE', 'TYPE', 'USING', 'VAR', 'WHEN', 'WHILE', 'WITH', 'WITHOUT', 'XOR', 'YIELD')
 #Token Name list
-#Not written the ones with //
+#Not written the ones with
 tokens = KeyW + ('DIGIT','HEXDIGIT', 'OCTDIGIT' , 'BINDIGIT', 'HEX_LIT', 'DEC_LIT', 'OCT_LIT', 'BIN_LIT', 'EXPONENT', 'SYM_CHARS', 'SYM_START_CHARS',
 	'INVALID', 'EOF', 'SYMBOL', 'INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT', 'UINT16LIT',
 	'UINT32LIT', 'UINT64LIT', 'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
@@ -27,10 +27,9 @@ tokens = KeyW + ('DIGIT','HEXDIGIT', 'OCTDIGIT' , 'BINDIGIT', 'HEX_LIT', 'DEC_LI
         EXPONENT        = r'((e|E)[+-]{DIGIT}(_{DIGIT})*)'
         SYM_CHARS       = r'([a-zA-Z0-9\x80-\xFF_]+)'
         SYM_START_CHARS = r'([a-zA-Z\x80-\xFF]+)'
-        //////////////////////////////////////////////////////////////////////////////
-
-//        INVALID       = "tkInvalid"
-//        EOF           = "[EOF]"
+        
+#        INVALID       = "tkInvalid"
+#        EOF           = "[EOF]"
         SYMBOL         = r'({SYM_START_CHARS}{SYM_CHARS}")'
         INTLIT         = r'({HEX_LIT}|{DEC_LIT}|{OCT_LIT}|{BIN_LIT}")'
         INT8LIT        = r'({INTLIT}'[iI]8")'
@@ -49,9 +48,9 @@ tokens = KeyW + ('DIGIT','HEXDIGIT', 'OCTDIGIT' , 'BINDIGIT', 'HEX_LIT', 'DEC_LI
         STRLIT         = r'("(\\"|\\[^"]|[^\\])*")'
         RSTRLIT        = r'(r{STRLIT}")'
         TRIPLESTRLIT   = r'(\"""(.|{EOL})*\""")'
-//        GSTRLIT        = "tkGStrLit"
-//        GTRIPLESTRLIT  = "tkGTripleStrLit"
-//        CHARLIT        = "tkCharLit"
+#        GSTRLIT        = "tkGStrLit"
+#        GTRIPLESTRLIT  = "tkGTripleStrLit"
+#        CHARLIT        = "tkCharLit"
 
 #Delimiters
         t_PARLE          = r'\('
@@ -76,11 +75,14 @@ tokens = KeyW + ('DIGIT','HEXDIGIT', 'OCTDIGIT' , 'BINDIGIT', 'HEX_LIT', 'DEC_LI
         t_OPR            = r'([+-*/\\<>!?\^.|=%&$@~:\x80-\xFF]")'
         t_COMMENT        = r'(#[^\r\n]*")'
         t_ACCENT         = r'`'
-//        INFIXOPR       = "tkInfixOpr"
-//        PREFIXOPR      = "tkPrefixOpr"
-//        POSTFIXOPR     = "tkPostfixOpr"
-    ]
-}
+#        INFIXOPR       = "tkInfixOpr"
+#        PREFIXOPR      = "tkPrefixOpr"
+#        POSTFIXOPR     = "tkPostfixOpr"
+
+def t_STRING(t):
+    r"(?P<start>\"|')[^\"']*(?P=start)"
+    t.value = t.value.replace("\"", "").replace("'", "")
+    return t
 
 input ::= (SYMBOL|ADDR|AND|AS|ASM|ATOMIC|BIND|BLOCK|BREAK|CASE|CAST|CONCEPT|CONST|CONTINUE|CONVERTER|DEFER|DISCARD|
 DISTINCT|DIV|DO|ELIF|ELSE|END|ENUM|EXCEPT|EXPORT|FINALLY|FOR|FROM|FUNC|GENERIC|IF|IMPORT|IN|INCLUDE|INTERFACE|IS|ISNOT|
