@@ -1,21 +1,313 @@
-#Nim-Compiler Lexer file
-# lexer.py
-#
-import ply.lex as lex        # After generating flex lexer delete this section somewhere after <YYINITIAL>
+#!/usr/bin/python
+from ply import lex
 
-KeyW = ( 'ADDR', 'AND', 'AS', 'ASM', 'ATOMIC', 'BIND', 'BLOCK', 'BREAK', 'CASE', 'CAST', 'CONCEPT', 'CONST', 'CONTINUE', 'CONVERTER', 'DEFER', 'DISCARD',
-	'DISTINCT', 'DIV', 'DO', 'ELIF', 'ELSE', 'END', 'ENUM', 'EXCEPT', 'EXPORT', 'FINALLY', 'FOR', 'FROM', 'FUNC', 'GENERIC', 'IF', 'IMPORT', 'IN', 'INCLUDE', 'INTERFACE', 'IS', 'ISNOT', 
-	'ITERATOR', 'LET', 'MACRO', 'METHOD', 'MIXIN', 'MOD', 'NIL', 'NOT', 'NOTIN', 'OBJECT', 'OF', 'OR', 'OUT', 'PROC', 'PTR', 'RAISE', 'REF', 'RETURN', 'SHL', 'SHR', 'STATIC', 'TEMPLATE',
-	'TRY', 'TUPLE', 'TYPE', 'USING', 'VAR', 'WHEN', 'WHILE', 'WITH', 'WITHOUT', 'XOR', 'YIELD')
-#Token Name list
-#Not written the ones with
-tokens = KeyW + ('DIGIT','HEXDIGIT', 'OCTDIGIT' , 'BINDIGIT', 'HEX_LIT', 'DEC_LIT', 'OCT_LIT', 'BIN_LIT', 'EXPONENT', 'SYM_CHARS', 'SYM_START_CHARS',
-	'INVALID', 'EOF', 'SYMBOL', 'INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT', 'UINT16LIT',
-	'UINT32LIT', 'UINT64LIT', 'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
-	'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',	
-	'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'ACCENT')  
+########################################
+############# RESERVED #################
+########################################
+reserved = {
+    'addr' : 'ADDR' ,
+    'and' : 'AND' ,
+    'array' : 'ARRAY',
+    'as' : 'AS' ,
+    'asm' : 'ASM' ,
+    'atomic' : 'ATOMIC' ,
+    'bind' : 'BIND' ,
+    'block' : 'BLOCK'
+    'bool' : 'BOOL' ,
+    'break' : 'BREAK' ,
+    'case' : 'CASE' ,
+    'cast' : 'CAST' ,
+    'concept' : 'CONCEPT' ,
+    'const' : 'CONST' ,
+    'continue' : 'CONTINUE' ,
+    'converter' : 'CONVERTER' ,
+    'cstring' : 'CSTRING' ,
+    'defer' : 'DEFER' ,
+    'discard' : 'DISCARD' ,
+    'distinct' : 'DISTINCT' ,
+    'div' : 'DIV' ,
+    'do' : 'DO' ,
+    'elif' : 'ELIF' ,
+    'else' : 'ELSE' ,
+    'end' : 'END' ,
+    'enum' : 'ENUM' ,
+    'except' : 'EXCEPT' ,
+    'export' : 'EXPORT' ,
+    'finally' : 'FINALLY' ,
+    'float' : 'FLOAT' ,
+    'float8' : 'FLOAT8' ,
+    'float16' : 'FLOAT16' ,
+    'float32' : 'FLOAT32' ,
+    'float64' : 'FLOAT64' ,
+    'for' : 'FOR' ,
+    'from' : 'FROM' ,
+    'func' : 'FUNC' ,
+    'generic' : 'GENERIC' ,
+    'if' : 'IF' ,
+    'import' : 'IMPORT' ,
+    'in' : 'IN' ,
+    'include' : 'INCLUDE' ,
+    'int' : 'INT' ,
+    'int8' : 'INT8' ,
+    'int16' : 'INT16' ,
+    'int32' : 'INT32' ,
+    'int64' : 'INT64' ,
+    'interface' : 'INTERFACE' ,
+    'is' : 'IS' ,
+    'isnot' : 'ISNOT' ,
+    'iterator' : 'ITERATOR' ,
+    'let' : 'LET' ,
+    'macro' : 'MACRO' ,
+    'method' : 'METHOD' ,
+    'mixin' : 'MIXIN' ,
+    'mod' : 'MOD' ,
+    'nil' : 'NIL' ,
+    'not' : 'NOT' ,
+    'notin' : 'NOTIN' ,
+    'object' : 'OBJECT' ,
+    'of' : 'OF' ,
+    'openArray' : 'OPENARRAY' ,
+    'or' : 'OR' ,
+    'out' : 'OUT' ,
+    'proc' : 'PROC' ,
+    'ptr' : 'PTR' ,
+    'raise' : 'RAISE' ,
+    'ref' : 'REF' ,
+    'return' : 'RETURN' ,
+    'set' : 'SET' ,
+    'seq' : 'SEQ' ,
+    'shl' : 'SHL' ,
+    'shr' : 'SHR' ,
+    'static' : 'STATIC' ,
+    'string' : 'STRING' ,
+    'template' : 'TEMPLATE' ,
+    'try' : 'TRY' ,
+    'tuple' : 'TUPLE' ,
+    'type' : 'TYPE' ,
+    'uint' : "UINT" ,
+    'uint8' : "UINT8" ,
+    'uint16' : "UINT16" ,
+    'uint32' : "UINT32" ,
+    'uint64' : "UINT64" ,
+    'using' : 'USING' ,
+    'var' : 'VAR' ,
+    'varargs' : 'VARARGS' ,
+    'when' : 'WHEN' ,
+    'while' : 'WHILE' ,
+    'with' : 'WITH' ,
+    'without' : 'WITHOUT' ,
+    'xor' : 'XOR' ,
+    'yield' : 'YIELD'
+}
 
+########################################
+############# TOKENS ###################
+########################################
+tokens = [
+        'DIGIT','HEXDIGIT', 'OCTDIGIT' , 'BINDIGIT', 'HEX_LIT', 'DEC_LIT', 'OCT_LIT', 'BIN_LIT', 'EXPONENT', 'SYM_CHARS', 'SYM_START_CHARS', 'INVALID', 'EOF', 'SYMBOL', 'INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT',
+    'UINT16LIT', 'UINT32LIT', 'UINT64LIT', 'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
+    'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',   
+    'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'ACCENT'
+        ] + list(reserved.values())
 
+########################################
+############# COMMENTS #################
+########################################
+def t_ignore_COMMENT(t):
+    r"//[^\n]+|"r"/\*[^(\*/)]+(\*/)"
+
+########################################
+############# LINE NUMBER ##############
+########################################
+def t_newline(t):
+    r'\n+'
+    global prev
+    t.lexer.lineno += prev
+    prev = len(t.value)
+    debug.setPrev(prev)
+    debug.setLineNumber(t.lexer.lineno)
+
+########################################
+############# WHITESPACE ###############
+########################################
+t_ignore_WHITESPACE = r"\s"
+
+########################################
+############# TYPES ####################
+########################################
+
+def t_OPR(t):
+    r"+|"r"-|"r"*|"r"/|"r"\\|"r"<|"r">|"r"!|"r"?|"r"\^|"r"\||"r"%|"r"&|"r"$|"r"@|"r"~"
+    return t
+    
+def t_STRING(t):
+    r"(?P<start>\"|')[^\"']*(?P=start)"
+    t.value = t.value.replace("\"", "").replace("'", "")
+    return t
+
+def t_NUMBER(t):
+    r"\d+"
+    t.value = int(t.value)
+    return t
+
+def t_BOOLEAN(t):
+    r"true|false"
+    return t
+
+########################################
+############# OPERATORS ################
+########################################
+def t_OP_HINT(t):
+    r"::"
+    return t
+
+def t_OP_DOT(t):
+    r"\."
+    return t
+
+def t_OP_EQUALS(t):
+    r"===|"r"=="
+    return t
+
+def t_OP_NOT_EQUALS(t):
+    r"!==|"r"!="
+    return t
+
+def t_OP_ASSIGNMENT(t):
+    r"=|"r"\+=|"r"-=|"r"\*=|"r"/=|"r"%="
+    return t
+
+def t_OP_NOT(t):
+    r"!"
+    return t
+
+def t_OP_COLON(t):
+    r":"
+    return t
+
+def t_OP_PLUS(t):
+    r"\+"
+    return t
+
+def t_OP_MINUS(t):
+    r"-"
+    return t
+
+def t_OP_MULTIPLICATION(t):
+    r"\*"
+    return t
+
+def t_OP_DIVISION(t):
+    r"/"
+    return t
+
+def t_OP_MODULUS(t):
+    r"%"
+    return t
+
+def t_OP_GREATER_THEN_E(t):
+    r">="
+    return t
+
+def t_OP_GREATER_THEN(t):
+    r">"
+    return t
+
+def t_OP_LESS_THEN_E(t):
+    r"<="
+    return t
+
+def t_OP_LESS_THEN(t):
+    r"<"
+    return t
+
+def t_OP_AND(t):
+    r"&&"
+    return t
+
+def t_OP_OR(t):
+    r"\|\|"
+    return t
+
+########################################
+############# IDENTIFIER ###############
+########################################
+def t_IDENTIFIER(t):
+    r"[a-zA-Z$_][\w$]*"
+    t.type = reserved.get(t.value,'IDENTIFIER')    # Check for reserved words
+    return t
+
+########################################
+############# SEPERATORS ###############
+########################################
+# RegEx for SEPERATORS
+def t_SEP_SEMICOLON(t):
+    r";"
+    return t
+
+def t_SEP_OPEN_BRACE(t):
+    r"\{"
+    return t
+
+def t_SEP_CLOSE_BRACE(t):
+    r"\}"
+    return t
+
+def t_SEP_OPEN_BRACKET(t):
+    r"\["
+    return t
+
+def t_SEP_CLOSE_BRACKET(t):
+    r"\]"
+    return t
+
+def t_SEP_OPEN_PARENTHESIS(t):
+    r"\("
+    return t
+
+def t_SEP_CLOSE_PARENTHESIS(t):
+    r"\)"
+    return t
+
+def t_SEP_COMMA(t):
+    r","
+    return t
+
+########################################
+############# ERROR ####################
+########################################
+def t_error(t):
+    print "Illegal character '%s'" % t.value[0]
+    t.lexer.skip(1)
+
+######################################################################################################
+# Create a lexer which uses the above defined rules, this can be used by the any parser which
+# includes this file
+
+######### Required Globals #############
+debug = debug.Debug()
+lexer = lex.lex()
+prev = 0
+########################################
+
+# A function to test the lexer
+def testLex(inputFile):
+    # Open the passed argument as an input file and then pass it to lex
+    program = open(inputFile).read()
+    lexer.input(program)
+
+    # This iterates over the function lex.token and converts the returned object into an iterator
+    print "\tTYPE \t\t\t\t\t\t VALUE"
+    print "\t---- \t\t\t\t\t\t -----"
+    for tok in iter(lexer.token, None):
+        print "%-25s \t\t\t\t %s" %(repr(tok.type), repr(tok.value))
+
+if __name__ == "__main__":
+    from sys import argv
+    filename, inputFile = argv
+    testLex(inputFile)
+
+                                      
         DIGIT           = r'([0-9])'
         HEXDIGIT        = r'({DIGIT}|[A-F]|[a-f])'
         OCTDIGIT        = r'([0-7])'
@@ -27,9 +319,10 @@ tokens = KeyW + ('DIGIT','HEXDIGIT', 'OCTDIGIT' , 'BINDIGIT', 'HEX_LIT', 'DEC_LI
         EXPONENT        = r'((e|E)[+-]{DIGIT}(_{DIGIT})*)'
         SYM_CHARS       = r'([a-zA-Z0-9\x80-\xFF_]+)'
         SYM_START_CHARS = r'([a-zA-Z\x80-\xFF]+)'
-        
-#        INVALID       = "tkInvalid"
-#        EOF           = "[EOF]"
+        //////////////////////////////////////////////////////////////////////////////
+
+//        INVALID       = "tkInvalid"
+//        EOF           = "[EOF]"
         SYMBOL         = r'({SYM_START_CHARS}{SYM_CHARS}")'
         INTLIT         = r'({HEX_LIT}|{DEC_LIT}|{OCT_LIT}|{BIN_LIT}")'
         INT8LIT        = r'({INTLIT}'[iI]8")'
@@ -48,41 +341,40 @@ tokens = KeyW + ('DIGIT','HEXDIGIT', 'OCTDIGIT' , 'BINDIGIT', 'HEX_LIT', 'DEC_LI
         STRLIT         = r'("(\\"|\\[^"]|[^\\])*")'
         RSTRLIT        = r'(r{STRLIT}")'
         TRIPLESTRLIT   = r'(\"""(.|{EOL})*\""")'
-#        GSTRLIT        = "tkGStrLit"
-#        GTRIPLESTRLIT  = "tkGTripleStrLit"
-#        CHARLIT        = "tkCharLit"
+//        GSTRLIT        = "tkGStrLit"
+//        GTRIPLESTRLIT  = "tkGTripleStrLit"
+//        CHARLIT        = "tkCharLit"
 
 #Delimiters
-        t_PARLE          = r'\('
-        t_PARRI          = r'\)'
-        t_BRACKETLE      = r'\['
-        t_BRACKETRI      = r'\]'
-        t_CURLYLE        = r'\{'
-        t_CURLYRI        = r'\}'
-        t_BRACKETDOTLE   = r'\[\.'
-        t_BRACKETDOTRI   = r'\.\['
-        t_CURLYDOTLE     = r'\{\.'
-        t_CURLYDOTRI     = r'\.\}'
-        t_PARDOTLE       = r'\(\.'
-        t_PARDOTRI       = r'\.\)'
-        t_COMMA          = r'\,'
-        t_SEMICOLON      = r';'
-        t_COLON          = r':'
-        t_COLONCOLON     = r'::'
-        t_EQUALS         = r'='
-        t_DOT            = r'\.'
-        t_DOTDOT         = r'\.\.'
-        t_OPR            = r'([+-*/\\<>!?\^.|=%&$@~:\x80-\xFF]")'
-        t_COMMENT        = r'(#[^\r\n]*")'
-        t_ACCENT         = r'`'
-#        INFIXOPR       = "tkInfixOpr"
-#        PREFIXOPR      = "tkPrefixOpr"
-#        POSTFIXOPR     = "tkPostfixOpr"
+        PARLE          = r'\('
+        PARRI          = r'\)'
+        BRACKETLE      = r'\['
+        BRACKETRI      = r'\]'
+        CURLYLE        = r'\{'
+        CURLYRI        = r'\}'
+        BRACKETDOTLE   = r'\[\.'
+        BRACKETDOTRI   = r'\.\['
+        CURLYDOTLE     = r'\{\.'
+        CURLYDOTRI     = r'\.\}'
+        PARDOTLE       = r'\(\.'
+        PARDOTRI       = r'\.\)'
+        COMMA          = r'\,'
+        SEMICOLON      = r';'
+        COLON          = r':'
+        COLONCOLON     = r'::'
+        EQUALS         = r'='
+        DOT            = r'\.'
+        DOTDOT         = r'\.\.'
 
-def t_STRING(t):
-    r"(?P<start>\"|')[^\"']*(?P=start)"
-    t.value = t.value.replace("\"", "").replace("'", "")
-    return t
+
+        OPR            = r'([+-*/\\<>!?\^.|=%&$@~:\x80-\xFF]")'
+        COMMENT        = r'(#[^\r\n]*")'
+        ACCENT         = "`"
+//        INFIXOPR       = "tkInfixOpr"
+//        PREFIXOPR      = "tkPrefixOpr"
+//        POSTFIXOPR     = "tkPostfixOpr"
+    ]
+}
 
 input ::= (SYMBOL|ADDR|AND|AS|ASM|ATOMIC|BIND|BLOCK|BREAK|CASE|CAST|CONCEPT|CONST|CONTINUE|CONVERTER|DEFER|DISCARD|
 DISTINCT|DIV|DO|ELIF|ELSE|END|ENUM|EXCEPT|EXPORT|FINALLY|FOR|FROM|FUNC|GENERIC|IF|IMPORT|IN|INCLUDE|INTERFACE|IS|ISNOT|
