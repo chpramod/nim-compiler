@@ -1,5 +1,6 @@
 #!/usr/bin/python
 from ply import lex
+#from helpers import debug as debug
 
 ########################################
 ############# RESERVED #################
@@ -12,7 +13,7 @@ reserved = {
     'asm' : 'ASM' ,
     'atomic' : 'ATOMIC' ,
     'bind' : 'BIND' ,
-    'block' : 'BLOCK'
+    'block' : 'BLOCK',
     'bool' : 'BOOL' ,
     'break' : 'BREAK' ,
     'case' : 'CASE' ,
@@ -108,8 +109,30 @@ tokens = [
          'INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT',
         'UINT16LIT', 'UINT32LIT', 'UINT64LIT', 'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
         'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',   
-        'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'ACCENT', 'IDENTIFIER', 'NUMBER'
+        'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'ACCENT', 'IDENTIFIER', 'NUMBER', 'NEWLINE', 'WS'
         ] + list(reserved.values())
+
+#Delimiters
+t_PARLE          = r'\('
+t_PARRI          = r'\)'
+t_BRACKETLE      = r'\['
+t_BRACKETRI      = r'\]'
+t_CURLYLE        = r'\{'
+t_CURLYRI        = r'\}'
+t_BRACKETDOTLE   = r'\[\.'
+t_BRACKETDOTRI   = r'\.\['
+t_CURLYDOTLE     = r'\{\.'
+t_CURLYDOTRI     = r'\.\}'
+t_PARDOTLE       = r'\(\.'
+t_PARDOTRI       = r'\.\)'
+t_COMMA          = r'\,'
+t_SEMICOLON      = r';'
+t_COLON          = r':'
+t_COLONCOLON     = r'::'
+t_EQUALS         = r'='
+t_DOT            = r'\.'
+t_DOTDOT         = r'\.\.'
+
 
 ########################################
 ############# COMMENTS #################
@@ -118,16 +141,27 @@ def t_COMMENT(t):
     r"[ ]*\043[^\n]*"  # \043 is '#'
     pass
 
+# Whitespace
+def t_WS(t):
+    r' [ ]+ '
+    #if t.lexer.at_line_start and t.lexer.paren_count == 0:
+    return t
+
 ########################################
 ############# LINE NUMBER ##############
 ########################################
-def t_newline(t):
+# def t_newline(t):
+#     r'\n+'
+#     global prev
+#     t.lexer.lineno += prev
+#     prev = len(t.value)
+#     debug.setPrev(prev)
+#     debug.setLineNumber(t.lexer.lineno)
+# Define a rule so we can track line numbers
+def t_NEWLINE(t):
     r'\n+'
-    global prev
-    t.lexer.lineno += prev
-    prev = len(t.value)
-    debug.setPrev(prev)
-    debug.setLineNumber(t.lexer.lineno)
+    t.lexer.lineno += len(t.value)
+    return t
 
 ########################################
 ############# WHITESPACE ###############
@@ -139,7 +173,7 @@ def t_newline(t):
 ########################################
 
 def t_OPR(t):
-    r"+|"r"-|"r"*|"r"/|"r"\\|"r"<|"r">|"r"!|"r"?|"r"\^|"r"\||"r"%|"r"&|"r"$|"r"@|"r"~"
+    r"\+|"r"-|"r"\*|"r"/|"r"\\|"r"\<|"r"\>|"r"\!|"r"\?|"r"\^|"r"\||"r"\%|"r"\&|"r"\$|"r"\@|"r"\~"
     return t
     
 # def t_STRING(t):
@@ -165,6 +199,7 @@ def t_IDENTIFIER(t):
     return t
 
 
+
 ########################################
 ############# ERROR ####################
 ########################################
@@ -177,27 +212,41 @@ def t_error(t):
 # includes this file
 
 ######### Required Globals #############
-debug = debug.Debug()
+#debug = debug.Debug()
 lexer = lex.lex()
 prev = 0
 ########################################
 
-# A function to test the lexer
-def testLex(inputFile):
-    # Open the passed argument as an input file and then pass it to lex
-    program = open(inputFile).read()
-    lexer.input(program)
+data = '''
+!3=4+10$~abcd
+ =20
+ '''
 
-    # This iterates over the function lex.token and converts the returned object into an iterator
-    print "\tTYPE \t\t\t\t\t\t VALUE"
-    print "\t---- \t\t\t\t\t\t -----"
-    for tok in iter(lexer.token, None):
-        print "%-25s \t\t\t\t %s" %(repr(tok.type), repr(tok.value))
+# Give the lexer some input
+lexer.input(data)
 
-if __name__ == "__main__":
-    from sys import argv
-    filename, inputFile = argv
-    testLex(inputFile)
+# Tokenize
+while True:
+    tok = lexer.token()
+    if not tok: 
+        break      # No more input
+    print(tok)
+# # A function to test the lexer
+# def testLex(inputFile):
+#     # Open the passed argument as an input file and then pass it to lex
+#     program = open(inputFile).read()
+#     lexer.input(program)
+
+#     # This iterates over the function lex.token and converts the returned object into an iterator
+#     print "\tTYPE \t\t\t\t\t\t VALUE"
+#     print "\t---- \t\t\t\t\t\t -----"
+#     for tok in iter(lexer.token, None):
+#         print "%-25s \t\t\t\t %s" %(repr(tok.type), repr(tok.value))
+
+# if __name__ == "__main__":
+#     from sys import argv
+#     filename, inputFile = argv
+#     testLex(inputFile)
 
                                       
         # DIGIT           = r'([0-9])'
@@ -236,62 +285,43 @@ if __name__ == "__main__":
 # //        GSTRLIT        = "tkGStrLit"
 # //        GTRIPLESTRLIT  = "tkGTripleStrLit"
 # //        CHARLIT        = "tkCharLit"
-        DIGIT           = r'([0-9])'
-        HEXDIGIT        = r'({DIGIT}|[A-F]|[a-f])'
-        OCTDIGIT        = r'([0-7])'
-        BINDIGIT        = r'([0-1])'
-        HEX_LIT         = r'(0(x|X){HEXDIGIT}(_{HEXDIGIT})*)'
-        DEC_LIT         = r'(-?{DIGIT}(_{DIGIT})*)'
-        OCT_LIT         = r'(0o{OCTDIGIT}(_{OCTDIGIT})*)'
-        BIN_LIT         = r'(0(b|B){BINDIGIT}(_{BINDIGIT})*)'
-        EXPONENT        = r'((e|E)[+-]{DIGIT}(_{DIGIT})*)'
-        SYM_CHARS       = r'([a-zA-Z0-9\x80-\xFF_]+)'
-        SYM_START_CHARS = r'([a-zA-Z\x80-\xFF]+)'
+#         DIGIT           = r'([0-9])'
+#         HEXDIGIT        = r'({DIGIT}|[A-F]|[a-f])'
+#         OCTDIGIT        = r'([0-7])'
+#         BINDIGIT        = r'([0-1])'
+#         HEX_LIT         = r'(0(x|X){HEXDIGIT}(_{HEXDIGIT})*)'
+#         DEC_LIT         = r'(-?{DIGIT}(_{DIGIT})*)'
+#         OCT_LIT         = r'(0o{OCTDIGIT}(_{OCTDIGIT})*)'
+#         BIN_LIT         = r'(0(b|B){BINDIGIT}(_{BINDIGIT})*)'
+#         EXPONENT        = r'((e|E)[+-]{DIGIT}(_{DIGIT})*)'
+#         SYM_CHARS       = r'([a-zA-Z0-9\x80-\xFF_]+)'
+#         SYM_START_CHARS = r'([a-zA-Z\x80-\xFF]+)'
         
-#        INVALID       = "tkInvalid"
-#        EOF           = "[EOF]"
-        SYMBOL         = r'({SYM_START_CHARS}{SYM_CHARS}")'
-        INTLIT         = r'({HEX_LIT}|{DEC_LIT}|{OCT_LIT}|{BIN_LIT}")'
-        INT8LIT        = r'({INTLIT}'[iI]8")'
-        INT16LIT       = r'({INTLIT}'[iI]16")'
-        INT32LIT       = r'({INTLIT}'[iI]32")'
-        INT64LIT       = r'({INTLIT}'[iI]64")'
-        UINTLIT        = r'({INTLIT}'[uU]")'
-        UINT8LIT       = r'({UINTLIT}'[uU]8")'
-        UINT16LIT      = r'({INTLIT}'[uU]16")'
-        UINT32LIT      = r'({INTLIT}'[uU]32")'
-        UINT64LIT      = r'({INTLIT}'[uU]64")'
-        FLOATLIT       = r'(-?{DIGIT}(_{DIGIT})*((.(_{DIGIT})*[EXPONENT])|{EXPONENT})")'
-        FLOAT32LIT     = r'(({HEX_LIT}|{FLOATLIT}|{DEC_LIT}|{OCT_LIT}|{BIN_LIT})'[fF]32")'
-        FLOAT64LIT     = r'(({HEX_LIT}|{FLOATLIT}|{DEC_LIT}|{OCT_LIT}|{BIN_LIT})'[fF]64")'
-        FLOAT128LIT    = r'(({HEX_LIT}|{FLOATLIT}|{DEC_LIT}|{OCT_LIT}|{BIN_LIT})'[fF]128")'
-        STRLIT         = r'("(\\"|\\[^"]|[^\\])*")'
-        RSTRLIT        = r'(r{STRLIT}")'
-        TRIPLESTRLIT   = r'(\"""(.|{EOL})*\""")'
+# #        INVALID       = "tkInvalid"
+# #        EOF           = "[EOF]"
+#         SYMBOL         = r'({SYM_START_CHARS}{SYM_CHARS}")'
+#         INTLIT         = r'({HEX_LIT}|{DEC_LIT}|{OCT_LIT}|{BIN_LIT}")'
+#         INT8LIT        = r'({INTLIT}'[iI]8")'
+#         INT16LIT       = r'({INTLIT}'[iI]16")'
+#         INT32LIT       = r'({INTLIT}'[iI]32")'
+#         INT64LIT       = r'({INTLIT}'[iI]64")'
+#         UINTLIT        = r'({INTLIT}'[uU]")'
+#         UINT8LIT       = r'({UINTLIT}'[uU]8")'
+#         UINT16LIT      = r'({INTLIT}'[uU]16")'
+#         UINT32LIT      = r'({INTLIT}'[uU]32")'
+#         UINT64LIT      = r'({INTLIT}'[uU]64")'
+#         FLOATLIT       = r'(-?{DIGIT}(_{DIGIT})*((.(_{DIGIT})*[EXPONENT])|{EXPONENT})")'
+#         FLOAT32LIT     = r'(({HEX_LIT}|{FLOATLIT}|{DEC_LIT}|{OCT_LIT}|{BIN_LIT})'[fF]32")'
+#         FLOAT64LIT     = r'(({HEX_LIT}|{FLOATLIT}|{DEC_LIT}|{OCT_LIT}|{BIN_LIT})'[fF]64")'
+#         FLOAT128LIT    = r'(({HEX_LIT}|{FLOATLIT}|{DEC_LIT}|{OCT_LIT}|{BIN_LIT})'[fF]128")'
+#         STRLIT         = r'("(\\"|\\[^"]|[^\\])*")'
+#         RSTRLIT        = r'(r{STRLIT}")'
+#         TRIPLESTRLIT   = r'(\"""(.|{EOL})*\""")'
 #        GSTRLIT        = "tkGStrLit"
 #        GTRIPLESTRLIT  = "tkGTripleStrLit"
 #        CHARLIT        = "tkCharLit"
 
-#Delimiters
-        t_PARLE          = r'\('
-        t_PARRI          = r'\)'
-        t_BRACKETLE      = r'\['
-        t_BRACKETRI      = r'\]'
-        t_CURLYLE        = r'\{'
-        t_CURLYRI        = r'\}'
-        t_BRACKETDOTLE   = r'\[\.'
-        t_BRACKETDOTRI   = r'\.\['
-        t_CURLYDOTLE     = r'\{\.'
-        t_CURLYDOTRI     = r'\.\}'
-        t_PARDOTLE       = r'\(\.'
-        t_PARDOTRI       = r'\.\)'
-        t_COMMA          = r'\,'
-        t_SEMICOLON      = r';'
-        t_COLON          = r':'
-        t_COLONCOLON     = r'::'
-        t_EQUALS         = r'='
-        t_DOT            = r'\.'
-        t_DOTDOT         = r'\.\.'
+
 
         #OPR            = r'([+-*/\\<>!?\^.|=%&$@~:\x80-\xFF]")'
 # #        COMMENT        = r'(#[^\r\n]*")'
@@ -301,9 +331,9 @@ if __name__ == "__main__":
 # //        POSTFIXOPR     = "tkPostfixOpr"
 #     ]
 
-        OPR            = r'([+-*/\\<>!?\^.|=%&$@~:\x80-\xFF]")'
-#        COMMENT        = r'(#[^\r\n]*")'
-        ACCENT         = "`"
+#         OPR            = r'([+-*/\\<>!?\^.|=%&$@~:\x80-\xFF]")'
+# #        COMMENT        = r'(#[^\r\n]*")'
+#         ACCENT         = "`"
 #        INFIXOPR       = "tkInfixOpr"
 #        PREFIXOPR      = "tkPrefixOpr"
 #        POSTFIXOPR     = "tkPostfixOpr"
