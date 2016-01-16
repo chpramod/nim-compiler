@@ -1,10 +1,15 @@
 #!/usr/bin/python
 from ply import lex
+import sys
 #from helpers import debug as debug
 
-########################################
-############# RESERVED #################
-########################################
+
+#TO DO:
+# 1. Indentation
+# 2. Decimals
+# 3. Strings
+
+#reserved keywords
 reserved = {
     'addr' : 'ADDR' ,
     'and' : 'AND' ,
@@ -101,9 +106,7 @@ reserved = {
     'yield' : 'YIELD'
 }
 
-########################################
-############# TOKENS ###################
-########################################
+#Clubbing with Tokens
 tokens = [
         'DIGIT','HEXDIGIT', 'OCTDIGIT' , 'BINDIGIT', 'HEX_LIT', 'DEC_LIT', 'OCT_LIT', 'BIN_LIT', 'EXPONENT', 'SYM_CHARS', 'SYM_START_CHARS', 'INVALID', 'EOF', 'SYMBOL',
          'INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT',
@@ -217,13 +220,18 @@ lexer = lex.lex()
 prev = 0
 ########################################
 
-data = '''
-!3=4+10$~abcd
- =20
- '''
+#Simple testing
+# data = '''
+# !3=4+10$~abcd
+#  =20
+#  '''
 
-# Give the lexer some input
-lexer.input(data)
+with open(sys.argv[1], 'r') as my_file:
+    # print(my_file.read())
+    lexer.input(my_file.read())
+
+# # Give the lexer some input
+# lexer.input(data)
 
 # Tokenize
 while True:
@@ -231,6 +239,9 @@ while True:
     if not tok: 
         break      # No more input
     print(tok)
+
+
+
 # # A function to test the lexer
 # def testLex(inputFile):
 #     # Open the passed argument as an input file and then pass it to lex
