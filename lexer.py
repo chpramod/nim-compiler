@@ -210,10 +210,9 @@ if __name__ == "__main__":
         EXPONENT        = r'((e|E)[+-]{DIGIT}(_{DIGIT})*)'
         SYM_CHARS       = r'([a-zA-Z0-9\x80-\xFF_]+)'
         SYM_START_CHARS = r'([a-zA-Z\x80-\xFF]+)'
-        //////////////////////////////////////////////////////////////////////////////
-
-//        INVALID       = "tkInvalid"
-//        EOF           = "[EOF]"
+        
+#        INVALID       = "tkInvalid"
+#        EOF           = "[EOF]"
         SYMBOL         = r'({SYM_START_CHARS}{SYM_CHARS}")'
         INTLIT         = r'({HEX_LIT}|{DEC_LIT}|{OCT_LIT}|{BIN_LIT}")'
         INT8LIT        = r'({INTLIT}'[iI]8")'
@@ -232,9 +231,9 @@ if __name__ == "__main__":
         STRLIT         = r'("(\\"|\\[^"]|[^\\])*")'
         RSTRLIT        = r'(r{STRLIT}")'
         TRIPLESTRLIT   = r'(\"""(.|{EOL})*\""")'
-//        GSTRLIT        = "tkGStrLit"
-//        GTRIPLESTRLIT  = "tkGTripleStrLit"
-//        CHARLIT        = "tkCharLit"
+#        GSTRLIT        = "tkGStrLit"
+#        GTRIPLESTRLIT  = "tkGTripleStrLit"
+#        CHARLIT        = "tkCharLit"
 
 #Delimiters
         PARLE          = r'\('
@@ -261,9 +260,9 @@ if __name__ == "__main__":
         OPR            = r'([+-*/\\<>!?\^.|=%&$@~:\x80-\xFF]")'
 #        COMMENT        = r'(#[^\r\n]*")'
         ACCENT         = "`"
-//        INFIXOPR       = "tkInfixOpr"
-//        PREFIXOPR      = "tkPrefixOpr"
-//        POSTFIXOPR     = "tkPostfixOpr"
+#        INFIXOPR       = "tkInfixOpr"
+#        PREFIXOPR      = "tkPrefixOpr"
+#        POSTFIXOPR     = "tkPostfixOpr"
     ]
 }
 
