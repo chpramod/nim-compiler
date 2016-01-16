@@ -200,7 +200,6 @@ if __name__ == "__main__":
     testLex(inputFile)
 
                                       
-<<<<<<< HEAD
         # DIGIT           = r'([0-9])'
         # HEXDIGIT        = r'({DIGIT}|[A-F]|[a-f])'
         # OCTDIGIT        = r'([0-7])'
@@ -237,7 +236,6 @@ if __name__ == "__main__":
 # //        GSTRLIT        = "tkGStrLit"
 # //        GTRIPLESTRLIT  = "tkGTripleStrLit"
 # //        CHARLIT        = "tkCharLit"
-=======
         DIGIT           = r'([0-9])'
         HEXDIGIT        = r'({DIGIT}|[A-F]|[a-f])'
         OCTDIGIT        = r'([0-7])'
@@ -273,7 +271,6 @@ if __name__ == "__main__":
 #        GSTRLIT        = "tkGStrLit"
 #        GTRIPLESTRLIT  = "tkGTripleStrLit"
 #        CHARLIT        = "tkCharLit"
->>>>>>> 401a303637c874491f0ab3d0b8b78114d10a61e8
 
 #Delimiters
         t_PARLE          = r'\('
@@ -296,8 +293,6 @@ if __name__ == "__main__":
         t_DOT            = r'\.'
         t_DOTDOT         = r'\.\.'
 
-
-<<<<<<< HEAD
         #OPR            = r'([+-*/\\<>!?\^.|=%&$@~:\x80-\xFF]")'
 # #        COMMENT        = r'(#[^\r\n]*")'
 #         ACCENT         = "`"
@@ -306,16 +301,12 @@ if __name__ == "__main__":
 # //        POSTFIXOPR     = "tkPostfixOpr"
 #     ]
 
-=======
         OPR            = r'([+-*/\\<>!?\^.|=%&$@~:\x80-\xFF]")'
 #        COMMENT        = r'(#[^\r\n]*")'
         ACCENT         = "`"
 #        INFIXOPR       = "tkInfixOpr"
 #        PREFIXOPR      = "tkPrefixOpr"
 #        POSTFIXOPR     = "tkPostfixOpr"
-    ]
-}
->>>>>>> 401a303637c874491f0ab3d0b8b78114d10a61e8
 
 # input ::= (SYMBOL|ADDR|AND|AS|ASM|ATOMIC|BIND|BLOCK|BREAK|CASE|CAST|CONCEPT|CONST|CONTINUE|CONVERTER|DEFER|DISCARD|
 # DISTINCT|DIV|DO|ELIF|ELSE|END|ENUM|EXCEPT|EXPORT|FINALLY|FOR|FROM|FUNC|GENERIC|IF|IMPORT|IN|INCLUDE|INTERFACE|IS|ISNOT|
