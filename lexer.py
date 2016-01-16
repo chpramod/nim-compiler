@@ -3,11 +3,12 @@ from ply import lex
 import sys
 #from helpers import debug as debug
 
-
+#run as python lexer.py grtngs.nim
 #TO DO:
 # 1. Indentation
 # 2. Decimals
 # 3. Strings
+# 4. For integers, currently integers like 5i16 are unaccounted for
 
 #reserved keywords
 reserved = {
@@ -112,7 +113,7 @@ tokens = [
          'INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT',
         'UINT16LIT', 'UINT32LIT', 'UINT64LIT', 'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
         'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',   
-        'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'ACCENT', 'IDENTIFIER', 'NUMBER', 'NEWLINE', 'WS'
+        'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'ACCENT', 'IDENTIFIER', 'NUMBER', 'STRING', 'NEWLINE', 'WS'
         ] + list(reserved.values())
 
 #Delimiters
@@ -187,6 +188,11 @@ def t_OPR(t):
 def t_NUMBER(t):
     r"\d+"
     t.value = int(t.value)
+    return t
+
+def t_STRLIT(t):
+    r'"([^\\"]+|\\"|\\\\)*"'  # I think this is right ...
+    #t.value=t.value[1:-1].decode("string-escape") # .swapcase() # for fun
     return t
 
 def t_BOOLEAN(t):
@@ -290,6 +296,7 @@ while True:
 #         FLOAT32LIT     = r'(({HEX_LIT}|{FLOATLIT}|{DEC_LIT}|{OCT_LIT}|{BIN_LIT})'[fF]32")'
 #         FLOAT64LIT     = r'(({HEX_LIT}|{FLOATLIT}|{DEC_LIT}|{OCT_LIT}|{BIN_LIT})'[fF]64")'
 #         FLOAT128LIT    = r'(({HEX_LIT}|{FLOATLIT}|{DEC_LIT}|{OCT_LIT}|{BIN_LIT})'[fF]128")'
+#STRLIT implemented above
 #         STRLIT         = r'("(\\"|\\[^"]|[^\\])*")'
 #         RSTRLIT        = r'(r{STRLIT}")'
 #         TRIPLESTRLIT   = r'(\"""(.|{EOL})*\""")'
