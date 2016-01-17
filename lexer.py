@@ -34,6 +34,7 @@ reserved = {
     'distinct' : 'DISTINCT' ,
     'div' : 'DIV' ,
     'do' : 'DO' ,
+    'echo' : 'ECHO'
     'elif' : 'ELIF' ,
     'else' : 'ELSE' ,
     'end' : 'END' ,
