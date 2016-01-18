@@ -10,6 +10,8 @@ import sys
 # 3. Strings
 # 4. For integers, currently integers like 5i16 are unaccounted for
 
+
+
 #reserved keywords
 reserved = {
     'addr' : 'ADDR' ,
@@ -140,23 +142,11 @@ t_DOTDOT         = r'\.\.'
 t_ACCENT         = r'`'
 
 
+
 #for passing on comments
 def t_COMMENT(t):
     r"[ ]*\043[^\n]*"  # \043 is '#'
     pass
-
-# Whitespace
-def t_WS(t):
-    r"^\s+"
-    #if t.lexer.at_line_start and t.lexer.paren_count == 0:
-    return t
-
-# Whitespace
-# def t_WSI(t):
-#     r' [ ]+ '
-#     #if t.lexer.at_line_start and t.lexer.paren_count == 0:
-# #    return t
-#     pass    
 
 ########################################
 ############# LINE NUMBER ##############
@@ -172,7 +162,23 @@ def t_WS(t):
 def t_NEWLINE(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
+    #strt = True
     return t
+
+
+# Whitespace
+# def t_WS(t):
+#     r'^ [\s]+'
+#     return t
+
+# Whitespace
+def t_WSI(t):
+    r' [ ]+ '
+    #if t.lexer.at_line_start and t.lexer.paren_count == 0:
+#    return t
+    pass    
+
+
 
 ########################################
 ############# WHITESPACE ###############
