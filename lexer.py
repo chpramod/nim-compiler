@@ -34,7 +34,7 @@ reserved = {
     'distinct' : 'DISTINCT' ,
     'div' : 'DIV' ,
     'do' : 'DO' ,
-    'echo' : 'ECHO'
+    'echo' : 'ECHO',
     'elif' : 'ELIF' ,
     'else' : 'ELSE' ,
     'end' : 'END' ,
@@ -114,7 +114,7 @@ tokens = [
          'INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT',
         'UINT16LIT', 'UINT32LIT', 'UINT64LIT', 'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
         'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',   
-        'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'ACCENT', 'IDENTIFIER', 'NUMBER', 'NEWLINE', 'WS'
+        'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'ACCENT', 'IDENTIFIER', 'NUMBER', 'NEWLINE', 'WS', 'WSI'
         ] + list(reserved.values())
 
 #Delimiters
@@ -137,20 +137,26 @@ t_COLONCOLON     = r'::'
 t_EQUALS         = r'='
 t_DOT            = r'\.'
 t_DOTDOT         = r'\.\.'
+t_ACCENT         = r'`'
 
 
-########################################
-############# COMMENTS #################
-########################################
+#for passing on comments
 def t_COMMENT(t):
     r"[ ]*\043[^\n]*"  # \043 is '#'
     pass
 
 # Whitespace
 def t_WS(t):
-    r' [ ]+ '
+    r"^\s+"
     #if t.lexer.at_line_start and t.lexer.paren_count == 0:
     return t
+
+# Whitespace
+# def t_WSI(t):
+#     r' [ ]+ '
+#     #if t.lexer.at_line_start and t.lexer.paren_count == 0:
+# #    return t
+#     pass    
 
 ########################################
 ############# LINE NUMBER ##############
