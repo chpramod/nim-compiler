@@ -201,9 +201,47 @@ def t_OPR(t):
 #     t.value = t.value.replace("\"", "").replace("'", "")
 #     return t
 
+
+def t_FLOAT32LIT (t) : 
+    r'(((\d*)\.(\d+)) | ((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+) ) (\'[fF]32)'
+    return t
+
+def t_FLOAT64LIT (t) : 
+    r'(((\d*)\.(\d+)) | ((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+) ) (\'[fF]64)'
+    return t
+
+def t_FLOAT128LIT (t) : 
+    r'(((\d*)\.(\d+)) | ((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+) ) (\'[fF]128)'
+    return t
+
+def t_FLOATLIT (t) : 
+    r'((\d*)\.(\d+))'
+    return t
+
+
+
+
+def t_INT64LIT(t):
+    r'((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+)\'([iI]64)'
+    return t
+
+def t_INT32LIT(t):
+    r'((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+)\'([iI]32)'
+    return t
+
+def t_INT16LIT(t):
+    r'((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+)\'([iI]16)'
+    return t
+
+
+def t_INT8LIT(t):
+    r'((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+)\'([iI]8)'
+    return t
+
 def t_INTLIT(t):
 	r'((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+)'
 	return t
+
 
 # def t_HEX_LIT(t):
 # 	r"(0(x|X)[0-9A-Fa-f]+)"
