@@ -116,7 +116,7 @@ tokens = [
          'INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT',
         'UINT16LIT', 'UINT32LIT', 'UINT64LIT', 'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
         'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',   
-        'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'ACCENT', 'IDENTIFIER', 'NUMBER', 'BOOLEAN', 'NEWLINE', 'WS', 'WSI'
+        'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'MULTICOMMENT', 'ACCENT', 'IDENTIFIER', 'NUMBER', 'BOOLEAN', 'NEWLINE', 'WS', 'WSI'
         ] + list(reserved.values())
 
 #Delimiters
@@ -144,10 +144,13 @@ t_ACCENT         = r'`'
 
 
 #for passing on comments
-def t_COMMENT(t):
-    r"[ ]*\043[^\n]*"  # \043 is '#'
-    pass
 
+def t_MULTICOMMENT(t):
+    r"[\s ]*\#\[[^\]]*[^\#]*\]\#\n"
+    pass
+def t_COMMENT(t):
+    r"[\s ]*\#[^\n]*\n"  # \043 is '#'
+    pass
 ########################################
 ############# LINE NUMBER ##############
 ########################################
@@ -201,10 +204,18 @@ def t_NUMBER(t):
     t.value = int(t.value)
     return t
 
-def t_STRLIT(t):
-    r'"([^\\"]+|\\"|\\\\)*"'  # I think this is right ...
-    #t.value=t.value[1:-1].decode("string-escape") # .swapcase() # for fun
+def t_TRIPLESTRLIT(t):
+    r'(\"\"\"[^(\"\"\")]*\"\"\")'
     return t
+
+def t_STRLIT(t):
+    r'(\"[^(\")]*\")'
+    return t
+
+# def t_STRLIT(t):
+#     r'"([^\"]+|\\"|\\\\)*"'  # I think this is right ...
+#     #t.value=t.value[1:-1] # .swapcase() # for fun
+#     return t
 
 def t_BOOLEAN(t):
     r"true|false"
@@ -256,7 +267,6 @@ while True:
     if not tok: 
         break      # No more input
     print(tok)
-
 
 
 # # A function to test the lexer

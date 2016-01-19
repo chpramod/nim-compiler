@@ -1,6 +1,9 @@
+#[ Multiline comment in already
+   commented out code. ]#
+
 echo "words words words ⚑"
 echo """
-<html>
+<html\>
   <head>
   </head>\n\n
 
