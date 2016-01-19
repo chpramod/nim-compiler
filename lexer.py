@@ -167,17 +167,15 @@ def t_NEWLINE(t):
 
 
 # Whitespace
-# def t_WS(t):
-#     r'^ [\s]+'
-#     return t
+def t_WSI(t):
+    r' (?<=\n)[\s ]+ '
+    #if t.lexer.at_line_start and t.lexer.paren_count == 0:
+    return t
 
 # Whitespace
-def t_WSI(t):
-    r' [ ]+ '
-    #if t.lexer.at_line_start and t.lexer.paren_count == 0:
-#    return t
-    pass    
-
+def t_WS(t):
+    r' [\s ]+ '
+    return t
 
 
 ########################################
