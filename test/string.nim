@@ -8,7 +8,7 @@ echo """
   </body>
 </html> """
 
-proc re(s: string): string = s
+proc re(s: system.string): system.string = s
 
 echo r".""."
 echo re"\b[a-z]++\b"
