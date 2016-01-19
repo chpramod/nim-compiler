@@ -345,8 +345,8 @@ while True:
     tok_data.setdefault(tok.type, list())
     tok_data[tok.type].append(str(tok.value));
 
-    print(tok)
+    #print(tok)
 
 print('\n\nTokens\tOccurances\tLexemes\n')
 for key,value in tok_data.iteritems():
-	print key+"\t\t"+str(len(value))+"\t{"+', '.join(value)+"}"
+	print key+"      "+str(len(value))+"\n\t\t\t    "+'\n\t\t\t    '.join(value)
