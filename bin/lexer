@@ -1,7 +1,18 @@
 #!/usr/bin/python
-import lex
+from ply import lex
 import sys
+#from helpers import debug as debug
 
+#run as python lexer.py grtngs.nim
+#TO DO:
+# 1. Indentation
+# 2. Decimals
+# 3. Strings
+# 4. For integers, currently integers like 5i16 are unaccounted for
+
+
+
+#reserved keywords
 reserved = {
     'addr' : 'ADDR' ,
     'and' : 'AND' ,
@@ -15,7 +26,6 @@ reserved = {
     'break' : 'BREAK' ,
     'case' : 'CASE' ,
     'cast' : 'CAST' ,
-    'char' : 'CHAR' ,
     'concept' : 'CONCEPT' ,
     'const' : 'CONST' ,
     'continue' : 'CONTINUE' ,
@@ -100,13 +110,16 @@ reserved = {
     'yield' : 'YIELD'
 }
 
+#Clubbing with Tokens
 tokens = [
-        'EXPONENT','INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT', 'UINT16LIT', 'UINT32LIT', 'UINT64LIT',
-         'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'CHARLIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
+        'DIGIT','HEXDIGIT', 'OCTDIGIT' , 'BINDIGIT', 'HEX_LIT', 'DEC_LIT', 'OCT_LIT', 'BIN_LIT', 'EXPONENT', 'SYM_CHARS', 'SYM_START_CHARS', 'INVALID', 'EOF', 'SYMBOL',
+         'INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT',
+        'UINT16LIT', 'UINT32LIT', 'UINT64LIT', 'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
         'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',   
         'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'MULTICOMMENT', 'ACCENT', 'IDENTIFIER', 'NUMBER', 'BOOLEAN', 'NEWLINE', 'WS', 'WSI'
         ] + list(reserved.values())
 
+#Delimiters
 t_PARLE          = r'\('
 t_PARRI          = r'\)'
 t_BRACKETLE      = r'\['
@@ -128,6 +141,10 @@ t_DOT            = r'\.'
 t_DOTDOT         = r'\.\.'
 t_ACCENT         = r'`'
 
+
+
+#for passing on comments
+
 def t_MULTICOMMENT(t):
     r"[\s ]*\#\[[^\]]*[^\#]*\]\#\n"
     pass
@@ -136,26 +153,54 @@ def t_COMMENT(t):
     r"[\s ]*\#[^\n]*\n"  # \043 is '#'
     pass
 
+########################################
+############# LINE NUMBER ##############
+########################################
+# def t_newline(t):
+#     r'\n+'
+#     global prev
+#     t.lexer.lineno += prev
+#     prev = len(t.value)
+#     debug.setPrev(prev)
+#     debug.setLineNumber(t.lexer.lineno)
+# Define a rule so we can track line numbers
 def t_NEWLINE(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
+    #strt = True
     return t
 
+
+# Whitespace
 def t_WSI(t):
     r' ((?<=\n)[\s ]+)|(^[\t]+) '
+    #if t.lexer.at_line_start and t.lexer.paren_count == 0:
     return t
 
+# Whitespace
 def t_WS(t):
     r' [\s ]+ '
     pass
 
+
+########################################
+############# WHITESPACE ###############
+########################################
+#t_ignore_WHITESPACE = r"\s"
+
+########################################
+############# TYPES ####################
+########################################
+
 def t_OPR(t):
     r"\+|"r"-|"r"\*|"r"/|"r"\\|"r"\<|"r"\>|"r"\!|"r"\?|"r"\^|"r"\||"r"\%|"r"\&|"r"\$|"r"\@|"r"\~"
     return t
+    
+# def t_STRING(t):
+#     r"(?P<start>\"|')[^\"']*(?P=start)"
+#     t.value = t.value.replace("\"", "").replace("'", "")
+#     return t
 
-def t_CHARLIT(t):
-    r"\'((.)|(\\r)|(\\c)|(\\f)|(\\v)|(\\t)|(\\\\)|(\\\")|(\\')|(\\a)|(\\b)|(\\e)|(0(x|X)[0-9A-Fa-f][0-9A-Fa-f])|(\d+))\'"
-    return t;
 
 def t_FLOAT32LIT (t) : 
     r'(((\d*)\.(\d+)) | ((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+) ) (\'[fF]32)'
@@ -173,6 +218,9 @@ def t_FLOATLIT (t) :
     r'((\d*)\.(\d+))'
     return t
 
+
+
+
 def t_INT64LIT(t):
     r'((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+)\'([iI]64)'
     return t
@@ -185,6 +233,7 @@ def t_INT16LIT(t):
     r'((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+)\'([iI]16)'
     return t
 
+
 def t_INT8LIT(t):
     r'((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+)\'([iI]8)'
     return t
@@ -192,6 +241,7 @@ def t_INT8LIT(t):
 def t_INTLIT(t):
 	r'((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+)'
 	return t
+
 
 # def t_HEX_LIT(t):
 # 	r"(0(x|X)[0-9A-Fa-f]+)"
@@ -216,12 +266,15 @@ def t_TRIPLESTRLIT(t):
     return t
 
 def t_RSTRLIT(t):
-    r'r(\"[^(\")]*\")' 
+    r'r(\"[^(\")]*\")'  # I think this is right ...
+    #r''
+    #t.value=t.value[1:-1].decode("string-escape") # .swapcase() # for fun
     return t
 
 def t_STRLIT(t):
-    r'"([^\n\\"]+|\\"|\\\\)*"'
-
+    r'"([^\n\\"]+|\\"|\\\\)*"'  # I think this is right ...
+    #r''
+    #t.value=t.value[1:-1].decode("string-escape") # .swapcase() # for fun
     return t
 
 def t_EXPONENT(t):
@@ -232,11 +285,44 @@ def t_BOOLEAN(t):
     r"true|false"
     return t
 
+########################################
+############# IDENTIFIER ###############
+########################################
 def t_IDENTIFIER(t):
     r"[a-zA-Z$_][\w$]*"
     t.type = reserved.get(t.value,'IDENTIFIER')    # Check for reserved words
     return t
 
+
+# def t_SYM_CHARS(t):
+# 	r'([a-zA-Z0-9\x80-\xFF_]+)'
+# 	return t
+
+# def t_SYM_START_CHARS(t):
+# 	r'([a-zA-Z\x80-\xFF]+)'
+# 	return t
+
+#SYMBOL         = r'({SYM_START_CHARS}{SYM_CHARS}")'
+ 
+#INTLIT         = r'((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+)'
+#INT8LIT        = r'({INTLIT}'[iI]8")'
+#INT16LIT       = r'({INTLIT}'[iI]16")'
+#INT32LIT       = r'({INTLIT}'[iI]32")'
+#INT64LIT       = r'({INTLIT}'[iI]64")'
+#UINTLIT        = r'({INTLIT}'[uU]")'
+#UINT8LIT       = r'({UINTLIT}'[uU]8")'
+#UINT16LIT      = r'({INTLIT}'[uU]16")'
+#UINT32LIT      = r'({INTLIT}'[uU]32")'
+#UINT64LIT      = r'({INTLIT}'[uU]64")'
+#FLOATLIT       = r'(-?{DIGIT}(_{DIGIT})*((.(_{DIGIT})*[EXPONENT])|{EXPONENT})")'
+#FLOAT32LIT     = r'(({HEX_LIT}|{FLOATLIT}|{DEC_LIT}|{OCT_LIT}|{BIN_LIT})'[fF]32")'
+#FLOAT64LIT     = r'(({HEX_LIT}|{FLOATLIT}|{DEC_LIT}|{OCT_LIT}|{BIN_LIT})'[fF]64")'
+#FLOAT128LIT    = r'(({HEX_LIT}|{FLOATLIT}|{DEC_LIT}|{OCT_LIT}|{BIN_LIT})'[fF]128")'
+
+
+########################################
+############# ERROR ####################
+########################################
 def t_error(t):
     print "Illegal character '%s'" % t.value[0]
     tok_data.setdefault('ILLEGAL_CHARACTERS', list())
