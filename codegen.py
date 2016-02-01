@@ -4,7 +4,7 @@
 import sys
 import pprint
 
-jumpLabels=["goto","ifgoto","call","label"]
+jumpLabels=["goto","ifgoto","call","label","ret"]
 
 def processTAC(TAC):
 
