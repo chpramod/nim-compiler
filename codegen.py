@@ -2,28 +2,30 @@
 
 #this program will convert 3-addr code to x86 assembly code
 import sys
+import pprint
+
+jumpLabels=["goto","ifgoto","call","label"]
+
+def processTAC(TAC):
 
 
 def generateAssCode(code):
-	jumpLabels=["goto","ifgoto","goto","call","label","ret"]
-	label=[]
+	leaders=[]
+	TAC = []
 	with code as f:
 		for line in f:
 			line=line.rstrip('\n')
 			splitLine=line.split(', ')
-			print splitLine[0]
+			print splitLine[1]
 			if splitLine[0]=='1':
-				label.append(splitLine[0])
+				leaders.append(splitLine[0])
 			elif splitLine[1] in jumpLabels:
-				label.append(splitLine[0])
-	#leaders=getLeaders(code)
+				leaders.append(splitLine[0])
+			TAC.append(splitLine)
+	pprint.pprint(TAC)
+	processTAC(TAC)
 
-
-#def getleaders(code):
-
-
-
-if __name__=="__main__": 
+if __name__=="__main__":
 	filename = sys.argv[1]
 	sourcefile = open(filename)
 	#print code
