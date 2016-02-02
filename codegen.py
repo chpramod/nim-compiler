@@ -3,13 +3,18 @@
 #this program will convert 3-addr code to x86 assembly code
 import sys
 import pprint
-import symbolTable
+from symbolTable import *
+from threeAC import *
 
 jumpLabels=["goto","ifgoto","call","label","ret"]
 reservedLabels = jumpLabels
 reservedLabels.append("print")
 
+register_list = ["$r1","$r2","$r3","$r4","$r5","$r6","$r7","$r8"]
+variables = []
+
 def generateAssCode(code):
+	global register_list,variables
 	leaders=[]
 	TAC = []
 	SymbolTable = dict()
@@ -56,15 +61,19 @@ def generateAssCode(code):
 	p+=1
 	p=len(leaders)-p
 	del leaders[-p:]
-	pprint.pprint(leaders)
+	# pprint.pprint(leaders)
 	# for k in range(1,len(leaders)-p):
 	# 	print leaders[len(leaders)-k]
 	# 	leaders.remove(leaders[len(leaders)-k])
-	pprint.pprint(TAC)
+	# pprint.pprint(TAC)
 	basicBlocks,variables = BasicBlocks(TAC, leaders)
-	pprint.pprint(basicBlocks)
-	pprint.pprint(variables)
+	regmem = regmemDescriptor(register_list,variables)
+	# pprint.pprint(basicBlocks)
 	GenerateSymbolTable(basicBlocks,SymbolTable,variables)
+	# for i in SymbolTable:
+	# 	for j in SymbolTable[i]:
+	# 		SymbolTable[i][j].printTable()
+	pprint.pprint(variables)
 
 def BasicBlocks(TAC,leaders):
 	#break code into basic blocks
@@ -94,9 +103,15 @@ def GenerateSymbolTable(basicBlocks,SymbolTable,variables):
 		SymbolTable[leader] = dict()
 		nextTable = None
 		for TACline in reversed(block):
-			if(TACline[1] not in reservedLabels):
-				SymbolTable[leader][TACline[0]] = symbolTable.symbolTable(variables,TACline,nextTable)
-				nextTable = SymbolTable[leader][TACline[0]]
+			SymbolTable[leader][TACline[0]] = symbolTable(variables,TACline,nextTable)
+			nextTable = SymbolTable[leader][TACline[0]]
+
+def GetReg(variable,SymbolTable,regmem):
+	if(regmem.getLoc(variable)!=None):
+		return regmem.getLoc(variable)
+	elif regmem.emptyReg()!=None:
+		return regmem.emptyReg()
+	elif 
 
 if __name__=="__main__":
 	filename = sys.argv[1]

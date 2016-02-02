@@ -1,4 +1,5 @@
 import pprint
+
 class symbolTable():
     def __init__(self,variables,TACline,nextTable):
         self.lineno = TACline[0]
@@ -7,7 +8,7 @@ class symbolTable():
             for variable in variables:
                 self.table[variable]=dict()
             for variable in variables: # Since source variables are used not destination variables
-                if variable in range(3,len(TACline)):
+                if variable in [TACline[index] for index in range(3,len(TACline))]:
                     self.table[variable]['curruse'] = 1 # Use of variable in current line of code
                 else:
                     self.table[variable]['curruse'] = 0
@@ -21,10 +22,13 @@ class symbolTable():
             for variable in variables:
                 self.table[variable]=dict()
             for variable in variables: # Since source variables are used not destination variables
-                if variable in range(3,len(TACline)):
+                if variable in [TACline[index] for index in range(3,len(TACline))]:
                     self.table[variable]['curruse'] = 1 # Use of variable in current line of code
                 else:
                     self.table[variable]['curruse'] = 0
                 self.table[variable]['nextuse'] = -1
-        print(self.lineno)
+        # print(self.lineno)
+        # pprint.pprint(self.table)
+    def printTable(self):
+        print self.lineno
         pprint.pprint(self.table)
