@@ -64,15 +64,15 @@ def processTAC(TAC,leaders):
 	basicBlocks=[]
 	for i in range(0,len(leaders)):
 		tempBlock=[]
-		tempBlock.append(leaders[i]-1)
+		tempBlock.append(TAC[leaders[i]-1])
 		# while (i<(len(leaders)-1) and leaders[i+1]==leaders[i]):
 		# 	i+=1
 		if(i!=(len(leaders)-1)):
 			for j in range(leaders[i]+1,leaders[i+1]):
-				tempBlock.append(j-1)
+				tempBlock.append(TAC[j-1])
 		elif(i==(len(leaders)-1)):
 			for j in range(leaders[i]+1,len(TAC)+1):
-				tempBlock.append(j-1)
+				tempBlock.append(TAC[j-1])
 		basicBlocks.append(tempBlock)
 	pprint.pprint(basicBlocks)
 		
