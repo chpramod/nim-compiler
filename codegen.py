@@ -3,12 +3,16 @@
 #this program will convert 3-addr code to x86 assembly code
 import sys
 import pprint
+import symbolTable
 
 jumpLabels=["goto","ifgoto","call","label","ret"]
+reservedLabels = jumpLabels
+reservedLabels.append("print")
 
 def generateAssCode(code):
 	leaders=[]
 	TAC = []
+	SymbolTable = dict()
 	totalLines=0
 	with code as f:
 		for line in f:
@@ -38,12 +42,12 @@ def generateAssCode(code):
 					# 		if splitLineIter[1]=='label' and splitLineIter[2]==splitLine[2]:
 					# 			leaders.append(int(splitLineIter[0]))
 					leaders.append(int(splitLine[0])+1)
-	#following lines improve leaders array				
-	leaders.sort()		
-	leaders.remove(totalLines+1)         #removes an entry which is added after reading last line 
+	#following lines improve leaders array
+	leaders.sort()
+	leaders.remove(totalLines+1)         #removes an entry which is added after reading last line
 	if len(leaders) == 0:                #following lines remove duplicates
 			return 0
-            
+
 	p = 0
 	for i in range(0,len(leaders)):
 		if leaders[i] != leaders[p]:
@@ -55,13 +59,17 @@ def generateAssCode(code):
 	pprint.pprint(leaders)
 	# for k in range(1,len(leaders)-p):
 	# 	print leaders[len(leaders)-k]
-	# 	leaders.remove(leaders[len(leaders)-k])                               
+	# 	leaders.remove(leaders[len(leaders)-k])
 	pprint.pprint(TAC)
-	processTAC(TAC, leaders)
+	basicBlocks,variables = BasicBlocks(TAC, leaders)
+	pprint.pprint(basicBlocks)
+	pprint.pprint(variables)
+	GenerateSymbolTable(basicBlocks,SymbolTable,variables)
 
-def processTAC(TAC,leaders):
-	#break code into basic blocks	
-	basicBlocks=[]
+def BasicBlocks(TAC,leaders):
+	#break code into basic blocks
+	basicBlocks= []
+	variables = []
 	for i in range(0,len(leaders)):
 		tempBlock=[]
 		tempBlock.append(TAC[leaders[i]-1])
@@ -74,9 +82,21 @@ def processTAC(TAC,leaders):
 			for j in range(leaders[i]+1,len(TAC)+1):
 				tempBlock.append(TAC[j-1])
 		basicBlocks.append(tempBlock)
-	pprint.pprint(basicBlocks)
-		
+		for line in tempBlock:
+			for point in line:
+				if(point[0]=='$' and point not in variables):
+					variables.append(point)
+	return basicBlocks,variables
 
+def GenerateSymbolTable(basicBlocks,SymbolTable,variables):
+	for block in basicBlocks:
+		leader = block[0][0]
+		SymbolTable[leader] = dict()
+		nextTable = None
+		for TACline in reversed(block):
+			if(TACline[1] not in reservedLabels):
+				SymbolTable[leader][TACline[0]] = symbolTable.symbolTable(variables,TACline,nextTable)
+				nextTable = SymbolTable[leader][TACline[0]]
 
 if __name__=="__main__":
 	filename = sys.argv[1]
