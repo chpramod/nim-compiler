@@ -38,10 +38,25 @@ def generateAssCode(code):
 					# 		if splitLineIter[1]=='label' and splitLineIter[2]==splitLine[2]:
 					# 			leaders.append(int(splitLineIter[0]))
 					leaders.append(int(splitLine[0])+1)
+	#following lines improve leaders array				
 	leaders.sort()		
-	leaders.remove(totalLines+1)         #removes an entry which is added after reading last line                                
-	pprint.pprint(TAC)
+	leaders.remove(totalLines+1)         #removes an entry which is added after reading last line 
+	if len(leaders) == 0:                #following lines remove duplicates
+			return 0
+            
+	p = 0
+	for i in range(0,len(leaders)):
+		if leaders[i] != leaders[p]:
+			leaders[i], leaders[p+1] = leaders[p+1], leaders[i]
+			p += 1
+	p+=1
+	p=len(leaders)-p
+	del leaders[-p:]
 	pprint.pprint(leaders)
+	# for k in range(1,len(leaders)-p):
+	# 	print leaders[len(leaders)-k]
+	# 	leaders.remove(leaders[len(leaders)-k])                               
+	pprint.pprint(TAC)
 	processTAC(TAC, leaders)
 
 def processTAC(TAC,leaders):
@@ -50,13 +65,17 @@ def processTAC(TAC,leaders):
 	for i in range(0,len(leaders)):
 		tempBlock=[]
 		tempBlock.append(leaders[i]-1)
-		while (i<(len(leaders)-1) and leaders[i+1]==leaders[i]):
-			i+=1
+		# while (i<(len(leaders)-1) and leaders[i+1]==leaders[i]):
+		# 	i+=1
 		if(i!=(len(leaders)-1)):
-			for j in range(i+1,leaders[i+1]):
+			for j in range(leaders[i]+1,leaders[i+1]):
+				tempBlock.append(j-1)
+		elif(i==(len(leaders)-1)):
+			for j in range(leaders[i]+1,len(TAC)+1):
 				tempBlock.append(j-1)
 		basicBlocks.append(tempBlock)
 	pprint.pprint(basicBlocks)
+		
 
 
 if __name__=="__main__":
