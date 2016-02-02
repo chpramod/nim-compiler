@@ -10,7 +10,7 @@ jumpLabels=["goto","ifgoto","call","label","ret"]
 reservedLabels = jumpLabels
 reservedLabels.append("print")
 
-register_list = ["$r1","$r2","$r3","$r4","$r5","$r6","$r7","$r8"]
+register_list = ["$eax","$ebx","$ecx","$edx","$esi","$edi"]
 variables = []
 
 def generateAssCode(code):
@@ -70,10 +70,11 @@ def generateAssCode(code):
 	regmem = regmemDescriptor(register_list,variables)
 	# pprint.pprint(basicBlocks)
 	GenerateSymbolTable(basicBlocks,SymbolTable,variables)
+	pprint.pprint(SymbolTable)
 	# for i in SymbolTable:
 	# 	for j in SymbolTable[i]:
 	# 		SymbolTable[i][j].printTable()
-	pprint.pprint(variables)
+	# pprint.pprint(variables)
 
 def BasicBlocks(TAC,leaders):
 	#break code into basic blocks
@@ -111,7 +112,7 @@ def GetReg(variable,SymbolTable,regmem):
 		return regmem.getLoc(variable)
 	elif regmem.emptyReg()!=None:
 		return regmem.emptyReg()
-	elif 
+	# elif
 
 if __name__=="__main__":
 	filename = sys.argv[1]
