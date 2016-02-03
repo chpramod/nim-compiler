@@ -9,7 +9,7 @@ class regmemDescriptor():
         # for reg in registers:
         #     self.table[reg]=None
         for variable in variables:
-            self.variablelist[variable] = {
+            self.variableList[variable] = {
 							'memory'	: None,
 							'register'	: None,
                             }

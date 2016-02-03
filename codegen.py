@@ -67,7 +67,7 @@ def generateAssCode(code):
 	# 	leaders.remove(leaders[len(leaders)-k])
 	# pprint.pprint(TAC)
 	basicBlocks,variables = BasicBlocks(TAC, leaders)
-	global regmem = regmemDescriptor(register_list,variables)
+	regmem = regmemDescriptor(register_list,variables)
 	# pprint.pprint(basicBlocks)
 	GenerateSymbolTable(basicBlocks,SymbolTable,variables)
 	#pprint.pprint(SymbolTable)
@@ -84,10 +84,10 @@ def generateAssCode(code):
 			print "_start:"
 		elif basicBlock[0][1]=='label':
 			print "%s:" % basicBlock[0][2]
-		else
-			print "label%d:" % basicBlock[0][0]
+		else:
+			print "label%d:" % int(basicBlock[0][0])
 
-		for line in basicBlock:
+		# for line in basicBlock:
 			#all the translation code deoending upon operators
 
 	print "section .data"
