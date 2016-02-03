@@ -93,7 +93,7 @@ def generateAssCode(code):
 	print "section .data"
 	for variable in variables:
 		print "%s" % variable
-
+	regmem.getRegister("$eax")
 
 def BasicBlocks(TAC,leaders):
 	#break code into basic blocks

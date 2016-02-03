@@ -12,6 +12,7 @@ class regmemDescriptor():
             self.variableList[variable] = {
 							'memory'	: None,
 							'register'	: None,
+                            'store'     : None
                             }
 
     def getRegVal(self,reg):
@@ -22,38 +23,39 @@ class regmemDescriptor():
         self.variable[value]=reg
 
     def getRegister(self, temp):
-		if temp in self.registerList.values():
-			register = self.variableList(temp)
-		else:
-			if len(self.freeReg) == 0:
-				register = self.busyReg.pop(0)
-				tempReg = self.registerList[register]
-				self.variablelist[tempReg]['register'] = None
-				self.registerList[register] = temp
+        if temp in self.registerList.values():
+            register = self.variableList[temp]
+        else:
+            if len(self.freeRegisters) != 0:
+                register = self.freeRegisters.pop()
+                # if self.variablelist[temp]['memory'] != None and self.variablelist[temp]['store']:
+                    # (level, offset) = self.variablelist[temp]['memory']
+                    # print (level, offset)
+                    # self.putAbsoluteAddressInRegister(level, offset)
+                    # self.addLineToCode(['lw', register, '0($s7)', ''])
 
-				if self.variableList[tempReg]['memory'] != None:
-					(level, offset) = self.ST.addressDescriptor[tempReg]['memory']
-					self.putAbsoluteAddressInRegister(levelgo, offset)
-					self.addLineToCode(['sw', register, '0($s7)', ''])
-					self.ST.addressDescriptor[tempReg]['store'] = True
+            else:
+            	register = self.busyRegisters.pop(0)
+            	tempReg = self.registerList[register]
+            	self.variablelist[tempReg]['register'] = None
+            	self.registerList[register] = temp
 
-				if self.ST.addressDescriptor[temp]['memory'] != None:
-					(level, offset) = self.ST.addressDescriptor[temp]['memory']
-					self.putAbsoluteAddressInRegister(level, offset)
-					self.addLineToCode(['lw', register, '0($s7)', ''])
-			else:
-				register = self.freeRegisters.pop()
-				if self.ST.addressDescriptor[temp]['memory'] != None and self.ST.addressDescriptor[temp]['store']:
-					(level, offset) = self.ST.addressDescriptor[temp]['memory']
-					# print (level, offset)
-					self.putAbsoluteAddressInRegister(level, offset)
-					self.addLineToCode(['lw', register, '0($s7)', ''])
+            	if self.variableList[tempReg]['memory'] != None:
+                    # (level, offset) = self.variablelist[tempReg]['memory']
+                    # self.putAbsoluteAddressInRegister(level, offset)
+                    # self.addLineToCode(['sw', register, '0($s7)', ''])
+                    self.variablelist[tempReg]['store'] = True
 
-			self.ST.addressDescriptor[temp]['register'] = register
-			self.busyRegisters.append(register)
-			self.registerDescriptor[register] = temp
+            	# if self.variablelist[temp]['memory'] != None:
+                    # (level, offset) = self.variablelist[temp]['memory']
+                    # self.putAbsoluteAddressInRegister(level, offset)
+                    # self.addLineToCode(['lw', register, '0($s7)', ''])
 
-		return register
+        	self.variablelist[temp]['register'] = register
+        	self.busyRegisters.append(register)
+        	self.registerList[register] = temp
+        self.busyRegisters.append(register)
+        return register
 
     def setReg(self,reg,value):
         self.register[reg] = value
