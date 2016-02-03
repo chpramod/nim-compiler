@@ -67,14 +67,33 @@ def generateAssCode(code):
 	# 	leaders.remove(leaders[len(leaders)-k])
 	# pprint.pprint(TAC)
 	basicBlocks,variables = BasicBlocks(TAC, leaders)
-	regmem = regmemDescriptor(register_list,variables)
+	global regmem = regmemDescriptor(register_list,variables)
 	# pprint.pprint(basicBlocks)
 	GenerateSymbolTable(basicBlocks,SymbolTable,variables)
-	pprint.pprint(SymbolTable)
+	#pprint.pprint(SymbolTable)
 	# for i in SymbolTable:
 	# 	for j in SymbolTable[i]:
 	# 		SymbolTable[i][j].printTable()
 	# pprint.pprint(variables)
+
+	#printing starts here
+	print "section .text"
+	print "\tglobal _start"
+	for basicBlock in basicBlocks:
+		if basicBlocks.index(basicBlock)==0:
+			print "_start:"
+		elif basicBlock[0][1]=='label':
+			print "%s:" % basicBlock[0][2]
+		else
+			print "label%d:" % basicBlock[0][0]
+
+		for line in basicBlock:
+			#all the translation code deoending upon operators
+
+	print "section .data"
+	for variable in variables:
+		print "%s" % variable
+
 
 def BasicBlocks(TAC,leaders):
 	#break code into basic blocks
@@ -107,11 +126,11 @@ def GenerateSymbolTable(basicBlocks,SymbolTable,variables):
 			SymbolTable[leader][TACline[0]] = symbolTable(variables,TACline,nextTable)
 			nextTable = SymbolTable[leader][TACline[0]]
 
-def GetReg(variable,SymbolTable,regmem):
-	if(regmem.getLoc(variable)!=None):
-		return regmem.getLoc(variable)
-	elif regmem.emptyReg()!=None:
-		return regmem.emptyReg()
+# def GetReg(variable,SymbolTable,regmem):
+# 	if(regmem.getLoc(variable)!=None):
+# 		return regmem.getLoc(variable)
+# 	elif regmem.emptyReg()!=None:
+# 		return regmem.emptyReg()
 	# elif
 
 if __name__=="__main__":
