@@ -88,11 +88,15 @@ def generateAssCode(code):
 		else:
 			fp.write("label%d:\n" % basicBlock[0][0])
 
-		#for line in basicBlock:
+		for line in basicBlock:
+			if line[1]=='=':
+				fp.write("\tmovl $(%d), %s\n" %(line[3],regmem.getRegister(line[2])))
+			elif line[]=='+':
 			#all the translation code deoending upon operators
 	print "section .data"
 	for variable in variables:
-		fp.write("%s\n" % variable)
+		fp.write("%s:\n" % variable.replace("$",""))
+		fp.write("\t.int\n")
 
 
 def BasicBlocks(TAC,leaders):

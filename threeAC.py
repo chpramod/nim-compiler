@@ -1,11 +1,11 @@
 class regmemDescriptor():
-    def __init__(self,registers,variables,fp):
+    def __init__(self,registers,variables):
         self.registerList = dict() # stores content of registers i.e. variables
         self.variableList = dict() # stores memory content i.e. registers, memory location, etc
         self.resetRegisters()
         self.freeRegisters =[]
         self.busyRegisters=[]
-        self.fp= fp
+
         # for reg in registers:
         #     self.table[reg]=None
         for variable in variables:
