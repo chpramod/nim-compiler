@@ -57,17 +57,10 @@ def generateAssCode(code):
 	if extra in	leaders:
 		print "inside1"
 		leaders.remove(extra)         #removes an entry which is added after reading last line
-	if len(leaders) == 0:                #following lines remove duplicates
+	if len(leaders) == 0:                
 			return 0
-
-	p = 0
-	for i in range(0,len(leaders)):
-		if leaders[i] != leaders[p]:
-			leaders[i], leaders[p+1] = leaders[p+1], leaders[i]
-			p += 1
-	p+=1
-	p=len(leaders)-p
-	del leaders[-p:]
+	leaders=list(set(leaders))			#This line removes duplicates
+	print leaders
 	# pprint.pprint(leaders)
 	# for k in range(1,len(leaders)-p):
 	# 	print leaders[len(leaders)-k]
@@ -76,8 +69,9 @@ def generateAssCode(code):
 	print TAC[0]
 	print len(leaders)
 	basicBlocks,variables = BasicBlocks(TAC, leaders)
-	print len(basicBlocks)
-	print len(variables)
+	print basicBlocks
+	print variables
+	print register_list
 	regmem = regmemDescriptor(register_list,variables,fp)
 	# pprint.pprint(basicBlocks)
 	GenerateSymbolTable(basicBlocks,SymbolTable,variables)
@@ -99,10 +93,11 @@ def generateAssCode(code):
 			fp.write("label%d:\n" % basicBlock[0][0])
 
 		for line in basicBlock:
-			print line[1]
 			if line[1]=='=':
-				print line[1]
-				fp.write("\tmovl $(%d), %s\n" %(line[3],regmem.getRegister(line[2])))
+				if (line[3].startswith('$')):
+					fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+				else:
+					fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
 			#elif line[]=='+':
 			#all the translation code deoending upon operators
 	fp.write("section .data\n")

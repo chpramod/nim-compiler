@@ -3,8 +3,8 @@ class regmemDescriptor():
         self.registerList = dict() # stores content of registers i.e. variables
         self.variableList = dict() # stores memory content i.e. registers, memory location, etc
         self.resetRegisters()
-        self.freeRegisters =[]
-        self.busyRegisters=[]
+        #self.freeRegisters =[]
+        #self.busyRegisters=[]
 
         # for reg in registers:
         #     self.table[reg]=None
