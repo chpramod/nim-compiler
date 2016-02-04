@@ -122,12 +122,22 @@ def generateAssCode(code):
 					fp.write("\taddl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
 					fp.write("\taddl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))
 			elif line[1]=='-':
+				#a=b-c a=a-c a=c-a a=b-2 a=a-2 a=2-b a=b-2 a=3-2
+				if (line[3].startswith('$') and line[4].startswith('$')):
+					if (line[2]==line[3]):                                                                  #a=a-c
+						fp.write("\tsubl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[2])))
+					elif(line[2]==line[4]):                                                                 #a=c-a
+						fp.write("\tsubl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+						fp.write("\tnegl %s\n" %(regmem.getRegister(line[2]))
+					else:                                                                                   #a=b-c
+						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+						fp.write("\tsubl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[2])))
 			elif line[1]=='*':
 			#all the translation code deoending upon operators
 	fp.write("section .data\n")
 	for variable in variables:
 		fp.write("%s:\n" % variable.replace("$",""))
-		fp.write("\t.int 0\n")
+		fp.write("\t.long 0\n")
 
 
 def BasicBlocks(TAC,leaders):
