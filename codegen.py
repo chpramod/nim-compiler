@@ -27,10 +27,10 @@ def generateAssCode(code):
 			splitLine=line.split(', ')
 			TAC.append(splitLine)
 			if splitLine[0]=='1':
-				print "inside"
-				print "%d" % int(splitLine[0])
+				#print "inside"
+				#print "%d" % int(splitLine[0])
 				leaders.append(int(splitLine[0]))
-				print len(leaders)
+				#print len(leaders)
 			elif splitLine[1] in jumpLabels:
 				if splitLine[1]=='goto':
 					leaders.append(int(splitLine[0])+1)
@@ -55,23 +55,20 @@ def generateAssCode(code):
 	leaders.sort()
 	extra=totalLines+1
 	if extra in	leaders:
-		print "inside1"
+		#print "inside1"
 		leaders.remove(extra)         #removes an entry which is added after reading last line
 	if len(leaders) == 0:                
 			return 0
 	leaders=list(set(leaders))			#This line removes duplicates
-	print leaders
+	#print leaders
 	# pprint.pprint(leaders)
 	# for k in range(1,len(leaders)-p):
 	# 	print leaders[len(leaders)-k]
 	# 	leaders.remove(leaders[len(leaders)-k])
 	# pprint.pprint(TAC)
-	print TAC[0]
-	print len(leaders)
+	#print TAC[0]
+	#print len(leaders)
 	basicBlocks,variables = BasicBlocks(TAC, leaders)
-	print basicBlocks
-	print variables
-	print register_list
 	regmem = regmemDescriptor(register_list,variables,fp)
 	# pprint.pprint(basicBlocks)
 	GenerateSymbolTable(basicBlocks,SymbolTable,variables)
@@ -94,16 +91,36 @@ def generateAssCode(code):
 
 		for line in basicBlock:
 			if line[1]=='=':
-				if (line[3].startswith('$')):
-					fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+				if line[3].startswith('$'):
+					fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))	#a=b
 				else:
-					fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
-			#elif line[]=='+':
+					fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))						#a=2
+			elif line[1]=='+':
+				if (line[3].startswith('$') and line[4].startswith('$')):
+					if (line[2]==line[3]):																	#a=a+b
+						a=regmem.getRegister(line[3])
+						b=regmem.getRegister(line[4])
+						fp.write("\taddl %s, %s\n" %(b,a))
+					else:																					#c=a+b
+						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+						fp.write("\taddl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[2])))
+				elif (line[3].startswith('$')):														
+					if (line[2]==line[3]):																	#a=a+2
+						fp.write("\taddl $%s, %s\n" %(line[4],regmem.getRegister(line[3])))
+					else:																					#b=a+2
+						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+						fp.write("\taddl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))
+				elif (line[4].startswith('$')):
+					if (line[2]==line[4]):																	#a=2+a
+						fp.write("\taddl $%s, %s\n" %(line[3],regmem.getRegister(line[4])))
+					else:																					#b=2+a
+						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[3])))
+						fp.write("\taddl $%s, %s\n" %(line[4],regmem.getRegister(line[4])))
 			#all the translation code deoending upon operators
 	fp.write("section .data\n")
 	for variable in variables:
 		fp.write("%s:\n" % variable.replace("$",""))
-		fp.write("\t.int\n")
+		fp.write("\t.int 0\n")
 
 
 def BasicBlocks(TAC,leaders):
