@@ -30,6 +30,7 @@ class regmemDescriptor():
         else:
             if len(self.freeRegisters) != 0:
                 register = self.freeRegisters.pop()
+                fp.write("\tMOVL $(%s) %s\n" %(temp,register))
                 # if self.variablelist[temp]['memory'] != None and self.variablelist[temp]['store']:
                     # (level, offset) = self.variablelist[temp]['memory']
                     # print (level, offset)
@@ -39,14 +40,16 @@ class regmemDescriptor():
             else:
             	register = self.busyRegisters.pop(0)
             	tempReg = self.registerList[register]
+                fp.write("\tMOVL %s $(%s)\n" %(register,tempReg))
             	self.variableList[tempReg]['register'] = None
             	self.registerList[register] = temp
+                fp.write("\tMOVL $(%s) %s\n" %(temp,register))
 
-            	if self.variableList[tempReg]['memory'] != None:
+            	# if self.variableList[tempReg]['memory'] != None:
                     # (level, offset) = self.variablelist[tempReg]['memory']
                     # self.putAbsoluteAddressInRegister(level, offset)
                     # self.addLineToCode(['sw', register, '0($s7)', ''])
-                    self.variableList[tempReg]['store'] = True
+                    # self.variableList[tempReg]['store'] = True
 
             	# if self.variablelist[temp]['memory'] != None:
                     # (level, offset) = self.variablelist[temp]['memory']
