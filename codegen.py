@@ -15,7 +15,7 @@ variables = []
 
 def generateAssCode(code):
 	global register_list,variables
-	fp = fopen("AssCode.s",'w')
+	fp = open("AssCode.s",'w')
 	leaders=[]
 	TAC = []
 	SymbolTable = dict()
@@ -50,7 +50,9 @@ def generateAssCode(code):
 					leaders.append(int(splitLine[0])+1)
 	#following lines improve leaders array
 	leaders.sort()
-	leaders.remove(totalLines+1)         #removes an entry which is added after reading last line
+	extra=totalLines+1
+	if extra in	leaders: 
+		leaders.remove(extra)         #removes an entry which is added after reading last line
 	if len(leaders) == 0:                #following lines remove duplicates
 			return 0
 
@@ -91,7 +93,7 @@ def generateAssCode(code):
 		for line in basicBlock:
 			if line[1]=='=':
 				fp.write("\tmovl $(%d), %s\n" %(line[3],regmem.getRegister(line[2])))
-			elif line[]=='+':
+			#elif line[]=='+':
 			#all the translation code deoending upon operators
 	print "section .data"
 	for variable in variables:
