@@ -87,3 +87,4 @@ class regmemDescriptor():
         fp.write("\tMOVL %s, %s\n" %(self.registerList[reg],reg))
         self.variablelist[self.registerList[reg]]=None
         self.registerList[reg]=None
+#
