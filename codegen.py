@@ -15,6 +15,7 @@ variables = []
 
 def generateAssCode(code):
 	global register_list,variables
+	fp = fopen("AssCode.s",'w')
 	leaders=[]
 	TAC = []
 	SymbolTable = dict()
@@ -67,7 +68,7 @@ def generateAssCode(code):
 	# 	leaders.remove(leaders[len(leaders)-k])
 	# pprint.pprint(TAC)
 	basicBlocks,variables = BasicBlocks(TAC, leaders)
-	regmem = regmemDescriptor(register_list,variables)
+	regmem = regmemDescriptor(register_list,variables,fp)
 	# pprint.pprint(basicBlocks)
 	GenerateSymbolTable(basicBlocks,SymbolTable,variables)
 	#pprint.pprint(SymbolTable)
