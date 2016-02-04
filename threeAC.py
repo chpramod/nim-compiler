@@ -23,10 +23,12 @@ class regmemDescriptor():
         self.variable[value]=reg
 
     def getRegister(self, temp):
+        #print self.registerList.values()
         if temp in self.registerList.values():
             register = self.variableList[temp]
         else:
             if len(self.freeRegisters) != 0:
+                print "#########"
                 register = self.freeRegisters.pop()
                 # if self.variablelist[temp]['memory'] != None and self.variablelist[temp]['store']:
                     # (level, offset) = self.variablelist[temp]['memory']
@@ -37,23 +39,23 @@ class regmemDescriptor():
             else:
             	register = self.busyRegisters.pop(0)
             	tempReg = self.registerList[register]
-            	self.variablelist[tempReg]['register'] = None
+            	self.variableList[tempReg]['register'] = None
             	self.registerList[register] = temp
 
             	if self.variableList[tempReg]['memory'] != None:
                     # (level, offset) = self.variablelist[tempReg]['memory']
                     # self.putAbsoluteAddressInRegister(level, offset)
                     # self.addLineToCode(['sw', register, '0($s7)', ''])
-                    self.variablelist[tempReg]['store'] = True
+                    self.variableList[tempReg]['store'] = True
 
             	# if self.variablelist[temp]['memory'] != None:
                     # (level, offset) = self.variablelist[temp]['memory']
                     # self.putAbsoluteAddressInRegister(level, offset)
                     # self.addLineToCode(['lw', register, '0($s7)', ''])
-
-        	self.variablelist[temp]['register'] = register
+        	self.variableList[temp]['register'] = register
         	self.busyRegisters.append(register)
         	self.registerList[register] = temp
+            print self.registerList[register]
         return register
 
     def setReg(self,reg,value):
@@ -85,6 +87,6 @@ class regmemDescriptor():
             self.busyRegisters.remove(self)
             self.freeRegisters.append(self)
         fp.write("\tMOVL %s, %s\n" %(self.registerList[reg],reg))
-        self.variablelist[self.registerList[reg]]=None
+        self.variableList[self.registerList[reg]]=None
         self.registerList[reg]=None
 #
