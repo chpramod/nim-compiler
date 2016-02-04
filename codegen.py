@@ -121,6 +121,8 @@ def generateAssCode(code):
 				else:                                       												#a=1+2
 					fp.write("\taddl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
 					fp.write("\taddl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))
+			elif line[1]=='-':
+			elif line[1]=='*':
 			#all the translation code deoending upon operators
 	fp.write("section .data\n")
 	for variable in variables:
