@@ -27,7 +27,10 @@ def generateAssCode(code):
 			splitLine=line.split(', ')
 			TAC.append(splitLine)
 			if splitLine[0]=='1':
+				print "inside"
+				print "%d" % int(splitLine[0])
 				leaders.append(int(splitLine[0]))
+				print len(leaders)
 			elif splitLine[1] in jumpLabels:
 				if splitLine[1]=='goto':
 					leaders.append(int(splitLine[0])+1)
@@ -51,7 +54,8 @@ def generateAssCode(code):
 	#following lines improve leaders array
 	leaders.sort()
 	extra=totalLines+1
-	if extra in	leaders: 
+	if extra in	leaders:
+		print "inside1"
 		leaders.remove(extra)         #removes an entry which is added after reading last line
 	if len(leaders) == 0:                #following lines remove duplicates
 			return 0
@@ -69,7 +73,11 @@ def generateAssCode(code):
 	# 	print leaders[len(leaders)-k]
 	# 	leaders.remove(leaders[len(leaders)-k])
 	# pprint.pprint(TAC)
+	print TAC[0]
+	print len(leaders)
 	basicBlocks,variables = BasicBlocks(TAC, leaders)
+	print len(basicBlocks)
+	print len(variables)
 	regmem = regmemDescriptor(register_list,variables,fp)
 	# pprint.pprint(basicBlocks)
 	GenerateSymbolTable(basicBlocks,SymbolTable,variables)
@@ -91,11 +99,13 @@ def generateAssCode(code):
 			fp.write("label%d:\n" % basicBlock[0][0])
 
 		for line in basicBlock:
+			print line[1]
 			if line[1]=='=':
+				print line[1]
 				fp.write("\tmovl $(%d), %s\n" %(line[3],regmem.getRegister(line[2])))
 			#elif line[]=='+':
 			#all the translation code deoending upon operators
-	print "section .data"
+	fp.write("section .data\n")
 	for variable in variables:
 		fp.write("%s:\n" % variable.replace("$",""))
 		fp.write("\t.int\n")
