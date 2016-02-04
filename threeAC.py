@@ -54,7 +54,6 @@ class regmemDescriptor():
         	self.variablelist[temp]['register'] = register
         	self.busyRegisters.append(register)
         	self.registerList[register] = temp
-        self.busyRegisters.append(register)
         return register
 
     def setReg(self,reg,value):
@@ -75,8 +74,16 @@ class regmemDescriptor():
         return None
 
     def resetRegisters(self):
-        self.registerList = {'$eax' : None, '$ebx' : None, '$ecx' : None, '$edx' : None, '$esi' : None, '$edi' : None}
+        self.registerList = {'%eax' : None, '%ebx' : None, '%ecx' : None, '%edx' : None, '%esi' : None, '%edi' : None}
         self.freeRegisters=[]
         for register in self.registerList.keys():
 			self.freeRegisters.append(register)
         self.busyRegisters= []
+
+    def freeRegister(self,reg):
+        if reg in busyRegisters:
+            self.busyRegisters.remove(self)
+            self.freeRegisters.append(self)
+        fp.write("\tMOVL %s, %s\n" %(self.registerList[reg],reg))
+        self.variablelist[self.registerList[reg]]=None
+        self.registerList[reg]=None
