@@ -77,23 +77,22 @@ def generateAssCode(code):
 	# pprint.pprint(variables)
 
 	#printing starts here
-	print "section .text"
-	print "\tglobal _start"
+	fp.write("section .text\n")
+	fp.write("\tglobal _start\n")
 	for basicBlock in basicBlocks:
 		if basicBlocks.index(basicBlock)==0:
-			print "_start:"
+			fp.write("_start:\n")
 		elif basicBlock[0][1]=='label':
-			print "%s:" % basicBlock[0][2]
+			fp.write("%s:\n" % basicBlock[0][2])
 		else:
-			print "label%d:" % int(basicBlock[0][0])
+			fp.write("label%d:\n" % basicBlock[0][0])
 
-		# for line in basicBlock:
+		#for line in basicBlock:
 			#all the translation code deoending upon operators
-
 	print "section .data"
 	for variable in variables:
-		print "%s" % variable
-	regmem.getRegister("$eax")
+		fp.write("%s\n" % variable)
+
 
 def BasicBlocks(TAC,leaders):
 	#break code into basic blocks
