@@ -6,6 +6,7 @@ class regmemDescriptor():
         #self.freeRegisters =[]
         #self.busyRegisters=[]
         self.fp = fp
+        self.ST=None
         # for reg in registers:
         #     self.table[reg]=None
         for variable in variables:
@@ -22,7 +23,8 @@ class regmemDescriptor():
         self.register[reg]=value
         self.variable[value]=reg
 
-    def getRegister(self, temp, currST):
+    def getRegister(self, temp):
+        self.ST.printTable()
         #print self.registerList.values()
         if temp in self.registerList.values():
             register = self.variableList[temp]['register']
@@ -38,6 +40,13 @@ class regmemDescriptor():
                     # self.addLineToCode(['lw', register, '0($s7)', ''])
 
             else:
+                register = None
+                maxx=0
+                for var in self.ST:
+                    if self.variableList[var]['register']!=None:
+                        if self.ST[var]['nextuse'] > maxx:
+                            register = self.variableList[var]['register']
+                        maxx=max(self.ST[var]['nextuse'],maxx)
             	register = self.busyRegisters.pop(0)
             	tempReg = self.registerList[register]
                 self.fp.write("\tMOVL %s $(%s)\n" %(register,tempReg))
@@ -91,4 +100,6 @@ class regmemDescriptor():
         self.fp.write("\tMOVL %s, %s\n" %(self.registerList[reg],reg))
         self.variableList[self.registerList[reg]]=None
         self.registerList[reg]=None
-#
+
+    def setST(self,ST):
+        self.ST = ST
