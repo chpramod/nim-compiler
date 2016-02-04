@@ -1,5 +1,5 @@
 class regmemDescriptor():
-    def __init__(self,registers,variables):
+    def __init__(self,registers,variables,fp):
         self.registerList = dict() # stores content of registers i.e. variables
         self.variableList = dict() # stores memory content i.e. registers, memory location, etc
         self.resetRegisters()
