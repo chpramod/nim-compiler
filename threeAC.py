@@ -1,7 +1,7 @@
 class regmemDescriptor():
     def __init__(self,registers,variables,fp):
-        self.registerList = dict() # stores content of registers i.e. variables
-        self.variableList = dict() # stores memory content i.e. registers, memory location, etc
+        self.registerList = {} # stores content of registers i.e. variables
+        self.variableList = {} # stores memory content i.e. registers, memory location, etc
         self.resetRegisters()
         #self.freeRegisters =[]
         #self.busyRegisters=[]
@@ -25,11 +25,11 @@ class regmemDescriptor():
     def getRegister(self, temp):
         #print self.registerList.values()
         if temp in self.registerList.values():
-            register = self.variableList[temp]
+            register = self.variableList[temp]['register']
         else:
             if len(self.freeRegisters) != 0:
-                print "#########"
                 register = self.freeRegisters.pop()
+                print register
                 # if self.variablelist[temp]['memory'] != None and self.variablelist[temp]['store']:
                     # (level, offset) = self.variablelist[temp]['memory']
                     # print (level, offset)
@@ -54,8 +54,7 @@ class regmemDescriptor():
                     # self.addLineToCode(['lw', register, '0($s7)', ''])
         	self.variableList[temp]['register'] = register
         	self.busyRegisters.append(register)
-        	self.registerList[register] = temp
-            print self.registerList[register]
+            self.registerList[register] = temp
         return register
 
     def setReg(self,reg,value):
