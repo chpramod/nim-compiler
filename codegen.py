@@ -132,8 +132,26 @@ def generateAssCode(code):
 					else:                                                                                   #a=b-c
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
 						fp.write("\tsubl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[2])))
+				elif(line[3].startswith('$')):                                                              #a=a-2
+					if (line[2]==line[3]):
+						fp.write("\tsubl $%s, %s\n" %(line[4],regmem.getRegister(line[3])))
+					else:                                                                                   #a=b-2
+						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+						fp.write("\tsubl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))
+				elif (line[4].startswith('$')):
+					if (line[2]==line[4]):																	#a=2-a
+						fp.write("\tsubl $%s, %s\n" %(line[3],regmem.getRegister(line[4])))
+						fp.write("\tnegl %s\n" %(regmem.getRegister(line[2]))
+					else:																					#a=2-b
+						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[2])))
+						fp.write("\tsubl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
+						fp.write("\tnegl %s\n" %(regmem.getRegister(line[2]))
+				else:                                       												#a=3-2
+					fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
+					fp.write("\tsubl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))
+
 			elif line[1]=='*':
-				if 																							
+				if
 					#a=a*b
 					#a=b*a
 					#c=a*b
@@ -141,7 +159,7 @@ def generateAssCode(code):
 					#b=a*2
 					#a=2*a
 					#b=2*a
-					#a=1*2																					
+					#a=1*2
 			#all the translation code deoending upon operators
 	fp.write("section .data\n")
 	for variable in variables:
