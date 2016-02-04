@@ -13,6 +13,8 @@ reservedLabels.append("print")
 register_list = ["$eax","$ebx","$ecx","$edx","$esi","$edi"]
 variables = []
 
+# {=+*-/%>><<ifgoto goto call label ret aright aleft left_star right_star print}
+
 def generateAssCode(code):
 	global register_list,variables
 	fp = open("AssCode.s",'w')
@@ -57,7 +59,7 @@ def generateAssCode(code):
 	if extra in	leaders:
 		print "inside1"
 		leaders.remove(extra)         #removes an entry which is added after reading last line
-	if len(leaders) == 0:                
+	if len(leaders) == 0:
 			return 0
 	leaders=list(set(leaders))			#This line removes duplicates
 	print leaders
