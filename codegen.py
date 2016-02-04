@@ -94,39 +94,39 @@ def generateAssCode(code):
 			fp.write("label%d:\n" % basicBlock[0][0])
 
 		for line in basicBlock:
-			currST = SymbolTable[str(leaders[leader_index])][line[0]]
+			regmem.setST(SymbolTable[str(leaders[leader_index])][line[0]])
 			if line[1]=='=':
 				if line[3].startswith('$'):
-					fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3],currST),regmem.getRegister(line[2],currST)))	#a=b
+					fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))	#a=b
 				else:
-					fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2],currST)))						#a=2
+					fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))						#a=2
 			elif line[1]=='+':
 				if (line[3].startswith('$') and line[4].startswith('$')):
 					if (line[2]==line[3]):																	#a=a+b
-						fp.write("\taddl %s, %s\n" %(regmem.getRegister(line[4],currST),regmem.getRegister(line[3],currST)))
+						fp.write("\taddl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[3])))
 					elif (line[2]==line[4]):																#a=b+a
-						fp.write("\taddl %s, %s\n" %(regmem.getRegister(line[3],currST),regmem.getRegister(line[4],currST)))
+						fp.write("\taddl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[4])))
 					else:																					#c=a+b
-						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3],currST),regmem.getRegister(line[2],currST)))
-						fp.write("\taddl %s, %s\n" %(regmem.getRegister(line[4],currST),regmem.getRegister(line[2],currST)))
+						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+						fp.write("\taddl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[2])))
 				elif (line[3].startswith('$')):
 					if (line[2]==line[3]):																	#a=a+2
-						fp.write("\taddl $%s, %s\n" %(line[4],regmem.getRegister(line[3],currST)))
+						fp.write("\taddl $%s, %s\n" %(line[4],regmem.getRegister(line[3])))
 					else:																					#b=a+2
-						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3],currST),regmem.getRegister(line[2],currST)))
-						fp.write("\taddl $%s, %s\n" %(line[4],regmem.getRegister(line[2],currST)))
+						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+						fp.write("\taddl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))
 				elif (line[4].startswith('$')):
 					if (line[2]==line[4]):																	#a=2+a
-						fp.write("\taddl $%s, %s\n" %(line[3],regmem.getRegister(line[4],currST)))
+						fp.write("\taddl $%s, %s\n" %(line[3],regmem.getRegister(line[4])))
 					else:																					#b=2+a
-						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[4],currST),regmem.getRegister(line[2],currST)))
-						fp.write("\taddl $%s, %s\n" %(line[3],regmem.getRegister(line[2],currST)))
+						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[2])))
+						fp.write("\taddl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
 				else:                                       												#a=1+2
-					fp.write("\taddl $%s, %s\n" %(line[3],regmem.getRegister(line[2],currST)))
-					fp.write("\taddl $%s, %s\n" %(line[4],regmem.getRegister(line[2],currST)))
+					fp.write("\taddl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
+					fp.write("\taddl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))
 
-			elif line[1]=='*':
-				if
+			# elif line[1]=='*':
+			# 	if
 					#a=a*b
 					#a=b*a
 					#c=a*b
