@@ -24,13 +24,15 @@ class regmemDescriptor():
         self.variable[value]=reg
 
     def getRegister(self, temp):
-        self.ST.printTable()
+        #self.ST.printTable()
         #print self.registerList.values()
         if temp in self.registerList.values():
             register = self.variableList[temp]['register']
             #print register
         else:
             if len(self.freeRegisters) != 0:
+                #print self.ST.table
+                #print self.ST
                 register = self.freeRegisters.pop()
                 self.fp.write("\tMOVL $(%s), %s\n" %(temp[1:],register))
                 # if self.variablelist[temp]['memory'] != None and self.variablelist[temp]['store']:
@@ -47,11 +49,11 @@ class regmemDescriptor():
                         if self.ST[var]['nextuse'] > maxx:
                             register = self.variableList[var]['register']
                         maxx=max(self.ST[var]['nextuse'],maxx)
-            	# register = self.busyRegisters.pop(0)
-            	tempReg = self.registerList[register]
+                register = self.busyRegisters.pop(0)
+                tempReg = self.registerList[register]
                 self.fp.write("\tMOVL %s, $(%s)\n" %(register,tempReg[1:]))
-            	self.variableList[tempReg]['register'] = None
-            	self.registerList[register] = temp
+                self.variableList[tempReg]['register'] = None
+                self.registerList[register] = temp
                 self.fp.write("\tMOVL $(%s), %s\n" %(temp[1:],register))
 
             	# if self.variableList[tempReg]['memory'] != None:

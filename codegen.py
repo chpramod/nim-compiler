@@ -158,7 +158,7 @@ def generateAssCode(code):
 					elif (line[2]==line[4]):
 					# 	#a=c-a
 					 	fp.write("\tsubl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
-					 	fp.write("\tnegl %s\n" % regmem.getRegister(Line[2]))
+					 	fp.write("\tnegl %s\n" % regmem.getRegister(line[2]))
 	 				else:
 	 				# 	#a=b-c
 	 				 	fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
@@ -172,11 +172,11 @@ def generateAssCode(code):
 				elif (line[4].startswith('$')):
 					if (line[2]==line[4]):																	#a=2-a
 						fp.write("\tsubl $%s, %s\n" %(line[3],regmem.getRegister(line[4])))
-						fp.write("\tnegl %s\n" % regmem.getRegister(Line[2]))
+						fp.write("\tnegl %s\n" % regmem.getRegister(line[2]))
 					else:																					#a=2-b
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[2])))
 						fp.write("\tsubl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
-						fp.write("\tnegl %s\n" % regmem.getRegister(Line[2]))
+						fp.write("\tnegl %s\n" % regmem.getRegister(line[2]))
 				else:                                       												#a=3-2
 					fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
 					fp.write("\tsubl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))	
@@ -219,7 +219,7 @@ def GenerateSymbolTable(basicBlocks,SymbolTable,variables):
 		for TACline in reversed(block):
 			SymbolTable[leader][TACline[0]] = symbolTable(variables,TACline,nextTable)
 			nextTable = SymbolTable[leader][TACline[0]]
-
+			#print SymbolTable[leader][TACline[0]].table
 # def GetReg(variable,SymbolTable,regmem):
 # 	if(regmem.getLoc(variable)!=None):
 # 		return regmem.getLoc(variable)
