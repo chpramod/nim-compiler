@@ -8,7 +8,7 @@ class symbolTable():
             for variable in variables:
                 self.table[variable]=dict()
             for variable in variables: # Since source variables are used not destination variables
-                if variable in [TACline[index] for index in range(3,len(TACline))]:
+                if ((TACline[1] not in ['>>','<<']) and (variable in [TACline[index] for index in range(3,len(TACline))]) or (TACline[1] in ['>>','<<']) and (variable in [TACline[index] for index in range(2,len(TACline))])):
                     self.table[variable]['curruse'] = 1 # Use of variable in current line of code
                 else:
                     self.table[variable]['curruse'] = 0
@@ -22,7 +22,7 @@ class symbolTable():
             for variable in variables:
                 self.table[variable]=dict()
             for variable in variables: # Since source variables are used not destination variables
-                if variable in [TACline[index] for index in range(3,len(TACline))]:
+                if ((TACline[1] not in ['>>','<<']) and (variable in [TACline[index] for index in range(3,len(TACline))]) or (TACline[1] in ['>>','<<']) and (variable in [TACline[index] for index in range(2,len(TACline))])):
                     self.table[variable]['curruse'] = 1 # Use of variable in current line of code
                 else:
                     self.table[variable]['curruse'] = 0
