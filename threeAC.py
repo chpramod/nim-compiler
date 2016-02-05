@@ -33,7 +33,8 @@ class regmemDescriptor():
                 #print self.ST.table
                 #print self.ST
                 register = self.freeRegisters.pop()
-                self.fp.write("\tMOVL %s, %s\n" %(temp[1:],register))
+                if self.variableList[temp]['register']!=None:
+                    self.fp.write("\tMOVL %s, %s\n" %(temp[1:],register))
                 # if self.variablelist[temp]['memory'] != None and self.variablelist[temp]['store']:
                     # (level, offset) = self.variablelist[temp]['memory']
                     # print (level, offset)
