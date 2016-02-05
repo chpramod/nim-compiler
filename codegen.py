@@ -185,13 +185,18 @@ def generateAssCode(code):
 				print "detected"
 				if (line[3].startswith('$') and line[4].startswith('$')):
 					if (line[2]==line[3]):																	#a=a/b
+						freeReg('%edx',True)
 						regmem.setReg(line[4],'%ebx')
 						regmem.setReg(line[2],'%eax')
 						fp.write("\tidivl %ebx\n")
 					elif (line[2]==line[4]):																#a=b/a
-						fp.write("\taddl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[4])))
+						freeReg('%edx',True)
+						setReg(line[3],'%eax')
+						setReg(line[4],'%ebx')
+
 					else:																					#c=a/b
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+						freeReg('%edx',True)
 						regmem.setReg(line[4],'%ebx')
 						regmem.setReg(line[2],'%eax')
 						fp.write("\tidivl %ebx\n")
