@@ -91,7 +91,7 @@ def generateAssCode(code):
 		elif basicBlock[0][1]=='label':
 			fp.write("%s:\n" % basicBlock[0][2])
 		else:
-			fp.write("label%d:\n" % basicBlock[0][0])
+			fp.write("label%s:\n" % basicBlock[0][0])
 
 		for line in basicBlock:
 			regmem.setST(SymbolTable[str(leaders[leader_index])][line[0]])
@@ -291,45 +291,69 @@ def generateAssCode(code):
 					fp.write("\tidivl $%s\n" %(line[4]))
 					setVarReg('%edx',line[2])
 			elif line[1]=='goto':																			#goto 2
-				if (line[5].isdigit()):	
-					fp.write("\tjmp label%s\n"%(line[5]))
+				if (line[2].isdigit()):	
+					fp.write("\tjmp label%s\n"%(line[2]))
 				else:
-					fp.write("\t")
+					fp.write("\tjmp %s\n"%(line[2]))
 			elif line[1]=='ifgoto':																	#ifgoto(leq,eq,le,geq,ge,neq)																		
 				if (line[2]=='leq'):
 					if (line[3].startswith('$') and line[4].startswith('$')):					#a<=b				#ifgoto, leq, a, b, 2
 						fp.write("\tcmpl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[3])))
-						fp.write("\tjle label%s\n"%(line[5]))
+						if (line[5].isdigit()):	
+							fp.write("\tjmp label%s\n"%(line[5]))
+						else:
+							fp.write("\tjmp %s\n"%(line[5]))
 					elif (line[3].startswith('$')):												#a<=2
 						fp.write("\tcmpl $%s, %s\n" %(line[4],regmem.getRegister(line[3])))
-						fp.write("\tjle label%s\n"%(line[5]))
+						if (line[5].isdigit()):	
+							fp.write("\tjmp label%s\n"%(line[5]))
+						else:
+							fp.write("\tjmp %s\n"%(line[5]))
 					elif (line[4].startswith('$')):												#2<=a
 						fp.write("\tcmpl %s, $%s\n" %(regmem.getRegister(line[4]),line[3]))
-						fp.write("\tjle label%s\n"%(line[5]))
+						if (line[5].isdigit()):	
+							fp.write("\tjmp label%s\n"%(line[5]))
+						else:
+							fp.write("\tjmp %s\n"%(line[5]))
 					else:																		#3<=2
 						fp.write("\tcmpl $%s, $%s\n" %(line[4],line[3]))
-						fp.write("\tjle label%s\n"%(line[5]))
+						if (line[5].isdigit()):	
+							fp.write("\tjmp label%s\n"%(line[5]))
+						else:
+							fp.write("\tjmp %s\n"%(line[5]))
 				if (line[2]=='geq'):
 					if (line[3].startswith('$') and line[4].startswith('$')):					#a>=b				#ifgoto, geq, a, b, 2
 						fp.write("\tcmpl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[3])))
-						fp.write("\tjge label%s\n"%(line[5]))
+						if (line[5].isdigit()):	
+							fp.write("\tjmp label%s\n"%(line[5]))
+						else:
+							fp.write("\tjmp %s\n"%(line[5]))
 					elif (line[3].startswith('$')):												#a>=2
 						fp.write("\tcmpl $%s, %s\n" %(line[4],regmem.getRegister(line[3])))
-						fp.write("\tjge label%s\n"%(line[5]))
+						if (line[5].isdigit()):	
+							fp.write("\tjmp label%s\n"%(line[5]))
+						else:
+							fp.write("\tjmp %s\n"%(line[5]))
 					elif (line[4].startswith('$')):												#2>=a
 						fp.write("\tcmpl %s, $%s\n" %(regmem.getRegister(line[4]),line[3]))
-						fp.write("\tjge label%s\n"%(line[5]))
+						if (line[5].isdigit()):	
+							fp.write("\tjmp label%s\n"%(line[5]))
+						else:
+							fp.write("\tjmp %s\n"%(line[5]))
 					else:																		#3>=2
 						fp.write("\tcmpl $%s, $%s\n" %(line[4],line[3]))
-						fp.write("\tjge label%s\n"%(line[5]))
-				if (line[2]=='eq'):
+						if (line[5].isdigit()):	
+							fp.write("\tjmp label%s\n"%(line[5]))
+						else:
+							fp.write("\tjmp %s\n"%(line[5]))
+				#if (line[2]=='eq'):
 
 
 
 
 
 
-			elif line[1]=='call':
+			#elif line[1]=='call':
 			#all the translation code deoending upon operators
 	fp.write(".section .data\n")
 	for variable in variables:
