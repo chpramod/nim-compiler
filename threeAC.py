@@ -111,6 +111,10 @@ class regmemDescriptor():
                 if self.ST.table[var]['nextuse'] == -1:
                     self.freeRegisters.append(self.variableList[var]['register'])
 
+    def freeAll(self,flag=False):
+        for reg in self.registerList:
+            self.freeReg(reg,flag)
+
     def freeReg(self,reg,flag=False):
         if reg not in self.freeRegisters:
             self.freeRegisters.append(reg)
