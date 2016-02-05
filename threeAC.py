@@ -32,7 +32,7 @@ class regmemDescriptor():
         else:
             if len(self.freeRegisters) != 0:
                 register = self.freeRegisters.pop()
-                self.fp.write("\tMOVL $(%s) %s\n" %(temp,register))
+                self.fp.write("\tMOVL $(%s), %s\n" %(temp[1:],register))
                 # if self.variablelist[temp]['memory'] != None and self.variablelist[temp]['store']:
                     # (level, offset) = self.variablelist[temp]['memory']
                     # print (level, offset)
@@ -47,12 +47,12 @@ class regmemDescriptor():
                         if self.ST[var]['nextuse'] > maxx:
                             register = self.variableList[var]['register']
                         maxx=max(self.ST[var]['nextuse'],maxx)
-            	register = self.busyRegisters.pop(0)
+            	# register = self.busyRegisters.pop(0)
             	tempReg = self.registerList[register]
-                self.fp.write("\tMOVL %s $(%s)\n" %(register,tempReg))
+                self.fp.write("\tMOVL %s, $(%s)\n" %(register,tempReg[1:]))
             	self.variableList[tempReg]['register'] = None
             	self.registerList[register] = temp
-                self.fp.write("\tMOVL $(%s) %s\n" %(temp,register))
+                self.fp.write("\tMOVL $(%s), %s\n" %(temp[1:],register))
 
             	# if self.variableList[tempReg]['memory'] != None:
                     # (level, offset) = self.variablelist[tempReg]['memory']
@@ -65,7 +65,7 @@ class regmemDescriptor():
                     # self.putAbsoluteAddressInRegister(level, offset)
                     # self.addLineToCode(['lw', register, '0($s7)', ''])
             self.variableList[temp]['register'] = register
-            self.busyRegisters.append(register)
+            # self.busyRegisters.append(register)
             self.registerList[register] = temp
         return register
 
