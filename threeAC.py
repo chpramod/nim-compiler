@@ -132,5 +132,13 @@ class regmemDescriptor():
         self.fp.write("\tMOVL %s, %s\n" %(var[1:],reg))
         self.registerList[reg]=var
 
+    def setVarReg(self,reg,var):
+        if self.variableList[var]['register']!=None:
+            self.registerList[self.variableList[var]['register']] = None
+            self.freeRegisters.append(self.variableList[var]['register'])
+        self.variableList[var]['register']=reg
+        if reg in self.freeRegisters:
+            self.freeRegisters.remove(reg)
+
     def setST(self,ST):
         self.ST = ST
