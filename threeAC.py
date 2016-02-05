@@ -32,7 +32,7 @@ class regmemDescriptor():
         else:
             if len(self.freeRegisters) != 0:
                 register = self.freeRegisters.pop()
-                self.fp.write("\tMOVL $(%s) %s\n" %(temp,register))
+                self.fp.write("\tMOVL $(%s) %s\n" %(temp[1:],register))
                 # if self.variablelist[temp]['memory'] != None and self.variablelist[temp]['store']:
                     # (level, offset) = self.variablelist[temp]['memory']
                     # print (level, offset)
@@ -49,10 +49,10 @@ class regmemDescriptor():
                         maxx=max(self.ST[var]['nextuse'],maxx)
             	register = self.busyRegisters.pop(0)
             	tempReg = self.registerList[register]
-                self.fp.write("\tMOVL %s $(%s)\n" %(register,tempReg))
+                self.fp.write("\tMOVL %s $(%s)\n" %(register,tempReg[1:]))
             	self.variableList[tempReg]['register'] = None
             	self.registerList[register] = temp
-                self.fp.write("\tMOVL $(%s) %s\n" %(temp,register))
+                self.fp.write("\tMOVL $(%s) %s\n" %(temp[1:],register))
 
             	# if self.variableList[tempReg]['memory'] != None:
                     # (level, offset) = self.variablelist[tempReg]['memory']
