@@ -93,7 +93,6 @@ class regmemDescriptor():
 
     def resetRegisters(self):
         self.registerList = {'%eax' : None, '%ebx' : None, '%ecx' : None, '%edx' : None, '%esi' : None, '%edi' : None}
-        self.freeRegisters=[]
         self.freeRegisters = self.registerList.keys()
         self.busyRegisters= []
 
@@ -106,10 +105,12 @@ class regmemDescriptor():
     #     self.registerList[reg]=None
 
     def freeRegister(self):
-        for var in self.ST.table:
+        for var in self.variableList:
             if self.variableList[var]['register']!=None:
-                if self.ST.table[var]['nextuse'] == -1:
+                if self.ST.table[var]['nextuse']==-1 and self.ST.table[var]['curruse']==0 and self.variableList[var]['register'] not in self.freeRegisters:
                     self.freeRegisters.append(self.variableList[var]['register'])
+                    self.registerList[self.variableList[var]['register']]=None
+                    self.variableList[var]['register']=None
 
     def freeAll(self,flag=False):
         for reg in self.registerList:
