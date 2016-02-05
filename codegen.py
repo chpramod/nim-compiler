@@ -95,6 +95,7 @@ def generateAssCode(code):
 
 		for line in basicBlock:
 			regmem.setST(SymbolTable[str(leaders[leader_index])][line[0]])
+			regmem.freeRegister()
 			if line[1]=='=':
 				if line[3].startswith('$'):
 					fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))	#a=b

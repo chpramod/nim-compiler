@@ -3,7 +3,6 @@ class regmemDescriptor():
         self.registerList = {} # stores content of registers i.e. variables
         self.variableList = {} # stores memory content i.e. registers, memory location, etc
         self.resetRegisters()
-        #self.freeRegisters =[]
         #self.busyRegisters=[]
         self.fp = fp
         self.ST=None
@@ -43,13 +42,15 @@ class regmemDescriptor():
 
             else:
                 register = None
-                maxx=0
-                for var in self.ST:
+                maxx=-2
+                print temp,self.variableList,self.freeRegisters
+                self.ST.printTable()
+                for var in self.ST.table:
                     if self.variableList[var]['register']!=None:
-                        if self.ST[var]['nextuse'] > maxx:
+                        if self.ST.table[var]['nextuse'] > maxx:
                             register = self.variableList[var]['register']
-                        maxx=max(self.ST[var]['nextuse'],maxx)
-                register = self.busyRegisters.pop(0)
+                        maxx=max(self.ST.table[var]['nextuse'],maxx)
+                # register = self.busyRegisters.pop(0)
                 tempReg = self.registerList[register]
                 self.fp.write("\tMOVL %s, $(%s)\n" %(register,tempReg[1:]))
                 self.variableList[tempReg]['register'] = None
@@ -95,13 +96,18 @@ class regmemDescriptor():
 			self.freeRegisters.append(register)
         self.busyRegisters= []
 
-    def freeRegister(self,reg):
-        if reg in busyRegisters:
-            self.busyRegisters.remove(self)
-            self.freeRegisters.append(self)
-        self.fp.write("\tMOVL %s, %s\n" %(self.registerList[reg],reg))
-        self.variableList[self.registerList[reg]]=None
-        self.registerList[reg]=None
+    # def freeRegister(self,reg):
+    #     if reg in busyRegisters:
+    #         self.busyRegisters.remove(self)
+    #         self.freeRegisters.append(self)
+    #     self.fp.write("\tMOVL %s, %s\n" %(self.registerList[reg],reg))
+    #     self.variableList[self.registerList[reg]]=None
+    #     self.registerList[reg]=None
 
+    def freeRegister(self):
+        for var in self.ST.table:
+            if self.variableList[var]['register']!=None:
+                if self.ST.table[var]['nextuse'] == -1:
+                    self.freeRegisters.append(self.variableList[var]['register'])
     def setST(self,ST):
         self.ST = ST
