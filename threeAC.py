@@ -94,8 +94,7 @@ class regmemDescriptor():
     def resetRegisters(self):
         self.registerList = {'%eax' : None, '%ebx' : None, '%ecx' : None, '%edx' : None, '%esi' : None, '%edi' : None}
         self.freeRegisters=[]
-        for register in self.registerList.keys():
-			self.freeRegisters.append(register)
+		self.freeRegisters = self.registerList.keys()
         self.busyRegisters= []
 
     # def freeRegister(self,reg):
