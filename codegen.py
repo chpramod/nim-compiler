@@ -13,7 +13,7 @@ reservedLabels.append("print")
 register_list = ["$eax","$ebx","$ecx","$edx","$esi","$edi"]
 variables = []
 
-# {=+*-/%>><<ifgoto goto call label ret aright aleft left_star right_star print}
+# {=+*-/%>><<ifgoto(leq,eq,le,geq,ge,neq) goto call label ret aright aleft left_star right_star print}
 
 def generateAssCode(code):
 	global register_list,variables
@@ -183,7 +183,6 @@ def generateAssCode(code):
 					fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
 					fp.write("\tsubl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))
 			elif line[1]=='/':
-				print "detected"
 				if (line[3].startswith('$') and line[4].startswith('$')):
 					if (line[2]==line[3]):																	#a=a/b
 						freeReg('%edx',True)
@@ -197,7 +196,7 @@ def generateAssCode(code):
 						freeReg('%edx',True)
 						setReg(line[4],'%ebx')
 						fp.write("\tidivl %ebx\n")
-						fp.write("\tmovl %s, %s\n" %('%eax',regmem.getRegister(line[4])))
+						setVarReg('%eax',line[2])
 					else:																					#c=a/b
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
 						freeReg('%edx',True)
@@ -221,20 +220,115 @@ def generateAssCode(code):
 						fp.write("\tmovl $%s, %s\n" %(line[3],'%eax'))
 						setReg(line[4],'%ebx')
 						fp.write("\tidivl %ebx\n")
-						fp.write("\tmovl %s, %s\n" %('%eax',regmem.getRegister(line[2])))
+						setVarReg('%eax',line[2])
 					else:																					#b=2/a
 						freeReg('%eax')
 						freeReg('%edx',True)
 						fp.write("\tmovl $%s, %s\n" %(line[3],'%eax'))
 						setReg(line[4],'%ebx')
 						fp.write("\tidivl %ebx\n")
-						fp.write("\tmovl %s, %s\n" %('%eax',regmem.getRegister(line[2])))
+						setVarReg('%eax',line[2])
 				else:                                       												#a=3/2
-					fp.write("\taddl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
-					fp.write("\taddl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))
+					freeReg('%eax')
+					freeReg('%edx',True)
+					fp.write("\tmovl $%s, %s\n" %(line[3],'%eax'))
+					fp.write("\tidivl $%s\n" %(line[4]))
+					setVarReg('%eax',line[2])
 			elif line[1]=='mod':
-			elif line[1]=='goto':
-			elif line[1]=='ifgoto':
+				if (line[3].startswith('$') and line[4].startswith('$')):
+					if (line[2]==line[3]):																	#a=a mod b
+						freeReg('%edx',True)
+						regmem.setReg(line[4],'%ebx')
+						regmem.setReg(line[2],'%eax')
+						fp.write("\tidivl %ebx\n")
+						setVarReg('%edx',line[2])
+					elif (line[2]==line[4]):
+						freeReg('%eax')
+						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),'%eax'))					#a=b mod a
+						freeReg('%eax')
+						freeReg('%edx',True)
+						setReg(line[4],'%ebx')
+						fp.write("\tidivl %ebx\n")
+						setVarReg('%edx',line[2])
+					else:																					#c=a mod b
+						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+						freeReg('%edx',True)
+						regmem.setReg(line[4],'%ebx')
+						regmem.setReg(line[2],'%eax')
+						fp.write("\tidivl %ebx\n")
+						setVarReg('%edx',line[2])
+				elif (line[3].startswith('$')):
+					if (line[2]==line[3]):																	#a=a mod 2
+						freeReg('%edx',True)
+						setReg(line[3],'%eax')
+						fp.write("\tidivl $%s\n" %(line[4]))
+						setVarReg('%edx',line[2])
+					else:																					#b=a mod 2
+						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+						freeReg('%edx',True)						
+						setReg(line[2],'%eax')
+						fp.write("\tidivl $%s\n" %(line[4]))
+						setVarReg('%edx',line[2])
+				elif (line[4].startswith('$')):
+					if (line[2]==line[4]):																	#a=2 mod a
+						freeReg('%eax')
+						freeReg('%edx',True)
+						fp.write("\tmovl $%s, %s\n" %(line[3],'%eax'))
+						setReg(line[4],'%ebx')
+						fp.write("\tidivl %ebx\n")
+						setVarReg('%edx',line[2])
+					else:																					#b=2 mod a
+						freeReg('%eax')
+						freeReg('%edx',True)
+						fp.write("\tmovl $%s, %s\n" %(line[3],'%eax'))
+						setReg(line[4],'%ebx')
+						fp.write("\tidivl %ebx\n")
+						setVarReg('%edx',line[2])
+				else:                                       												#a=3 mod 2
+					freeReg('%eax')
+					freeReg('%edx',True)
+					fp.write("\tmovl $%s, %s\n" %(line[3],'%eax'))
+					fp.write("\tidivl $%s\n" %(line[4]))
+					setVarReg('%edx',line[2])
+			elif line[1]=='goto':																			#goto 2
+				if (line[5].isdigit()):	
+					fp.write("\tjmp label%s\n"%(line[5]))
+				else:
+					fp.write("\t")
+			elif line[1]=='ifgoto':																	#ifgoto(leq,eq,le,geq,ge,neq)																		
+				if (line[2]=='leq'):
+					if (line[3].startswith('$') and line[4].startswith('$')):					#a<=b				#ifgoto, leq, a, b, 2
+						fp.write("\tcmpl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[3])))
+						fp.write("\tjle label%s\n"%(line[5]))
+					elif (line[3].startswith('$')):												#a<=2
+						fp.write("\tcmpl $%s, %s\n" %(line[4],regmem.getRegister(line[3])))
+						fp.write("\tjle label%s\n"%(line[5]))
+					elif (line[4].startswith('$')):												#2<=a
+						fp.write("\tcmpl %s, $%s\n" %(regmem.getRegister(line[4]),line[3]))
+						fp.write("\tjle label%s\n"%(line[5]))
+					else:																		#3<=2
+						fp.write("\tcmpl $%s, $%s\n" %(line[4],line[3]))
+						fp.write("\tjle label%s\n"%(line[5]))
+				if (line[2]=='geq'):
+					if (line[3].startswith('$') and line[4].startswith('$')):					#a>=b				#ifgoto, geq, a, b, 2
+						fp.write("\tcmpl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[3])))
+						fp.write("\tjge label%s\n"%(line[5]))
+					elif (line[3].startswith('$')):												#a>=2
+						fp.write("\tcmpl $%s, %s\n" %(line[4],regmem.getRegister(line[3])))
+						fp.write("\tjge label%s\n"%(line[5]))
+					elif (line[4].startswith('$')):												#2>=a
+						fp.write("\tcmpl %s, $%s\n" %(regmem.getRegister(line[4]),line[3]))
+						fp.write("\tjge label%s\n"%(line[5]))
+					else:																		#3>=2
+						fp.write("\tcmpl $%s, $%s\n" %(line[4],line[3]))
+						fp.write("\tjge label%s\n"%(line[5]))
+				if (line[2]=='eq'):
+
+
+
+
+
+
 			elif line[1]=='call':
 			#all the translation code deoending upon operators
 	fp.write(".section .data\n")
