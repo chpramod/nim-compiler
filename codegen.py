@@ -124,45 +124,17 @@ def generateAssCode(code):
 				else:                                       												#a=1+2
 					fp.write("\taddl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
 					fp.write("\taddl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))
-			elif line[1]=='-':
- 				#a=b-c a=a-c a=c-a a=b-2 a=a-2 a=2-b a=b-2 a=3-2
- 				if (line[3].startswith('$') and line[4].startswith('$')):
- 					if (line[2]==line[3]):                                                                  #a=a-c
- 						fp.write("\tsubl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[2])))
- 					elif(line[2]==line[4]):                                                                 #a=c-a
- 						fp.write("\tsubl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
- 						fp.write("\tnegl %s\n" %(regmem.getRegister(line[2]))
- 					else:                                                                                   #a=b-c
- 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
- 						fp.write("\tsubl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[2])))
-					elif(line[3].startswith('$')):                                                              #a=a-2
-						if (line[2]==line[3]):
-							fp.write("\tsubl $%s, %s\n" %(line[4],regmem.getRegister(line[3])))
-						else:                                                                                   #a=b-2
-							fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
-							fp.write("\tsubl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))
-				elif (line[4].startswith('$')):
-					if (line[2]==line[4]):																	#a=2-a
-						fp.write("\tsubl $%s, %s\n" %(line[3],regmem.getRegister(line[4])))
-						fp.write("\tnegl %s\n" %(regmem.getRegister(line[2]))
-					else:																					#a=2-b
-						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[2])))
-						fp.write("\tsubl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
-						fp.write("\tnegl %s\n" %(regmem.getRegister(line[2]))
-				else:                                       												#a=3-2
-					fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
-					fp.write("\tsubl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))
 			elif line[1]=='*':
 				if (line[3].startswith('$') and line[4].startswith('$')):
-					if (line[2]==line[3]):																	#a=a*b
+					if (line[2]==line[3]):										#a=a*b
 						fp.write("\timull %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[3])))
-					elif (line[2]==line[4]):																#a=b*a
+					elif (line[2]==line[4]):								#a=b*a
 						fp.write("\timull %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[4])))
-					else:																					#c=a*b
+					else:											#c=a*b
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
 						fp.write("\timull %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[2])))
 				elif (line[3].startswith('$')):
-					if (line[2]==line[3]):																	#a=a*2
+					if (line[2]==line[3]):										#a=a*2
 						fp.write("\timull $%s, %s\n" %(line[4],regmem.getRegister(line[3])))
 					else:																					#b=a*2
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
