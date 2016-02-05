@@ -450,7 +450,9 @@ def generateAssCode(code):
 							fp.write("\tjne label%s\n"%(line[5]))
 						else:
 							fp.write("\tjne %s\n"%(line[5]))
-			#elif line[1]=='call':
+			elif line[1]=='call':
+				regmem.freeAll()
+				fp.write("\tcall %s\n"%(line[2]))
 			#all the translation code deoending upon operators
 	fp.write(".section .data\n")
 	for variable in variables:
