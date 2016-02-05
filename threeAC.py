@@ -73,8 +73,8 @@ class regmemDescriptor():
             self.registerList[register] = temp
         return register
 
-    def setReg(self,reg,value):
-        self.register[reg] = value
+    # def setReg(self,reg,value):
+    #     self.register[reg] = value
 
     # def getLoc(self,var):
     #     return self.variable[var]
@@ -110,5 +110,27 @@ class regmemDescriptor():
             if self.variableList[var]['register']!=None:
                 if self.ST.table[var]['nextuse'] == -1:
                     self.freeRegisters.append(self.variableList[var]['register'])
+
+    def freeReg(self,reg,flag=False):
+        if reg not in self.freeRegisters:
+            self.freeRegisters.append(reg)
+            for var in self.variableList:
+                if self.variableList[var]['register']==reg:
+                    self.variableList[var]['register']=None
+                    self.fp.write("\tMOVL %s, %s\n" %(reg,var[1:]))
+                    break
+        if flag==True:
+            self.fp.write("\tXORL %s, %s\n" %(reg,reg))
+        self.registerList[reg]=None
+
+    def setReg(self,var,reg):
+        self.freeReg(reg)
+        self.freeRegisters.remove(reg)
+        if self.variableList[var]['register']!=None:
+            self.freeReg(self.variableList[var]['register'])
+        self.variableList[var]['register']=reg
+        self.fp.write("\tMOVL %s, %s\n" %(var[1:],reg))
+        self.registerList[reg]=var
+
     def setST(self,ST):
         self.ST = ST
