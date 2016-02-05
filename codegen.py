@@ -81,8 +81,8 @@ def generateAssCode(code):
 	# pprint.pprint(variables)
 
 	#printing starts here
-	fp.write("section .text\n")
-	fp.write("\tglobal _start\n")
+	fp.write(".section .text\n")
+	fp.write("\t.global _start\n")
 	leader_index=-1
 	for basicBlock in basicBlocks:
 		leader_index+=1
@@ -96,6 +96,7 @@ def generateAssCode(code):
 		for line in basicBlock:
 			regmem.setST(SymbolTable[str(leaders[leader_index])][line[0]])
 			regmem.freeRegister()
+			SymbolTable[str(leaders[leader_index])][line[0]].printTable()
 			if line[1]=='=':
 				if line[3].startswith('$'):
 					fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))	#a=b
@@ -180,7 +181,7 @@ def generateAssCode(code):
 						fp.write("\tnegl %s\n" % regmem.getRegister(line[2]))
 				else:                                       												#a=3-2
 					fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
-					fp.write("\tsubl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))	
+					fp.write("\tsubl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))
 			elif line[1]=='/':
 				print "detected"
 				if (line[3].startswith('$') and line[4].startswith('$')):
@@ -212,9 +213,9 @@ def generateAssCode(code):
 					fp.write("\taddl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))
 			# elif line[1]=='goto':
 			# elif line[1]=='ifgoto':
-			# elif line[1]=='call':		 	
+			# elif line[1]=='call':
 			#all the translation code deoending upon operators
-	fp.write("section .data\n")
+	fp.write(".section .data\n")
 	for variable in variables:
 		fp.write("%s:\n" % variable.replace("$",""))
 		fp.write("\t.long 0\n")
