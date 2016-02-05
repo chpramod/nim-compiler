@@ -3,7 +3,10 @@ import pprint
 class symbolTable():
     def __init__(self,variables,TACline,nextTable):
         self.op = TACline[1]
-        self.dest = TACline[2]
+        if(len(TACline)>2):
+            self.dest = TACline[2]
+        else:
+            self.dest = None
         self.lineno = int(TACline[0])
         self.table={}
         if(nextTable!=None):
