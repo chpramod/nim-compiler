@@ -454,6 +454,7 @@ def generateAssCode(code):
 				regmem.freeAll()
 				fp.write("\tcall %s\n"%(line[2]))
 			elif line[1]=='ret':
+				fp.write("\tret\n")
 			elif incr:
 			elif decr:
 
