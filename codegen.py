@@ -454,10 +454,22 @@ def generateAssCode(code):
 				regmem.freeAll()
 				fp.write("\tcall %s\n"%(line[2]))
 			elif line[1]=='ret':
-			elif incr:
-			elif decr:
-
-
+			elif line[1]=='incr':																#incr,a
+				fp.write("\tincl %s\n"%(getRegister(line[2])))
+			elif line[1]=='decr':																#decr,a
+				fp.write("\tdecl %s\n"%(getRegister(line[2])))	
+			elif line[1]=='shl':													#left shift : (shl,a,2) nim uses logical shift , so shll is used in place of sall
+				if (line[2].startswith('$') and line[3].startswith('$')):			# a << b
+					fp.write("\tshll %s, %s\n"%(getRegister(line[3]),getRegister(line[2])))
+				elif(line[2].startswith('$')):
+					fp.write("\tshll $%s, %s\n"%(line[3],getRegister(line[2])))		# a << 2
+			elif line[1]=='shr':													#right shift : (shr,a,2)
+				if (line[2].startswith('$') and line[3].startswith('$')):			# a >> b
+					fp.write("\tshrl %s, %s\n"%(getRegister(line[3]),getRegister(line[2])))
+				elif(line[2].startswith('$')):
+					fp.write("\tshrl $%s, %s\n"%(line[3],getRegister(line[2])))		# a >> 2
+			elif line[1]=='and':
+				fp.write("\tandl ")
 			#all the translation code deoending upon operators
 	fp.write(".section .data\n")
 	for variable in variables:
