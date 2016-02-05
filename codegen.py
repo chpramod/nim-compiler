@@ -100,7 +100,7 @@ def generateAssCode(code):
 		for line in basicBlock:
 			regmem.setST(SymbolTable[str(leaders[leader_index])][line[0]])
 			regmem.freeRegister()
-			#SymbolTable[str(leaders[leader_index])][line[0]].printTable()
+			SymbolTable[str(leaders[leader_index])][line[0]].printTable()
 			if line[1]=='=':
 				if line[3].startswith('$'):
 					fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))	#a=b
@@ -214,7 +214,7 @@ def generateAssCode(code):
 						fp.write("\tidivl $%s\n" %(line[4]))
 					else:																					#b=a/2
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
-						freeReg('%edx',True)						
+						freeReg('%edx',True)
 						setReg(line[2],'%eax')
 						fp.write("\tidivl $%s\n" %(line[4]))
 				elif (line[4].startswith('$')):
@@ -269,7 +269,7 @@ def generateAssCode(code):
 						setVarReg('%edx',line[2])
 					else:																					#b=a mod 2
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
-						freeReg('%edx',True)						
+						freeReg('%edx',True)
 						setReg(line[2],'%eax')
 						fp.write("\tidivl $%s\n" %(line[4]))
 						setVarReg('%edx',line[2])
@@ -295,158 +295,158 @@ def generateAssCode(code):
 					fp.write("\tidivl $%s\n" %(line[4]))
 					setVarReg('%edx',line[2])
 			elif line[1]=='goto':																			#goto 2
-				if (line[2].isdigit()):	
+				if (line[2].isdigit()):
 					fp.write("\tjmp label%s\n"%(line[2]))
 				else:
 					fp.write("\tjmp %s\n"%(line[2]))
-			elif line[1]=='ifgoto':																	#ifgoto(leq,eq,le,geq,ge,neq)																		
+			elif line[1]=='ifgoto':																	#ifgoto(leq,eq,le,geq,ge,neq)
 				if (line[2]=='leq'):
 					if (line[3].startswith('$') and line[4].startswith('$')):					#a<=b				#ifgoto, leq, a, b, 2
 						fp.write("\tcmpl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[3])))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjle label%s\n"%(line[5]))
 						else:
 							fp.write("\tjle %s\n"%(line[5]))
 					elif (line[3].startswith('$')):												#a<=2
 						fp.write("\tcmpl $%s, %s\n" %(line[4],regmem.getRegister(line[3])))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjle label%s\n"%(line[5]))
 						else:
 							fp.write("\tjle %s\n"%(line[5]))
 					elif (line[4].startswith('$')):												#2<=a
 						fp.write("\tcmpl %s, $%s\n" %(regmem.getRegister(line[4]),line[3]))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjle label%s\n"%(line[5]))
 						else:
 							fp.write("\tjle %s\n"%(line[5]))
 					else:																		#3<=2
 						fp.write("\tcmpl $%s, $%s\n" %(line[4],line[3]))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjle label%s\n"%(line[5]))
 						else:
 							fp.write("\tjle %s\n"%(line[5]))
 				if (line[2]=='geq'):
 					if (line[3].startswith('$') and line[4].startswith('$')):					#a>=b				#ifgoto, geq, a, b, 2
 						fp.write("\tcmpl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[3])))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjge label%s\n"%(line[5]))
 						else:
 							fp.write("\tjge %s\n"%(line[5]))
 					elif (line[3].startswith('$')):												#a>=2
 						fp.write("\tcmpl $%s, %s\n" %(line[4],regmem.getRegister(line[3])))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjge label%s\n"%(line[5]))
 						else:
 							fp.write("\tjge %s\n"%(line[5]))
 					elif (line[4].startswith('$')):												#2>=a
 						fp.write("\tcmpl %s, $%s\n" %(regmem.getRegister(line[4]),line[3]))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjge label%s\n"%(line[5]))
 						else:
 							fp.write("\tjge %s\n"%(line[5]))
 					else:																		#3>=2
 						fp.write("\tcmpl $%s, $%s\n" %(line[4],line[3]))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjge label%s\n"%(line[5]))
 						else:
 							fp.write("\tjge %s\n"%(line[5]))
-				elif (line[2]=='eq'): 
-					if (line[3].startswith('$') and line[4].startswith('$')):					#a==b				
+				elif (line[2]=='eq'):
+					if (line[3].startswith('$') and line[4].startswith('$')):					#a==b
 						fp.write("\tcmpl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[3])))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tje label%s\n"%(line[5]))
 						else:
 							fp.write("\tje %s\n"%(line[5]))
 					elif (line[3].startswith('$')):												#a==2
 						fp.write("\tcmpl $%s, %s\n" %(line[4],regmem.getRegister(line[3])))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tje label%s\n"%(line[5]))
 						else:
 							fp.write("\tje %s\n"%(line[5]))
 					elif (line[4].startswith('$')):												#2==a
 						fp.write("\tcmpl %s, $%s\n" %(regmem.getRegister(line[4]),line[3]))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tje label%s\n"%(line[5]))
 						else:
 							fp.write("\tje %s\n"%(line[5]))
 					else:																		#3==2
 						fp.write("\tcmpl $%s, $%s\n" %(line[4],line[3]))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tje label%s\n"%(line[5]))
 						else:
 							fp.write("\tje %s\n"%(line[5]))
 				elif (line[2]=='le'):
 					if (line[3].startswith('$') and line[4].startswith('$')):					#a<b				#ifgoto, leq, a, b, 2
 						fp.write("\tcmpl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[3])))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjle label%s\n"%(line[5]))
 						else:
 							fp.write("\tjle %s\n"%(line[5]))
 					elif (line[3].startswith('$')):												#a<2
 						fp.write("\tcmpl $%s, %s\n" %(line[4],regmem.getRegister(line[3])))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjle label%s\n"%(line[5]))
 						else:
 							fp.write("\tjle %s\n"%(line[5]))
 					elif (line[4].startswith('$')):												#2<a
 						fp.write("\tcmpl %s, $%s\n" %(regmem.getRegister(line[4]),line[3]))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjle label%s\n"%(line[5]))
 						else:
 							fp.write("\tjle %s\n"%(line[5]))
 					else:																		#3<2
 						fp.write("\tcmpl $%s, $%s\n" %(line[4],line[3]))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjle label%s\n"%(line[5]))
 						else:
 							fp.write("\tjle %s\n"%(line[5]))
 				elif (line[2]=='gr'):
 					if (line[3].startswith('$') and line[4].startswith('$')):					#a>b				#ifgoto, geq, a, b, 2
 						fp.write("\tcmpl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[3])))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjg label%s\n"%(line[5]))
 						else:
 							fp.write("\tjg %s\n"%(line[5]))
 					elif (line[3].startswith('$')):												#a>2
 						fp.write("\tcmpl $%s, %s\n" %(line[4],regmem.getRegister(line[3])))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjg label%s\n"%(line[5]))
 						else:
 							fp.write("\tjg %s\n"%(line[5]))
 					elif (line[4].startswith('$')):												#2>a
 						fp.write("\tcmpl %s, $%s\n" %(regmem.getRegister(line[4]),line[3]))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjg label%s\n"%(line[5]))
 						else:
 							fp.write("\tjg %s\n"%(line[5]))
 					else:																		#3>2
 						fp.write("\tcmpl $%s, $%s\n" %(line[4],line[3]))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjg label%s\n"%(line[5]))
 						else:
 							fp.write("\tjg %s\n"%(line[5]))
-				elif (line[2]=='neq'): 
-					if (line[3].startswith('$') and line[4].startswith('$')):					#a==b				
+				elif (line[2]=='neq'):
+					if (line[3].startswith('$') and line[4].startswith('$')):					#a==b
 						fp.write("\tcmpl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[3])))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjne label%s\n"%(line[5]))
 						else:
 							fp.write("\tjne %s\n"%(line[5]))
 					elif (line[3].startswith('$')):												#a==2
 						fp.write("\tcmpl $%s, %s\n" %(line[4],regmem.getRegister(line[3])))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjne label%s\n"%(line[5]))
 						else:
 							fp.write("\tjne %s\n"%(line[5]))
 					elif (line[4].startswith('$')):												#2==a
 						fp.write("\tcmpl %s, $%s\n" %(regmem.getRegister(line[4]),line[3]))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjne label%s\n"%(line[5]))
 						else:
 							fp.write("\tjne %s\n"%(line[5]))
 					else:																		#3==2
 						fp.write("\tcmpl $%s, $%s\n" %(line[4],line[3]))
-						if (line[5].isdigit()):	
+						if (line[5].isdigit()):
 							fp.write("\tjne label%s\n"%(line[5]))
 						else:
 							fp.write("\tjne %s\n"%(line[5]))
