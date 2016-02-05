@@ -455,24 +455,81 @@ def generateAssCode(code):
 				fp.write("\tcall %s\n"%(line[2]))
 			elif line[1]=='ret':
 				fp.write("\tret\n")
+			elif line[1]=='print':                                                              #print %eax
+				fp.write("\tpushl %s\n"%(regmem.getRegister(line[2])))
+				regmem.freeAll()
+				fp.write("\tcall printIntNumber\n")
+			elif line[1]=='end':
+				fp.write("\tcall endlabel\n")
 			elif line[1]=='incr':																#incr,a
-				fp.write("\tincl %s\n"%(getRegister(line[2])))
+				fp.write("\tincl %s\n"%(regmem.getRegister(line[2])))
 			elif line[1]=='decr':																#decr,a
-				fp.write("\tdecl %s\n"%(getRegister(line[2])))	
+				fp.write("\tdecl %s\n"%(regmem.getRegister(line[2])))	
 			elif line[1]=='shl':													#left shift : (shl,a,2) nim uses logical shift , so shll is used in place of sall
 				if (line[2].startswith('$') and line[3].startswith('$')):			# a << b
-					fp.write("\tshll %s, %s\n"%(getRegister(line[3]),getRegister(line[2])))
+					fp.write("\tshll %s, %s\n"%(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
 				elif(line[2].startswith('$')):
-					fp.write("\tshll $%s, %s\n"%(line[3],getRegister(line[2])))		# a << 2
+					fp.write("\tshll $%s, %s\n"%(line[3],regmem.getRegister(line[2])))		# a << 2
 			elif line[1]=='shr':													#right shift : (shr,a,2)
 				if (line[2].startswith('$') and line[3].startswith('$')):			# a >> b
-					fp.write("\tshrl %s, %s\n"%(getRegister(line[3]),getRegister(line[2])))
+					fp.write("\tshrl %s, %s\n"%(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
 				elif(line[2].startswith('$')):
-					fp.write("\tshrl $%s, %s\n"%(line[3],getRegister(line[2])))		# a >> 2
+					fp.write("\tshrl $%s, %s\n"%(line[3],regmem.getRegister(line[2])))		# a >> 2
 			elif line[1]=='and':													# a & b
 				fp.write("\tandl ")
 			#all the translation code deoending upon operators
-	fp.write(".section .data\n")
+	fp.write("\n#the print function for integers\n\
+jmp EndPrintNum\n\
+printIntNumber:\n\
+	popl %ecx\n\
+    cmpl $0, %ecx\n\
+    jge positive_part #if number is >=0\n\
+    notl %ecx               #Other wise make positive : BIT wise NOT\n\
+    inc %ecx                #Increment to take negative\n\
+    movl %ecx, %edi         #Save the ecx value\n\
+    \n\
+    movl    $45, %eax   #print the - sign\n\
+    pushl   %eax  # add '-' character to the stack to print\n\
+    movl $4, %eax\n\
+    movl $1, %ebx\n\
+    movl %esp, %ecx\n\
+    movl $1, %edx\n\
+    int $0x80\n\
+    popl %eax  #Remove the top from the stack\n\
+    movl %edi, %ecx  #Restore %ecx back \n\
+	\n\
+	\n\
+positive_part:\n\
+    movl %ecx, %eax   #storing number in %eax and will act as quotient\n\
+    movl %esp, %esi   #storing the initial position of the stack positive_part_printer in %esi register\n\
+iter_labl:\n\
+    cdq\n\
+    movl $10, %ebx    # %ebx is the divisor\n\
+    idivl %ebx        #divide number by 10.remainder in %edx\n\
+    pushl %edx        #pushing the least significant digit into stack for later print\n\
+    cmpl $0, %eax     #check if we have extracted all digits\n\
+    jne iter_labl     #If not equal to zero,then we continue printing the digits\n\
+    jmp print_num     #else if quotient=0, then jump to print_num\n\
+    \n\
+print_num:\n\
+    popl %edx         #poping the topmost element as digit of our number pushed into the stack\n\
+    addl $48, %edx    #converting ascii character\n\
+    pushl %edx        #only to pop later\n\
+    movl $4, %eax     #4 is print sys-call number\n\
+    movl $1, %ebx     #1 for to stdout\n\
+    movl %esp, %ecx   #number+50 refers to location where the digit is stored in memory \n\
+    movl $1, %edx     #size of buffer=1 coz we r printn one digit\n\
+    int $0x80         #execute\n\
+    popl %edx         #Pop the digit on the top  \n\
+    cmp %esp, %esi    #checking if all digits exhausted\n\
+    jne print_num     #we jump back to print_num label to print rest of digits\n\
+    ret  \n\
+    EndPrintNum:\n")	
+	fp.write("\n\nendlabel:\n\
+	movl $1, %eax\n\
+	movl $0, %ebx\n\
+	int $0x80\n")	
+	fp.write("\n\n\n.section .data\n")
 	for variable in variables:
 		fp.write("%s:\n" % variable.replace("$",""))
 		fp.write("\t.long 0\n")
