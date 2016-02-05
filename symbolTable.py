@@ -2,17 +2,21 @@ import pprint
 
 class symbolTable():
     def __init__(self,variables,TACline,nextTable):
+        self.op = TACline[1]
+        self.dest = TACline[2]
         self.lineno = int(TACline[0])
         self.table={}
         if(nextTable!=None):
             for variable in variables:
                 self.table[variable]=dict()
             for variable in variables: # Since source variables are used not destination variables
-                if variable in [TACline[index] for index in range(3,len(TACline))]:
+                if ((TACline[1] not in ['>>','<<']) and (variable in [TACline[index] for index in range(3,len(TACline))]) or (TACline[1] in ['>>','<<']) and (variable in [TACline[index] for index in range(2,len(TACline))])):
                     self.table[variable]['curruse'] = 1 # Use of variable in current line of code
                 else:
                     self.table[variable]['curruse'] = 0
                 self.table[variable]['nextuse'] = nextTable.table[variable]['nextuse'] if nextTable.table[variable]['curruse'] == 0 else nextTable.lineno
+            if nextTable.op=='=':
+                self.table[nextTable.dest]['nextuse'] = -1
             # Not sure about this part
             # if(self.table[variable][nextuse] < TACline[0]):
             #     self.table[variable][status] = 0 # 0 = Dead, 1 = Live
@@ -22,7 +26,7 @@ class symbolTable():
             for variable in variables:
                 self.table[variable]=dict()
             for variable in variables: # Since source variables are used not destination variables
-                if variable in [TACline[index] for index in range(3,len(TACline))]:
+                if ((TACline[1] not in ['>>','<<']) and (variable in [TACline[index] for index in range(3,len(TACline))]) or (TACline[1] in ['>>','<<']) and (variable in [TACline[index] for index in range(2,len(TACline))])):
                     self.table[variable]['curruse'] = 1 # Use of variable in current line of code
                 else:
                     self.table[variable]['curruse'] = 0
