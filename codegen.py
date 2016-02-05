@@ -190,11 +190,14 @@ def generateAssCode(code):
 						regmem.setReg(line[4],'%ebx')
 						regmem.setReg(line[2],'%eax')
 						fp.write("\tidivl %ebx\n")
-					elif (line[2]==line[4]):																#a=b/a
+					elif (line[2]==line[4]):
+						freeReg('%eax')
+						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),'%eax'))					#a=b/a
+						freeReg('%eax')
 						freeReg('%edx',True)
-						setReg(line[3],'%eax')
 						setReg(line[4],'%ebx')
-
+						fp.write("\tidivl %ebx\n")
+						fp.write("\tmovl %s, %s\n" %('%eax',regmem.getRegister(line[4])))
 					else:																					#c=a/b
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
 						freeReg('%edx',True)
@@ -202,23 +205,37 @@ def generateAssCode(code):
 						regmem.setReg(line[2],'%eax')
 						fp.write("\tidivl %ebx\n")
 				elif (line[3].startswith('$')):
-					if (line[2]==line[3]):																	#a=a+2
-						fp.write("\taddl $%s, %s\n" %(line[4],regmem.getRegister(line[3])))
-					else:																					#b=a+2
+					if (line[2]==line[3]):																	#a=a/2
+						freeReg('%edx',True)
+						setReg(line[3],'%eax')
+						fp.write("\tidivl $%s\n" %(line[4]))
+					else:																					#b=a/2
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
-						fp.write("\taddl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))
+						freeReg('%edx',True)						
+						setReg(line[2],'%eax')
+						fp.write("\tidivl $%s\n" %(line[4]))
 				elif (line[4].startswith('$')):
-					if (line[2]==line[4]):																	#a=2+a
-						fp.write("\taddl $%s, %s\n" %(line[3],regmem.getRegister(line[4])))
-					else:																					#b=2+a
-						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[2])))
-						fp.write("\taddl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
-				else:                                       												#a=1+2
+					if (line[2]==line[4]):																	#a=2/a
+						freeReg('%eax')
+						freeReg('%edx',True)
+						fp.write("\tmovl $%s, %s\n" %(line[3],'%eax'))
+						setReg(line[4],'%ebx')
+						fp.write("\tidivl %ebx\n")
+						fp.write("\tmovl %s, %s\n" %('%eax',regmem.getRegister(line[2])))
+					else:																					#b=2/a
+						freeReg('%eax')
+						freeReg('%edx',True)
+						fp.write("\tmovl $%s, %s\n" %(line[3],'%eax'))
+						setReg(line[4],'%ebx')
+						fp.write("\tidivl %ebx\n")
+						fp.write("\tmovl %s, %s\n" %('%eax',regmem.getRegister(line[2])))
+				else:                                       												#a=3/2
 					fp.write("\taddl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
 					fp.write("\taddl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))
-			# elif line[1]=='goto':
-			# elif line[1]=='ifgoto':
-			# elif line[1]=='call':
+			elif line[1]=='mod':
+			elif line[1]=='goto':
+			elif line[1]=='ifgoto':
+			elif line[1]=='call':
 			#all the translation code deoending upon operators
 	fp.write(".section .data\n")
 	for variable in variables:
