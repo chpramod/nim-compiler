@@ -2,7 +2,7 @@ import pprint
 
 class symbolTable():
     def __init__(self,variables,TACline,nextTable):
-        self.lineno = TACline[0]
+        self.lineno = int(TACline[0])
         self.table={}
         if(nextTable!=None):
             for variable in variables:

@@ -43,13 +43,14 @@ class regmemDescriptor():
             else:
                 register = None
                 maxx=-2
-                print temp,self.variableList,self.freeRegisters
-                self.ST.printTable()
+                #print temp,self.variableList,self.freeRegisters
+                #self.ST.printTable()
                 for var in self.ST.table:
                     if self.variableList[var]['register']!=None:
                         if self.ST.table[var]['nextuse'] > maxx:
+                            #print "#############" ,var, self.ST.table[var]['nextuse'], maxx
                             register = self.variableList[var]['register']
-                        maxx=max(self.ST.table[var]['nextuse'],maxx)
+                            maxx=max(self.ST.table[var]['nextuse'],maxx)
                 # register = self.busyRegisters.pop(0)
                 tempReg = self.registerList[register]
                 self.fp.write("\tMOVL %s, $(%s)\n" %(register,tempReg[1:]))
