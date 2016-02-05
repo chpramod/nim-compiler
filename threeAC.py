@@ -139,6 +139,7 @@ class regmemDescriptor():
         self.variableList[var]['register']=reg
         if reg in self.freeRegisters:
             self.freeRegisters.remove(reg)
+        self.registerList[reg]=var
 
     def setST(self,ST):
         self.ST = ST
