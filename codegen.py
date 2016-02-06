@@ -465,18 +465,42 @@ def generateAssCode(code):
 				fp.write("\tincl %s\n"%(regmem.getRegister(line[2])))
 			elif line[1]=='decr':																#decr,a
 				fp.write("\tdecl %s\n"%(regmem.getRegister(line[2])))	
-			elif line[1]=='shl':													#left shift : (shl,a,2) nim uses logical shift , so shll is used in place of sall
-				if (line[2].startswith('$') and line[3].startswith('$')):			# a << b
-					fp.write("\tshll %s, %s\n"%(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
-				elif(line[2].startswith('$')):
-					fp.write("\tshll $%s, %s\n"%(line[3],regmem.getRegister(line[2])))		# a << 2
-			elif line[1]=='shr':													#right shift : (shr,a,2)
-				if (line[2].startswith('$') and line[3].startswith('$')):			# a >> b
-					fp.write("\tshrl %s, %s\n"%(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
-				elif(line[2].startswith('$')):
-					fp.write("\tshrl $%s, %s\n"%(line[3],regmem.getRegister(line[2])))		# a >> 2
-			elif line[1]=='and':													# a & b
-				fp.write("\tandl ")
+			elif line[1]==('shl' or 'shr' or 'and' or 'or' or 'xor') :			#bitwise operators
+				if (line[3].startswith('$') and line[4].startswith('$')):
+					if (line[2]==line[3]):											# a = a << b
+						fp.write("\t%sl %s, %s\n"%(line[1],regmem.getRegister(line[4]),regmem.getRegister(line[2])))
+					elif (line[2]==line[4]):										# a = b << a
+						regTempb = regmem.getRegister(line[3])
+						regTempa = regmem.getRegister(line[4]) 
+						regmem.freeReg(regTemp)
+						fp.write("\t%sl %s, %s\n"%(line[1],regTempa,regTempb))
+						regmem.setVarReg(regTempb,line[2])
+					else:															# c = a << b
+						fp.write("\tmovl %s, %s\n"%(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+						fp.write("\t%sl %s, %s\n"%(line[1],regmem.getRegister(line[4]),regmem.getRegister(line[2])))
+				elif(line[3].startswith('$')):										
+					if (line[2]==line[3]):											# a = a << 2
+						fp.write("\t%sl %s, %s\n"%(line[1],line[4],regmem.getRegister(line[2])))
+					else:															# a = b << 2
+						fp.write("\tmovl %s, %s\n"%(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+						fp.write("\t%sl %s, %s\n"%(line[1],line[4],regmem.getRegister(line[2])))	
+				elif(line[4].startswith('$')):										
+					if (line[2]==line[4]):											# a = 2 << a
+						regmem.freeReg('%eax')
+						regmem.setReg(line[2],'%ebx')
+						fp.write("\tmovl $%s, %eax\n"%(line[3]))
+						fp.write("\t%sl %ebx, %eax\n"%(line[1]))
+						setVarReg('%eax',line[2])
+					else:															# a = 2 << b
+						fp.write("\tmovl $%s, %s\n"%(line[3],regmem.getRegister(line[2])))
+						fp.write("\t%sl %s %s\n"%(line[1],regmem.getRegister(line[4]),regmem.getRegister(line[2])))
+			elif line[1]=='not':													#(line,not,a,b)
+				if (line[2].startswith('$') and line[3].startswith('$')):			# a = ~b
+					fp.write("\tmovl %s, %s\n"%(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+					fp.write("\tnotl %s\n"%(regmem.getRegister(line[2])))
+				else:																# a = ~2
+					fp.write("\tmovl $%s, %s\n"%(line[3],regmem.getRegister(line[2])))
+					fp.write("\tnotl %s\n"%(regmem.getRegister(line[2])))
 			#all the translation code deoending upon operators
 	fp.write("\n#the print function for integers\n\
 jmp EndPrintNum\n\
