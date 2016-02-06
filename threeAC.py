@@ -51,8 +51,8 @@ class regmemDescriptor():
                     # print self.ST.lineno,var
                     # if self.variableList[var]['register']!=None and var in self.currLine:
                     #     print "HII\t"+self.ST.lineno+var
-                    # if self.variableList[var]['register']!=None and var not in self.currLine:
-                    if self.variableList[var]['register']!=None:
+                    if self.variableList[var]['register']!=None and var not in self.currLine:
+                    # if self.variableList[var]['register']!=None:
                         if self.ST.table[var]['nextuse'] > maxx:
                             #print "#############" ,var, self.ST.table[var]['nextuse'], maxx
                             register = self.variableList[var]['register']
