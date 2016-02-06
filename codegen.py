@@ -470,7 +470,13 @@ def generateAssCode(code):
 			elif line[1]=='call':
 				regmem.freeAll()
 				fp.write("\tcall %s\n"%(line[2]))
+				if len(line)==4:
+					regmem.setVarReg('%eax',line[3])
 			elif line[1]=='ret':
+				if len(line)==3:
+					regmem.freeReg('%eax')
+					fp.write("\tmovl %s, %eax\n" %(regmem.getRegister(line[2])))
+					regmem.freeReg('%eax')
 				fp.write("\tret\n")
 			elif line[1]=='print':
 				a=regmem.getRegister(line[2])                                                            #print %eax
