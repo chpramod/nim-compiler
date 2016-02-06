@@ -99,8 +99,8 @@ def generateAssCode(code):
 			fp.write("label%s:\n" % basicBlock[0][0])
 
 		for line in basicBlock:
+			print line
 			regmem.setST(SymbolTable[str(leaders[leader_index])][line[0]])
-			regmem.freeRegister()
 			SymbolTable[str(leaders[leader_index])][line[0]].printTable()
 			if line[1]=='=': #a=b[] #a[]=b #a[]=2
 				if line[3].startswith('$'):
@@ -109,7 +109,7 @@ def generateAssCode(code):
 						tempIndex=line[2].find('[')
 						tempStr=line[2][1:tempIndex]
 						fp.write("\tmovl $({0}), %eax\n".format(tempStr))
-						fp.write("\tmovl %s, %d(%eax)\n" %(regmem.getRegister(line[3]),(int(line[2][-2])*4)))  
+						fp.write("\tmovl %s, %d(%eax)\n" %(regmem.getRegister(line[3]),(int(line[2][-2])*4)))
 					else:
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))	#a=b
 				else:
@@ -470,7 +470,7 @@ def generateAssCode(code):
 				fp.write("\tcall %s\n"%(line[2]))
 			elif line[1]=='ret':
 				fp.write("\tret\n")
-			elif line[1]=='print':  
+			elif line[1]=='print':
 				a=regmem.getRegister(line[2])                                                            #print %eax
 				print a
 				fp.write("\tpushl %s\n"%(a))
@@ -478,33 +478,33 @@ def generateAssCode(code):
 				fp.write("\tcall printIntNumber\n")
 			elif line[1]=='array':
 				arrayCurrent=[line[2],line[3]]
-				arrayDef.append(arrayCurrent)	
+				arrayDef.append(arrayCurrent)
 			elif line[1]=='end':
 				fp.write("\tcall endlabel\n")
 			elif line[1]=='incr':																#incr,a
 				fp.write("\tincl %s\n"%(regmem.getRegister(line[2])))
 			elif line[1]=='decr':																#decr,a
-				fp.write("\tdecl %s\n"%(regmem.getRegister(line[2])))	
+				fp.write("\tdecl %s\n"%(regmem.getRegister(line[2])))
 			elif line[1]==('shl' or 'shr' or 'and' or 'or' or 'xor') :			#bitwise operators
 				if (line[3].startswith('$') and line[4].startswith('$')):
 					if (line[2]==line[3]):											# a = a << b
 						fp.write("\t%sl %s, %s\n"%(line[1],regmem.getRegister(line[4]),regmem.getRegister(line[2])))
 					elif (line[2]==line[4]):										# a = b << a
 						regTempb = regmem.getRegister(line[3])
-						regTempa = regmem.getRegister(line[4]) 
+						regTempa = regmem.getRegister(line[4])
 						regmem.freeReg(regTemp)
 						fp.write("\t%sl %s, %s\n"%(line[1],regTempa,regTempb))
 						regmem.setVarReg(regTempb,line[2])
 					else:															# c = a << b
 						fp.write("\tmovl %s, %s\n"%(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
 						fp.write("\t%sl %s, %s\n"%(line[1],regmem.getRegister(line[4]),regmem.getRegister(line[2])))
-				elif(line[3].startswith('$')):										
+				elif(line[3].startswith('$')):
 					if (line[2]==line[3]):											# a = a << 2
 						fp.write("\t%sl %s, %s\n"%(line[1],line[4],regmem.getRegister(line[2])))
 					else:															# a = b << 2
 						fp.write("\tmovl %s, %s\n"%(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
-						fp.write("\t%sl %s, %s\n"%(line[1],line[4],regmem.getRegister(line[2])))	
-				elif(line[4].startswith('$')):										
+						fp.write("\t%sl %s, %s\n"%(line[1],line[4],regmem.getRegister(line[2])))
+				elif(line[4].startswith('$')):
 					if (line[2]==line[4]):											# a = 2 << a
 						regmem.freeReg('%eax')
 						regmem.setReg(line[2],'%ebx')
@@ -521,6 +521,7 @@ def generateAssCode(code):
 				else:																# a = ~2
 					fp.write("\tmovl $%s, %s\n"%(line[3],regmem.getRegister(line[2])))
 					fp.write("\tnotl %s\n"%(regmem.getRegister(line[2])))
+			regmem.freeRegister()
 			#all the translation code deoending upon operators
 	fp.write("\n#the print function for integers\n\
 jmp EndPrintNum\n\
@@ -568,11 +569,11 @@ print_num:\n\
     cmp %esp, %esi    #checking if all digits exhausted\n\
     jne print_num     #we jump back to print_num label to print rest of digits\n\
     ret  \n\
-    EndPrintNum:\n")	
+    EndPrintNum:\n")
 	fp.write("\n\nendlabel:\n\
 	movl $1, %eax\n\
 	movl $0, %ebx\n\
-	int $0x80\n")	
+	int $0x80\n")
 	fp.write("\n\n\n.section .data\n")
 	for arrays in arrayDef:
 		fp.write("%s:\n" % arrays[0].replace("$",""))

@@ -3,6 +3,7 @@ class regmemDescriptor():
         self.registerList = {} # stores content of registers i.e. variables
         self.variableList = {} # stores memory content i.e. registers, memory location, etc
         self.resetRegisters()
+        self.currLine=[]
         #self.busyRegisters=[]
         self.fp = fp
         self.ST=None
@@ -47,6 +48,10 @@ class regmemDescriptor():
                 #print temp,self.variableList,self.freeRegisters
                 #self.ST.printTable()
                 for var in self.ST.table:
+                    # print self.ST.lineno,var
+                    # if self.variableList[var]['register']!=None and var in self.currLine:
+                    #     print "HII\t"+self.ST.lineno+var
+                    # if self.variableList[var]['register']!=None and var not in self.currLine:
                     if self.variableList[var]['register']!=None:
                         if self.ST.table[var]['nextuse'] > maxx:
                             #print "#############" ,var, self.ST.table[var]['nextuse'], maxx
@@ -107,10 +112,8 @@ class regmemDescriptor():
     def freeRegister(self):
         for var in self.variableList:
             if self.variableList[var]['register']!=None:
-                if self.ST.table[var]['nextuse']==-1 and self.ST.table[var]['curruse']==0 and self.variableList[var]['register'] not in self.freeRegisters:
-                    self.freeRegisters.append(self.variableList[var]['register'])
-                    self.registerList[self.variableList[var]['register']]=None
-                    self.variableList[var]['register']=None
+                if self.ST.table[var]['nextuse']==-1 and self.variableList[var]['register'] not in self.freeRegisters:
+                    self.freeReg(self.variableList[var]['register'])
 
     def freeAll(self,flag=False):
         for reg in self.registerList:
@@ -145,6 +148,13 @@ class regmemDescriptor():
         if reg in self.freeRegisters:
             self.freeRegisters.remove(reg)
         self.registerList[reg]=var
+
+    def protectRegs(self,line):
+        self.currLine=[]
+        for i in line:
+            if i in self.variableList.keys():
+                self.currLine.append(i)
+        print self.currLine
 
     def setST(self,ST):
         self.ST = ST
