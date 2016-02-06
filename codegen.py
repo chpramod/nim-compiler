@@ -481,7 +481,7 @@ def generateAssCode(code):
 	fp.write("\n#the print function for integers\n\
 jmp EndPrintNum\n\
 printIntNumber:\n\
-	popl %ecx\n\
+	movl 4(%esp), %ecx\n\
     cmpl $0, %ecx\n\
     jge positive_part #if number is >=0\n\
     notl %ecx               #Other wise make positive : BIT wise NOT\n\
