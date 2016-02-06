@@ -109,7 +109,8 @@ def generateAssCode(code):
 						tempIndex=line[2].find('[')
 						tempStr=line[2][1:tempIndex]
 						fp.write("\tmovl $({0}), %eax\n".format(tempStr))
-						fp.write("\tmovl %s, %d(%eax)\n" %(regmem.getRegister(line[3]),(int(line[2][-2])*4)))
+						tempStr=line[2][tempIndex+1:-1]
+						fp.write("\tmovl %s, %d(%eax)\n" %(regmem.getRegister(line[3]),4*int(tempStr)))
 					else:
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))	#a=b
 				else:
@@ -118,7 +119,8 @@ def generateAssCode(code):
 						tempIndex=line[2].find('[')
 						tempStr=line[2][1:tempIndex]
 						fp.write("\tmovl $({0}), %eax\n".format(tempStr))
-						fp.write("\tmovl ${0}, {1}(%eax)\n" .format(line[3],(int(line[2][-2])*4)))
+						tempStr=line[2][tempIndex+1:-1]
+						fp.write("\tmovl ${0}, {1}(%eax)\n" .format(line[3],4*int(tempStr)))
 					else:
 						fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))	     			#a=2
 			elif line[1]=='+':
@@ -580,8 +582,11 @@ print_num:\n\
 		variables.remove(arrays[0])
 		fp.write("\t.space %d\n"%(int(arrays[1])*4))
 	for variable in variables:
-		fp.write("%s:\n" % variable.replace("$",""))
-		fp.write("\t.long 0\n")
+		if variable.find('[')!=-1:
+			variables.remove(variable)
+		else:
+			fp.write("%s:\n" % variable.replace("$",""))
+			fp.write("\t.long 0\n")
 
 
 def BasicBlocks(TAC,leaders):
