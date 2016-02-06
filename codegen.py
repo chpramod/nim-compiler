@@ -106,19 +106,17 @@ def generateAssCode(code):
 				if line[3].startswith('$'):
 					if line[2].endswith("]"):                                                           #a[]=b
 						regmem.freeReg('%eax')
-						tempStr=line[2][1:-3]
+						tempIndex=line[2].find('[')
+						tempStr=line[2][1:tempIndex]
 						fp.write("\tmovl $({0}), %eax\n".format(tempStr))
-						fp.write("\tmovl %s, %d(%eax)\n" %(regmem.getRegister(line[3]),(int(line[2][-2])*4))) 
-					else:
-						fp.write("\tmovl {0}, {1}\n" .format(regmem.getRegister(line[3]),regmem.getRegister(line[2])))	#a=b
-						fp.write("\tmovl $(%s), %eax" %(line[2][1:-3]))
-						fp.write("\tmovl %s, %d(%eax)" %(regmem.getRegister(line[3]),(int(line[2][-2])*4))) 
+						fp.write("\tmovl %s, %d(%eax)\n" %(regmem.getRegister(line[3]),(int(line[2][-2])*4)))  
 					else:
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))	#a=b
 				else:
 					if line[2].endswith("]"):                                                           #a[]=2
 						regmem.freeReg('%eax')
-						tempStr=line[2][1:-3]
+						tempIndex=line[2].find('[')
+						tempStr=line[2][1:tempIndex]
 						fp.write("\tmovl $({0}), %eax\n".format(tempStr))
 						fp.write("\tmovl ${0}, {1}(%eax)\n" .format(line[3],(int(line[2][-2])*4)))
 					else:
