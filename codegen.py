@@ -19,6 +19,7 @@ def generateAssCode(code):
 	global register_list,variables
 	fp = open("AssCode.s",'w')
 	leaders=[]
+	arrayDef=[]
 	TAC = []
 	SymbolTable = dict()
 	totalLines=0
@@ -459,6 +460,9 @@ def generateAssCode(code):
 				fp.write("\tpushl %s\n"%(regmem.getRegister(line[2])))
 				regmem.freeAll()
 				fp.write("\tcall printIntNumber\n")
+			elif line[1]=='array':
+				arrayCurrent=[line[2],line[3]]
+				arrayDef.append(arrayCurrent)	
 			elif line[1]=='end':
 				fp.write("\tcall endlabel\n")
 			elif line[1]=='incr':																#incr,a
@@ -554,6 +558,10 @@ print_num:\n\
 	movl $0, %ebx\n\
 	int $0x80\n")	
 	fp.write("\n\n\n.section .data\n")
+	for arrays in arrayDef:
+		fp.write("%s:\n" % arrays[0].replace("$",""))
+		variables.remove(arrays[0])
+		fp.write("\t.space %d\n"%(int(arrays[1])*4))
 	for variable in variables:
 		fp.write("%s:\n" % variable.replace("$",""))
 		fp.write("\t.long 0\n")
