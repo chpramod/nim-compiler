@@ -99,9 +99,9 @@ def generateAssCode(code):
 			fp.write("label%s:\n" % basicBlock[0][0])
 
 		for line in basicBlock:
-			print line
+			regmem.protectRegs(line)
 			regmem.setST(SymbolTable[str(leaders[leader_index])][line[0]])
-			SymbolTable[str(leaders[leader_index])][line[0]].printTable()
+			# SymbolTable[str(leaders[leader_index])][line[0]].printTable()
 			if line[1]=='=': #a=b[] #a[]=b #a[]=2
 				if line[3].startswith('$'):
 					if line[2].endswith("]"):                                                           #a[]=b

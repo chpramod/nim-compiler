@@ -1,3 +1,4 @@
+from pprint import pprint
 class regmemDescriptor():
     def __init__(self,registers,variables,fp):
         self.registerList = {} # stores content of registers i.e. variables
@@ -24,6 +25,7 @@ class regmemDescriptor():
         self.variable[value]=reg
 
     def getRegister(self, temp):
+        # pprint(self.registerList)
         #self.ST.printTable()
         #print self.registerList.values()
         if temp in self.registerList.values():
@@ -34,8 +36,8 @@ class regmemDescriptor():
                 #print self.ST.table
                 #print self.ST
                 register = self.freeRegisters.pop()
-                if self.variableList[temp]['register']!=None:
-                    self.fp.write("\tMOVL %s, %s\n" %(temp[1:],register))
+                # if self.variableList[temp]['register']!=None:
+                self.fp.write("\tMOVL %s, %s\n" %(temp[1:],register))
                 # if self.variablelist[temp]['memory'] != None and self.variablelist[temp]['store']:
                     # (level, offset) = self.variablelist[temp]['memory']
                     # print (level, offset)
@@ -77,6 +79,7 @@ class regmemDescriptor():
             self.variableList[temp]['register'] = register
             # self.busyRegisters.append(register)
             self.registerList[register] = temp
+        print self.ST.lineno,self.currLine,temp,register
         return register
 
     # def setReg(self,reg,value):
@@ -154,7 +157,6 @@ class regmemDescriptor():
         for i in line:
             if i in self.variableList.keys():
                 self.currLine.append(i)
-        print self.currLine
 
     def setST(self,ST):
         self.ST = ST
