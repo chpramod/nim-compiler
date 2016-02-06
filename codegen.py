@@ -475,7 +475,7 @@ def generateAssCode(code):
 			elif line[1]=='ret':
 				if len(line)==3:
 					regmem.freeReg('%eax')
-					fp.write("\tmovl %s, %eax\n" %(regmem.getRegister(line[2])))
+					fp.write("\tmovl {0}, %eax\n" .format(regmem.getRegister(line[2])))
 					regmem.freeReg('%eax')
 				fp.write("\tret\n")
 			elif line[1]=='print':
