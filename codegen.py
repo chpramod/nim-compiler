@@ -107,8 +107,8 @@ def generateAssCode(code):
 					if line[2].endswith("]"):                                    #a[]=b
 						regmem.freeReg('%eax')
 						fp.write("\tmovl $(%s), %eax" %(line[2][1:-3]))
-						fp.write("\tmovl %s, %d(%eax)" %(regmem.getRegister(line[3]),(int(line[2][-2])*4)) 
-					else
+						fp.write("\tmovl %s, %d(%eax)" %(regmem.getRegister(line[3]),(int(line[2][-2])*4))) 
+					else:
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))	#a=b
 				else:
 					fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))						#a=2
