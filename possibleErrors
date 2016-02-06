@@ -1,0 +1,18 @@
+# also after assigning nextUse once it shd be reassigned to -1
+# currUse in getReg
+#error for a=1 then print b
+
+
+#improvement in
+
+call function with argument
+subl b-a
+
+#to do 
+
+arrays
+
+
+#specs
+
+we are only dealing with a[]=b type operations, rest of them shall be converted(i.e. say for b=a[], we'll do a[]=t and then b=t)
