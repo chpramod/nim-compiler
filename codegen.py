@@ -479,10 +479,10 @@ def generateAssCode(code):
 					regmem.freeReg('%eax')
 				fp.write("\tret\n")
 			elif line[1]=='print':
-				a=regmem.getRegister(line[2])                                                            #print %eax
-				print a
-				fp.write("\tpushl %s\n"%(a))
+				# a=regmem.getRegister(line[2])                                                            #print a
+				# print a
 				regmem.freeAll()
+				fp.write("\tpushl %s\n"%(line[2][1:]))
 				fp.write("\tcall printIntNumber\n")
 			elif line[1]=='array':
 				arrayCurrent=[line[2],line[3]]
