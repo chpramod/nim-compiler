@@ -505,7 +505,8 @@ def generateAssCode(code):
 				fp.write("\tincl %s\n"%(regmem.getRegister(line[2])))
 			elif line[1]=='decr':																#decr,a
 				fp.write("\tdecl %s\n"%(regmem.getRegister(line[2])))
-			elif (line[1]=='shl' or 'shr'):
+			elif (line[1]=='shl' or line[1]=='shr'):
+				print "**************************"
 				if (line[3].startswith('$') and line[4].startswith('$')):
 					if (line[2]==line[3]):											# a = a << b
 						fp.write("\t%sl %s, %s\n"%(line[1],regmem.getRegister(line[4]),regmem.getRegister(line[2])))
@@ -537,7 +538,7 @@ def generateAssCode(code):
 				else:																# a = 2 << 3
 					fp.write("\tmovl $%s, %s\n"%(line[3],regmem.getRegister(line[2])))
 					fp.write("\t%sl %s, %s\n"%(line[1],line[4],regmem.getRegister(line[2])))
-			elif (line[1]=='and' or 'or' or 'xor'):			#bitwise operators
+			elif (line[1]=='and' or line[1]=='or' or line[1]=='xor'):			#bitwise operators
 				print "###################################"
 				if (line[3].startswith('$') and line[4].startswith('$')):
 					if (line[2]==line[3]):											# a = a and b
