@@ -102,7 +102,8 @@ def generateAssCode(code):
 			regmem.protectRegs(line)
 			regmem.setST(SymbolTable[str(leaders[leader_index])][line[0]])
 			SymbolTable[str(leaders[leader_index])][line[0]].printTable()
-			print line[1]
+			pprint(line)
+			pprint(regmem.variableList)
 			if line[1]=='=': #a=b[] #a[]=b #a[]=2
 				if line[3].startswith('$'):
 					if line[2].endswith("]"):                                                           #a[]=b
@@ -213,32 +214,36 @@ def generateAssCode(code):
 						fp.write("\tidivl %ebx\n")
 					elif (line[2]==line[4]):
 						regmem.freeReg('%eax')
-						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),'%eax'))					#a=b/a 
+						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),'%eax'))					#a=b/a
 						regmem.freeReg('%eax')
 						regmem.freeReg('%edx',True)
 						regmem.setReg(line[4],'%ebx')
 						fp.write("\tidivl %ebx\n")
 						regmem.setVarReg('%eax',line[2])
 					else:																					#c=a/b
-						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+						# fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
 						regmem.freeReg('%edx',True)
 						regmem.setReg(line[4],'%ebx')
-						regmem.setReg(line[2],'%eax')
+						regmem.setReg(line[3],'%eax')
+						regmem.freeReg('%eax')
 						fp.write("\tidivl %ebx\n")
+						regmem.setVarReg('%eax',line[2])
 				elif (line[3].startswith('$')):
-					if (line[2]==line[3]):																	#a=a/2 
+					if (line[2]==line[3]):																	#a=a/2
 						regmem.freeReg('%edx',True)
 						regmem.setReg(line[3],'%eax')
 						regmem.freeReg('%ebx')
 						fp.write("\tmovl $%s, %s\n" %(line[4],'%ebx'))
 						fp.write("\tidivl %ebx\n")
 					else:																					#b=a/2
-						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+						# fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
 						regmem.freeReg('%edx',True)
-						regmem.setReg(line[2],'%eax')
+						regmem.setReg(line[3],'%eax')
 						regmem.freeReg('%ebx')
 						fp.write("\tmovl $%s, %s\n" %(line[4],'%ebx'))
+						regmem.freeReg('%eax')
 						fp.write("\tidivl %ebx\n")
+						regmem.setVarReg('%eax',line[2])
 				elif (line[4].startswith('$')):
 					if (line[2]==line[4]):																	#a=2/a
 						regmem.freeReg('%eax')
@@ -279,23 +284,29 @@ def generateAssCode(code):
 						fp.write("\tidivl %ebx\n")
 						regmem.setVarReg('%edx',line[2])
 					else:																					#c=a mod b
-						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+						# fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
 						regmem.freeReg('%edx',True)
 						regmem.setReg(line[4],'%ebx')
-						regmem.setReg(line[2],'%eax')
+						regmem.setReg(line[3],'%eax')
+						regmem.freeReg('%eax')
 						fp.write("\tidivl %ebx\n")
 						regmem.setVarReg('%edx',line[2])
 				elif (line[3].startswith('$')):
 					if (line[2]==line[3]):																	#a=a mod 2
 						regmem.freeReg('%edx',True)
 						regmem.setReg(line[3],'%eax')
-						fp.write("\tidivl $%s\n" %(line[4]))
+						regmem.freeReg('%ebx')
+						fp.write("\tmovl $%s, %s\n" %(line[4],'%ebx'))
+						fp.write("\tidivl %ebx\n")
 						regmem.setVarReg('%edx',line[2])
 					else:																					#b=a mod 2
-						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+						# fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
 						regmem.freeReg('%edx',True)
-						regmem.setReg(line[2],'%eax')
-						fp.write("\tidivl $%s\n" %(line[4]))
+						regmem.setReg(line[3],'%eax')
+						regmem.freeReg('%ebx')
+						fp.write("\tmovl $%s, %s\n" %(line[4],'%ebx'))
+						regmem.freeReg('%eax')
+						fp.write("\tidivl %ebx\n")
 						regmem.setVarReg('%edx',line[2])
 				elif (line[4].startswith('$')):
 					if (line[2]==line[4]):																	#a=2 mod a
@@ -316,7 +327,9 @@ def generateAssCode(code):
 					regmem.freeReg('%eax')
 					regmem.freeReg('%edx',True)
 					fp.write("\tmovl $%s, %s\n" %(line[3],'%eax'))
-					fp.write("\tidivl $%s\n" %(line[4]))
+					regmem.freeReg('%ebx')
+					fp.write("\tmovl $%s, %s\n" %(line[4],'%ebx'))
+					fp.write("\tidivl %s\n" %('%ebx'))
 					regmem.setVarReg('%edx',line[2])
 			elif line[1]=='goto':																			#goto 2
 				if (line[2].isdigit()):
