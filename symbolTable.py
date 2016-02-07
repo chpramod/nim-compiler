@@ -18,6 +18,7 @@ class symbolTable():
                 else:
                     self.table[variable]['curruse'] = 0
                 self.table[variable]['nextuse'] = nextTable.table[variable]['nextuse'] if nextTable.table[variable]['curruse'] == 0 else nextTable.lineno
+                self.table[variable]['nextassign'] = nextTable.lineno if nextTable.dest == variable and nextTable.table[variable]['curruse'] == 0 else nextTable.table[variable]['nextassign']
             if nextTable.op=='=':
                 self.table[nextTable.dest]['nextuse'] = -1
             # Not sure about this part
@@ -34,6 +35,7 @@ class symbolTable():
                 else:
                     self.table[variable]['curruse'] = 0
                 self.table[variable]['nextuse'] = -1
+                self.table[variable]['nextassign'] = -1
         # print(self.lineno)
         # pprint.pprint(self.table)
     def printTable(self):

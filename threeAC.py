@@ -115,7 +115,7 @@ class regmemDescriptor():
     def freeRegister(self):
         for var in self.variableList:
             if self.variableList[var]['register']!=None:
-                if self.ST.table[var]['nextuse']==-1 and self.variableList[var]['register'] not in self.freeRegisters:
+                if self.ST.table[var]['nextuse']==-1 and self.ST.table[var]['nextassign']==-1 and self.variableList[var]['register'] not in self.freeRegisters:
                     self.freeReg(self.variableList[var]['register'])
 
     def freeAll(self,flag=False):
