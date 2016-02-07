@@ -102,6 +102,7 @@ def generateAssCode(code):
 			regmem.protectRegs(line)
 			regmem.setST(SymbolTable[str(leaders[leader_index])][line[0]])
 			SymbolTable[str(leaders[leader_index])][line[0]].printTable()
+			print line[1]
 			if line[1]=='=': #a=b[] #a[]=b #a[]=2
 				if line[3].startswith('$'):
 					if line[2].endswith("]"):                                                           #a[]=b
@@ -504,7 +505,7 @@ def generateAssCode(code):
 				fp.write("\tincl %s\n"%(regmem.getRegister(line[2])))
 			elif line[1]=='decr':																#decr,a
 				fp.write("\tdecl %s\n"%(regmem.getRegister(line[2])))
-			elif line[1]==('shl' or 'shr' or 'and' or 'or' or 'xor'):			#bitwise operators
+			elif (line[1]=='shl' or 'shr'):
 				if (line[3].startswith('$') and line[4].startswith('$')):
 					if (line[2]==line[3]):											# a = a << b
 						fp.write("\t%sl %s, %s\n"%(line[1],regmem.getRegister(line[4]),regmem.getRegister(line[2])))
@@ -536,6 +537,40 @@ def generateAssCode(code):
 				else:																# a = 2 << 3
 					fp.write("\tmovl $%s, %s\n"%(line[3],regmem.getRegister(line[2])))
 					fp.write("\t%sl %s, %s\n"%(line[1],line[4],regmem.getRegister(line[2])))
+			elif (line[1]=='and' or 'or' or 'xor'):			#bitwise operators
+				print "###################################"
+				if (line[3].startswith('$') and line[4].startswith('$')):
+					if (line[2]==line[3]):											# a = a and b
+						fp.write("\t%sl %s, %s\n"%(line[1],regmem.getRegister(line[4]),regmem.getRegister(line[2])))
+					elif (line[2]==line[4]):										# a = b and a
+						regTempb = regmem.getRegister(line[3])
+						regTempa = regmem.getRegister(line[4])
+						regmem.freeReg(regTemp)
+						fp.write("\t%sl %s, %s\n"%(line[1],regTempa,regTempb))
+						regmem.setVarReg(regTempb,line[2])
+					else:															# c = a and b
+						fp.write("\tmovl %s, %s\n"%(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+						fp.write("\t%sl %s, %s\n"%(line[1],regmem.getRegister(line[4]),regmem.getRegister(line[2])))
+				elif(line[3].startswith('$')):
+					if (line[2]==line[3]):											# a = a and 2
+						fp.write("\t%sl %s, %s\n"%(line[1],line[4],regmem.getRegister(line[2])))
+					else:															# a = b and 2
+						fp.write("\tmovl %s, %s\n"%(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
+						fp.write("\t%sl $%s, %s\n"%(line[1],line[4],regmem.getRegister(line[2])))
+				elif(line[4].startswith('$')):
+					if (line[2]==line[4]):											# a = 2 and a
+						regmem.freeReg('%eax')
+						regmem.setReg(line[2],'%ebx')
+						fp.write("\tmovl $%s, %eax\n"%(line[3]))
+						fp.write("\t%sl %ebx, %eax\n"%(line[1]))
+						setVarReg('%eax',line[2])
+					else:															# a = 2 and b
+						fp.write("\tmovl $%s, %s\n"%(line[3],regmem.getRegister(line[2])))
+						fp.write("\t%sl %s %s\n"%(line[1],regmem.getRegister(line[4]),regmem.getRegister(line[2])))
+				else:																# a = 2 and 3
+					print "###########################################"
+					fp.write("\tmovl $%s, %s\n"%(line[3],regmem.getRegister(line[2])))
+					fp.write("\t%sl $%s, %s\n"%(line[1],line[4],regmem.getRegister(line[2])))
 			elif line[1]=='not':													#(line,not,a,b)
 				if (line[2].startswith('$') and line[3].startswith('$')):			# a = ~b
 					fp.write("\tmovl %s, %s\n"%(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
