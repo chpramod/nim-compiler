@@ -131,8 +131,11 @@ class regmemDescriptor():
             self.freeReg(reg,flag)
 
     def freeReg(self,reg,flag=False):
+        print "inside freeReg", reg
         if reg not in self.freeRegisters:
+            print "inside freereg if1"
             self.freeRegisters.append(reg)
+            print "variablelist", self.variableList
             for var in self.variableList:
                 if self.variableList[var]['register']==reg:
                     self.variableList[var]['register']=None
@@ -145,9 +148,12 @@ class regmemDescriptor():
         self.registerList[reg]=None
 
     def setReg(self,var,reg):
+        print "inside setReg", var, reg
+        print self.variableList
         self.freeReg(reg)
         self.freeRegisters.remove(reg)
         if self.variableList[var]['register']!=None:
+            print "inside if",self.variableList[var]['register']
             self.freeReg(self.variableList[var]['register'])
         self.variableList[var]['register']=reg
         self.fp.write("\tMOVL %s, %s\n" %(var[1:],reg))

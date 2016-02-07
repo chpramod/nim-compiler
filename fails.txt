@@ -25,3 +25,7 @@
 11, print, $y					
 
 
+scan, $p
+print, $p
+end
+

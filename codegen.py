@@ -496,6 +496,10 @@ def generateAssCode(code):
 					regmem.freeAll()
 					fp.write("\tpushl $%s\n"%(line[2]))
 					fp.write("\tcall printIntNumber\n")
+			elif line[1]=='scan':
+					fp.write("\tmovl {0}, {1}\n" .format(regmem.getRegister(line[2]),line[2][1:]))
+					fp.write("\tpushl {0}\n".format(line[2]))
+					fp.write("\tpushl $formatstr\n\tcall scanf\n")
 			elif line[1]=='array':
 				arrayCurrent=[line[2],line[3]]
 				arrayDef.append(arrayCurrent)
@@ -506,7 +510,6 @@ def generateAssCode(code):
 			elif line[1]=='decr':																#decr,a
 				fp.write("\tdecl %s\n"%(regmem.getRegister(line[2])))
 			elif (line[1]=='shl' or line[1]=='shr'):
-				print "**************************"
 				if (line[3].startswith('$') and line[4].startswith('$')):
 					if (line[2]==line[3]):											# a = a << b
 						fp.write("\t%sl %s, %s\n"%(line[1],regmem.getRegister(line[4]),regmem.getRegister(line[2])))
@@ -539,7 +542,6 @@ def generateAssCode(code):
 					fp.write("\tmovl $%s, %s\n"%(line[3],regmem.getRegister(line[2])))
 					fp.write("\t%sl %s, %s\n"%(line[1],line[4],regmem.getRegister(line[2])))
 			elif (line[1]=='and' or line[1]=='or' or line[1]=='xor'):			#bitwise operators
-				print "###################################"
 				if (line[3].startswith('$') and line[4].startswith('$')):
 					if (line[2]==line[3]):											# a = a and b
 						fp.write("\t%sl %s, %s\n"%(line[1],regmem.getRegister(line[4]),regmem.getRegister(line[2])))
@@ -569,7 +571,6 @@ def generateAssCode(code):
 						fp.write("\tmovl $%s, %s\n"%(line[3],regmem.getRegister(line[2])))
 						fp.write("\t%sl %s %s\n"%(line[1],regmem.getRegister(line[4]),regmem.getRegister(line[2])))
 				else:																# a = 2 and 3
-					print "###########################################"
 					fp.write("\tmovl $%s, %s\n"%(line[3],regmem.getRegister(line[2])))
 					fp.write("\t%sl $%s, %s\n"%(line[1],line[4],regmem.getRegister(line[2])))
 			elif line[1]=='not':													#(line,not,a,b)
@@ -643,6 +644,7 @@ print_num:\n\
 		else:
 			fp.write("%s:\n" % variable.replace("$",""))
 			fp.write("\t.long 0\n")
+	fp.write("formatstr:\n\t.ascii \"\%d\"\n")
 
 
 def BasicBlocks(TAC,leaders):

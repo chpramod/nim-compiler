@@ -1,5 +1,5 @@
 import pprint
-twoAddrCodes = ['incr','decr','print','>>','<<']
+twoAddrCodes = ['incr','decr','print','scanf','>>','<<']
 class symbolTable():
     def __init__(self,variables,TACline,nextTable):
         self.op = TACline[1]
