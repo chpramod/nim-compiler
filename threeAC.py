@@ -1,4 +1,5 @@
 from pprint import pprint
+nonDirtyOp = ['print']
 class regmemDescriptor():
     def __init__(self,registers,variables,fp):
         self.registerList = {} # stores content of registers i.e. variables
@@ -116,13 +117,14 @@ class regmemDescriptor():
     #     self.registerList[reg]=None
 
     def freeRegister(self):
-        if self.ST.dest in self.variableList.keys():
+        if self.ST.dest in self.variableList.keys() and self.ST.op not in nonDirtyOp:
             self.variableList[self.ST.dest]['dirty']=True
         pprint(self.variableList)
         for var in self.variableList:
             if self.variableList[var]['register']!=None:
                 if self.ST.table[var]['nextuse']==-1 and self.ST.table[var]['nextassign']==-1 and self.variableList[var]['register'] not in self.freeRegisters:
                     self.freeReg(self.variableList[var]['register'])
+        pprint(self.variableList)
 
     def freeAll(self,flag=False):
         for reg in self.registerList:

@@ -2,7 +2,6 @@ import pprint
 twoAddrCodes = ['incr','decr','print','>>','<<']
 class symbolTable():
     def __init__(self,variables,TACline,nextTable):
-        global twoAddrCodes
         self.op = TACline[1]
         if(len(TACline)>2):
             self.dest = TACline[2]
