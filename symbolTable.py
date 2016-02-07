@@ -1,7 +1,8 @@
 import pprint
-
+twoAddrCodes = ['incr','decr','print','>>','<<']
 class symbolTable():
     def __init__(self,variables,TACline,nextTable):
+        global twoAddrCodes
         self.op = TACline[1]
         if(len(TACline)>2):
             self.dest = TACline[2]
@@ -15,7 +16,7 @@ class symbolTable():
             for variable in variables:
                 self.table[variable]=dict()
             for variable in variables: # Since source variables are used not destination variables
-                if ((TACline[1] not in ['incr','decr','print']) and (variable in [TACline[index] for index in range(3,len(TACline))]) or (TACline[1] in ['incr','decr','print']) and (variable in [TACline[index] for index in range(2,len(TACline))])):
+                if ((TACline[1] not in twoAddrCodes) and (variable in [TACline[index] for index in range(3,len(TACline))]) or (TACline[1] in twoAddrCodes) and (variable in [TACline[index] for index in range(2,len(TACline))])):
                     self.table[variable]['curruse'] = 1 # Use of variable in current line of code
                 else:
                     self.table[variable]['curruse'] = 0
@@ -32,7 +33,7 @@ class symbolTable():
             for variable in variables:
                 self.table[variable]=dict()
             for variable in variables: # Since source variables are used not destination variables
-                if ((TACline[1] not in ['>>','<<']) and (variable in [TACline[index] for index in range(3,len(TACline))]) or (TACline[1] in ['>>','<<']) and (variable in [TACline[index] for index in range(2,len(TACline))])):
+                if ((TACline[1] not in twoAddrCodes) and (variable in [TACline[index] for index in range(3,len(TACline))]) or (TACline[1] in twoAddrCodes) and (variable in [TACline[index] for index in range(2,len(TACline))])):
                     self.table[variable]['curruse'] = 1 # Use of variable in current line of code
                 else:
                     self.table[variable]['curruse'] = 0
