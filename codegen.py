@@ -532,18 +532,23 @@ def generateAssCode(code):
 						regmem.setReg(line[3],'%eax')
 						fp.write("\t{0}l {1}, %eax\n".format(line[1],'%cl'))
 					elif (line[2]==line[4]):										# a = b << a
+						regmem.setReg(line[4],'%ecx')
 						regTempb = regmem.getRegister(line[3])
-						regTempa = regmem.getRegister(line[4])
-						regmem.setReg('%ecx',line[4])
-						regmem.freeReg(regTemp)
-						fp.write("\t%sl %s, %s\n"%(line[1],regTempa,regTempb))
+						#regTempa = regmem.getRegister(line[4])
+						regmem.freeReg(regTempb)
+						fp.write("\t%sl %s, %s\n"%(line[1],'%cl',regTempb))
 						regmem.setVarReg(regTempb,line[2])
 					else:															# c = a << b
-						fp.write("\tmovl %s, %s\n"%(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
-						fp.write("\t%sl %s, %s\n"%(line[1],regmem.getRegister(line[4]),regmem.getRegister(line[2])))
+						regmem.setReg(line[4],'%ecx')
+						regTempb = regmem.getRegister(line[3])
+						#regTempa = regmem.getRegister(line[4])
+						regmem.freeReg(regTempb)
+						fp.write("\t%sl %s, %s\n"%(line[1],'%cl',regTempb))
+						regmem.setVarReg(regTempb,line[2])
 				elif(line[3].startswith('$')):
 					if (line[2]==line[3]):											# a = a << 2
-						fp.write("\t%sl %s, %s\n"%(line[1],line[4],regmem.getRegister(line[2])))
+						fp.write("\tmovl ${0}, %ecx\n".format(line[4]))
+						fp.write("\t%sl %s, %s\n"%(line[1],'%cl',regmem.getRegister(line[2])))
 					else:															# a = b << 2
 						fp.write("\tmovl %s, %s\n"%(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
 						fp.write("\t%sl %s, %s\n"%(line[1],line[4],regmem.getRegister(line[2])))
