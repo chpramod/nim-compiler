@@ -14,7 +14,7 @@ class regmemDescriptor():
             self.variableList[variable] = {
 							'memory'	: None,
 							'register'	: None,
-                            'store'     : None
+                            'dirty'     : False
                             }
 
     def getRegVal(self,reg):
@@ -25,8 +25,8 @@ class regmemDescriptor():
         self.variable[value]=reg
 
     def getRegister(self, temp):
-        # pprint(self.registerList)
-        #self.ST.printTable()
+        pprint(self.registerList)
+        self.ST.printTable()
         #print self.registerList.values()
         if temp in self.registerList.values():
             register = self.variableList[temp]['register']
@@ -37,7 +37,8 @@ class regmemDescriptor():
                 #print self.ST
                 register = self.freeRegisters.pop()
                 # if self.variableList[temp]['register']!=None:
-                self.fp.write("\tMOVL %s, %s\n" %(temp[1:],register))
+                if self.ST.table[temp]['curruse']==1:
+                    self.fp.write("\tMOVL %s, %s\n" %(temp[1:],register))
                 # if self.variablelist[temp]['memory'] != None and self.variablelist[temp]['store']:
                     # (level, offset) = self.variablelist[temp]['memory']
                     # print (level, offset)
@@ -61,7 +62,9 @@ class regmemDescriptor():
                             maxx=max(self.ST.table[var]['nextuse'],maxx)
                 # register = self.busyRegisters.pop(0)
                 tempReg = self.registerList[register]
-                self.fp.write("\tMOVL %s, %s\n" %(register,tempReg[1:]))
+                if self.variableList[tempReg]['dirty']==True:
+                    self.fp.write("\tMOVL %s, %s\n" %(register,tempReg[1:]))
+                self.variableList[tempReg]['dirty']=False
                 self.variableList[tempReg]['register'] = None
                 self.registerList[register] = temp
                 self.fp.write("\tMOVL %s, %s\n" %(temp[1:],register))
@@ -113,6 +116,9 @@ class regmemDescriptor():
     #     self.registerList[reg]=None
 
     def freeRegister(self):
+        if self.ST.dest in self.variableList.keys():
+            self.variableList[self.ST.dest]['dirty']=True
+        pprint(self.variableList)
         for var in self.variableList:
             if self.variableList[var]['register']!=None:
                 if self.ST.table[var]['nextuse']==-1 and self.ST.table[var]['nextassign']==-1 and self.variableList[var]['register'] not in self.freeRegisters:
@@ -128,7 +134,9 @@ class regmemDescriptor():
             for var in self.variableList:
                 if self.variableList[var]['register']==reg:
                     self.variableList[var]['register']=None
-                    self.fp.write("\tMOVL %s, %s\n" %(reg,var[1:]))
+                    if self.variableList[var]['dirty']==True:
+                        self.fp.write("\tMOVL %s, %s\n" %(reg,var[1:]))
+                    self.variableList[var]['dirty']=False
                     break
         if flag==True:
             self.fp.write("\tXORL %s, %s\n" %(reg,reg))

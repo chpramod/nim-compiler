@@ -101,7 +101,7 @@ def generateAssCode(code):
 		for line in basicBlock:
 			regmem.protectRegs(line)
 			regmem.setST(SymbolTable[str(leaders[leader_index])][line[0]])
-			# SymbolTable[str(leaders[leader_index])][line[0]].printTable()
+			SymbolTable[str(leaders[leader_index])][line[0]].printTable()
 			if line[1]=='=': #a=b[] #a[]=b #a[]=2
 				if line[3].startswith('$'):
 					if line[2].endswith("]"):                                                           #a[]=b
