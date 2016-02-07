@@ -9,7 +9,9 @@ class symbolTable():
             self.dest = None
         self.lineno = int(TACline[0])
         self.table={}
+        self.prevTable=None
         if(nextTable!=None):
+            nextTable.prevTable=self
             for variable in variables:
                 self.table[variable]=dict()
             for variable in variables: # Since source variables are used not destination variables
