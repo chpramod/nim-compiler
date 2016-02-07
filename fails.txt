@@ -5,7 +5,23 @@
 5, =, $e, 1					
 6, =, $s, 5
 7, =, $x, 20
-8, /, $y, $x, $s	//problem in this line
+8, /, $y, $x, $s	//problem in this line		//no error if y is assigned earlier 
 9, print, $y
+
+
+
+
+
+1, =, $a, 2
+2, +, $a, $a, $a
+3, =, $c, 3
+4, =, $d, 2
+5, =, $e, 1					
+6, =, $s, 5
+7, =, $y, 123
+8, =, $x, 20
+9, print, $x			//no error without this print statement
+10, /, $y, $x, $s
+11, print, $y					
 
 
