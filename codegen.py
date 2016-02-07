@@ -515,10 +515,13 @@ def generateAssCode(code):
 			elif (line[1]=='shl' or line[1]=='shr'):
 				if (line[3].startswith('$') and line[4].startswith('$')):
 					if (line[2]==line[3]):											# a = a << b
-						fp.write("\t%sl %s, %s\n"%(line[1],regmem.getRegister(line[4]),regmem.getRegister(line[2])))
+						regmem.setReg(line[4],'%ecx')
+						regmem.setReg(line[3],'%eax')
+						fp.write("\t{0}l {1}, %eax\n".format(line[1],'%cl'))
 					elif (line[2]==line[4]):										# a = b << a
 						regTempb = regmem.getRegister(line[3])
 						regTempa = regmem.getRegister(line[4])
+						regmem.setReg('%ecx',line[4])
 						regmem.freeReg(regTemp)
 						fp.write("\t%sl %s, %s\n"%(line[1],regTempa,regTempb))
 						regmem.setVarReg(regTempb,line[2])
