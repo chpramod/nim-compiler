@@ -145,7 +145,7 @@ def generateAssCode(code):
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[2])))
 						fp.write("\taddl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
 				else:                                       												#a=1+2
-					fp.write("\taddl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
+					fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
 					fp.write("\taddl $%s, %s\n" %(line[4],regmem.getRegister(line[2])))
 			elif line[1]=='*':
 				if (line[3].startswith('$') and line[4].startswith('$')):
@@ -212,7 +212,7 @@ def generateAssCode(code):
 						fp.write("\tidivl %ebx\n")
 					elif (line[2]==line[4]):
 						regmem.freeReg('%eax')
-						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),'%eax'))					#a=b/a
+						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),'%eax'))					#a=b/a 
 						regmem.freeReg('%eax')
 						regmem.freeReg('%edx',True)
 						regmem.setReg(line[4],'%ebx')
@@ -225,15 +225,19 @@ def generateAssCode(code):
 						regmem.setReg(line[2],'%eax')
 						fp.write("\tidivl %ebx\n")
 				elif (line[3].startswith('$')):
-					if (line[2]==line[3]):																	#a=a/2
+					if (line[2]==line[3]):																	#a=a/2 
 						regmem.freeReg('%edx',True)
 						regmem.setReg(line[3],'%eax')
-						fp.write("\tidivl $%s\n" %(line[4]))
+						regmem.freeReg('%ebx')
+						fp.write("\tmovl $%s, %s\n" %(line[4],'%ebx'))
+						fp.write("\tidivl %ebx\n")
 					else:																					#b=a/2
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
 						regmem.freeReg('%edx',True)
 						regmem.setReg(line[2],'%eax')
-						fp.write("\tidivl $%s\n" %(line[4]))
+						regmem.freeReg('%ebx')
+						fp.write("\tmovl $%s, %s\n" %(line[4],'%ebx'))
+						fp.write("\tidivl %ebx\n")
 				elif (line[4].startswith('$')):
 					if (line[2]==line[4]):																	#a=2/a
 						regmem.freeReg('%eax')
@@ -253,7 +257,9 @@ def generateAssCode(code):
 					regmem.freeReg('%eax')
 					regmem.freeReg('%edx',True)
 					fp.write("\tmovl $%s, %s\n" %(line[3],'%eax'))
-					fp.write("\tidivl $%s\n" %(line[4]))
+					regmem.freeReg('%ebx')
+					fp.write("\tmovl $%s, %s\n" %(line[4],'%ebx'))
+					fp.write("\tidivl %s\n" %('%ebx'))
 					regmem.setVarReg('%eax',line[2])
 			elif line[1]=='mod':
 				if (line[3].startswith('$') and line[4].startswith('$')):
@@ -498,7 +504,7 @@ def generateAssCode(code):
 				fp.write("\tincl %s\n"%(regmem.getRegister(line[2])))
 			elif line[1]=='decr':																#decr,a
 				fp.write("\tdecl %s\n"%(regmem.getRegister(line[2])))
-			elif line[1]==('shl' or 'shr' or 'and' or 'or' or 'xor') :			#bitwise operators
+			elif line[1]==('shl' or 'shr' or 'and' or 'or' or 'xor'):			#bitwise operators
 				if (line[3].startswith('$') and line[4].startswith('$')):
 					if (line[2]==line[3]):											# a = a << b
 						fp.write("\t%sl %s, %s\n"%(line[1],regmem.getRegister(line[4]),regmem.getRegister(line[2])))
@@ -527,6 +533,9 @@ def generateAssCode(code):
 					else:															# a = 2 << b
 						fp.write("\tmovl $%s, %s\n"%(line[3],regmem.getRegister(line[2])))
 						fp.write("\t%sl %s %s\n"%(line[1],regmem.getRegister(line[4]),regmem.getRegister(line[2])))
+				else:																# a = 2 << 3
+					fp.write("\tmovl $%s, %s\n"%(line[3],regmem.getRegister(line[2])))
+					fp.write("\t%sl %s, %s\n"%(line[1],line[4],regmem.getRegister(line[2])))
 			elif line[1]=='not':													#(line,not,a,b)
 				if (line[2].startswith('$') and line[3].startswith('$')):			# a = ~b
 					fp.write("\tmovl %s, %s\n"%(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
