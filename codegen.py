@@ -547,11 +547,17 @@ def generateAssCode(code):
 						regmem.setVarReg(regTempb,line[2])
 				elif(line[3].startswith('$')):
 					if (line[2]==line[3]):											# a = a << 2
+						regmem.freeReg('%ecx')
 						fp.write("\tmovl ${0}, %ecx\n".format(line[4]))
 						fp.write("\t%sl %s, %s\n"%(line[1],'%cl',regmem.getRegister(line[2])))
-					else:															# a = b << 2
-						fp.write("\tmovl %s, %s\n"%(regmem.getRegister(line[3]),regmem.getRegister(line[2])))
-						fp.write("\t%sl %s, %s\n"%(line[1],line[4],regmem.getRegister(line[2])))
+					else:															# b = a << 2
+						temp=regmem.getRegister(line[3])
+						regmem.freeReg('%ecx')
+						fp.write("\tmovl ${0}, %ecx\n".format(line[4]))
+						regmem.freeReg(temp)
+						fp.write("\t%sl %s, %s\n"%(line[1],'%cl',temp))
+						regmem.setVarReg(temp,line[2])
+
 				elif(line[4].startswith('$')):
 					if (line[2]==line[4]):											# a = 2 << a
 						regmem.freeReg('%eax')
@@ -590,7 +596,7 @@ def generateAssCode(code):
 						regmem.setReg(line[2],'%ebx')
 						fp.write("\tmovl $%s, %eax\n"%(line[3]))
 						fp.write("\t%sl %ebx, %eax\n"%(line[1]))
-						setVarReg('%eax',line[2])
+						regmem.setVarReg('%eax',line[2])
 					else:															# a = 2 and b
 						fp.write("\tmovl $%s, %s\n"%(line[3],regmem.getRegister(line[2])))
 						fp.write("\t%sl %s %s\n"%(line[1],regmem.getRegister(line[4]),regmem.getRegister(line[2])))
