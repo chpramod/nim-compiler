@@ -24,7 +24,7 @@
 10, /, $y, $x, $s
 11, print, $y					
 
-
+//works for now but 
 scan, $p
 print, $p
 end

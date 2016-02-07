@@ -497,7 +497,10 @@ def generateAssCode(code):
 					fp.write("\tpushl $%s\n"%(line[2]))
 					fp.write("\tcall printIntNumber\n")
 			elif line[1]=='scan':
-					fp.write("\tmovl {0}, {1}\n" .format(regmem.getRegister(line[2]),line[2][1:]))
+					a=regmem.getRegister(line[2])                                                            #print a
+					print a
+					regmem.freeReg(a)
+					#fp.write("\tmovl {0}, {1}\n" .format(a,line[2][1:]))
 					fp.write("\tpushl {0}\n".format(line[2]))
 					fp.write("\tpushl $formatstr\n\tcall scanf\n")
 			elif line[1]=='array':
