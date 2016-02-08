@@ -489,14 +489,17 @@ def generateAssCode(code):
 							fp.write("\tjne %s\n"%(line[5]))
 			elif line[1]=='call':
 				regmem.freeAll()
-				fp.write("\tcall %s\n"%(line[2]))
+				fp.write("\tcall {0}\n".format(line[2]))
 				if len(line)==4:
+					fp.write("\tmovl %eax, {0}\n".format(line[3][1:]))
 					regmem.setVarReg('%eax',line[3])
 			elif line[1]=='ret':
 				if len(line)==3:
 					regmem.freeReg('%eax')
 					fp.write("\tmovl {0}, %eax\n" .format(regmem.getRegister(line[2])))
 					regmem.freeReg('%eax')
+					fp.write("\tpushl %eax\n")
+					fp.write("\taddl $4, %esp\n")
 				fp.write("\tret\n")
 			elif line[1]=='print':
 				if line[2].startswith('$'):
@@ -520,7 +523,7 @@ def generateAssCode(code):
 				arrayCurrent=[line[2],line[3]]
 				arrayDef.append(arrayCurrent)
 			elif line[1]=='end':
-				fp.write("\tcall endlabel\n")
+				fp.write("\tjmp endlabel\n")
 			elif line[1]=='incr':																#incr,a
 				fp.write("\tincl %s\n"%(regmem.getRegister(line[2])))
 			elif line[1]=='decr':																#decr,a
