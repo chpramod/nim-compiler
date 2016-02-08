@@ -102,10 +102,10 @@ def generateAssCode(code):
 		for line in basicBlock:
 			regmem.protectRegs(line)
 			regmem.setST(SymbolTable[str(leaders[leader_index])][line[0]])
-			SymbolTable[str(leaders[leader_index])][line[0]].printTable()
-			pprint(line)
-			pprint(regmem.variableList)
-			if line[1]=='=': 
+			# SymbolTable[str(leaders[leader_index])][line[0]].printTable()
+			# pprint(line)
+			# pprint(regmem.variableList)
+			if line[1]=='=':
 				if line[3].startswith('$'):
 					if line[2].endswith("]"):
 						regmem.freeReg('%eax')
@@ -113,7 +113,7 @@ def generateAssCode(code):
 						tempStr=line[2][1:tempIndex]
 						fp.write("\tmovl $({0}), %eax\n".format(tempStr))
 						tempStr=line[2][tempIndex+1:-1]
-						if tempStr.startswith('$'):
+						if tempStr.startswith('$'):									#a[b]=c
 							regmem.freeReg('%ebx')
 							regmem.setReg(tempStr[1:],'%ebx')
 						else:                                                        #a[2]=b
@@ -138,6 +138,8 @@ def generateAssCode(code):
 							fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))	     			#a=2
 						else:                                                          #a[2]=2
 							fp.write("\tmovl ${0}, {1}(%eax)\n" .format(line[3],4*int(tempStr)))
+					else:
+						fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))	 
 			elif line[1]=='+':
 				if (line[3].startswith('$') and line[4].startswith('$')):
 					if (line[2]==line[3]):																	#a=a+b
@@ -719,6 +721,7 @@ print_num:\n\
 			fp.write("\t.long 0\n")
 	fp.write("dump:\n\t.space 50\n")
 	fp.write("formatstr:\n\t.ascii \"\%d\"\n")
+	fp.close()
 
 
 def BasicBlocks(TAC,leaders):
@@ -764,3 +767,5 @@ if __name__=="__main__":
 	sourcefile = open(filename)
 	#print code
 	generateAssCode(sourcefile)
+	with open("AssCode.s", 'r') as fin:
+		print fin.read()
