@@ -121,12 +121,13 @@ class regmemDescriptor():
         if self.ST.dest in self.variableList.keys() and self.ST.op not in nonDirtyOp:
             if self.variableList[self.ST.dest]['register']!=None:
                 self.variableList[self.ST.dest]['dirty']=True
-        pprint(self.variableList)
+        # pprint(self.variableList)
         for var in self.variableList:
+            # print self.freeRegisters
             if self.variableList[var]['register']!=None:
                 if self.ST.table[var]['nextuse']==-1 and self.ST.table[var]['nextassign']==-1 and self.variableList[var]['register'] not in self.freeRegisters:
                     self.freeReg(self.variableList[var]['register'])
-        pprint(self.variableList)
+        # pprint(self.variableList)
 
     def freeAll(self,flag=False):
         for reg in self.registerList:
@@ -179,6 +180,7 @@ class regmemDescriptor():
         if var in self.variableList.keys():
             if self.variableList[var]['dirty']==True:
                 self.fp.write("\tMOVL %s, %s\n" %(self.variableList[var]['register'],var[1:]))
+                self.variableList[var]['dirty']==False
 
     def setST(self,ST):
         self.ST = ST
