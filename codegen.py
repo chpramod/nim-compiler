@@ -124,7 +124,7 @@ def generateAssCode(code):
 						tempStr=line[3][1:tempIndex]
 						fp.write("\tmovl $({0}), %eax\n".format(tempStr))
 						tempStr=line[3][tempIndex+1:-1]
-						fp.write("\tmovl {0}(%eax), {1}\n" .format(4*int(tempStr)),regmem.getRegister(line[2]))
+						fp.write("\tmovl {0}(%eax), {1}\n" .format(4*int(tempStr),regmem.getRegister(line[2])))
 					else:
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))	#a=b
 				else:
