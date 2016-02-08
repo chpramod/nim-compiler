@@ -487,7 +487,7 @@ def generateAssCode(code):
 							fp.write("\tjne label%s\n"%(line[5]))
 						else:
 							fp.write("\tjne %s\n"%(line[5]))
-			elif line[1]=='call':
+			elif line[1]=='call':                                                              #call foo
 				regmem.freeAll()
 				fp.write("\tcall {0}\n".format(line[2]))
 				if len(line)==4:
@@ -497,7 +497,7 @@ def generateAssCode(code):
 				if len(line)==3:
 					regmem.freeReg('%eax')
 					fp.write("\tmovl {0}, %eax\n" .format(regmem.getRegister(line[2])))
-					regmem.freeReg('%eax')
+					regmem.freeAll()
 					fp.write("\tpushl %eax\n")
 					fp.write("\taddl $4, %esp\n")
 				fp.write("\tret\n")
