@@ -105,7 +105,7 @@ def generateAssCode(code):
 			SymbolTable[str(leaders[leader_index])][line[0]].printTable()
 			pprint(line)
 			pprint(regmem.variableList)
-			if line[1]=='=': #a=b[] #a[]=b #a[]=2
+			if line[1]=='=': 
 				if line[3].startswith('$'):
 					if line[2].endswith("]"):
 						regmem.freeReg('%eax')
@@ -118,6 +118,13 @@ def generateAssCode(code):
 							regmem.setReg(tempStr[1:],'%ebx')
 						else:                                                        #a[2]=b
 							fp.write("\tmovl {0}, {1}(%eax)\n" .format(regmem.getRegister(line[3]),4*int(tempStr)))
+					elif line[3].endswith("]"):                                      #b=a[2]
+						regmem.freeReg('%eax')
+						tempIndex=line[3].find('[')
+						tempStr=line[3][1:tempIndex]
+						fp.write("\tmovl $({0}), %eax\n".format(tempStr))
+						tempStr=line[3][tempIndex+1:-1]
+						fp.write("\tmovl {0}(%eax), {1}\n" .format(4*int(tempStr)),regmem.getRegister(line[2]))
 					else:
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))	#a=b
 				else:
