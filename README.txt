@@ -91,8 +91,12 @@ NOTE:	Any function call in 3 addr code must be made after the 'end' statement
 
 Array
 -------
+following operations on array 'a' done:
 
-
+definition: lineno, array, $a, 2
+assignment: a[2]=b
+            a[2]=2
+	    b=a[2]	
 
 Points to note :
 -----------------
@@ -100,4 +104,6 @@ Points to note :
 1. The three address code must be in the exact format mentioned above, any extra spaces or characters will result in an error.
 
 2. "lineno" in the above format is the line number of the three address code.
+
+3. A variable cannot be passed as an index to the array yet. 
 
