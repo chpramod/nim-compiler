@@ -1,0 +1,11 @@
+1, =, $a, 0
+2, call, temp
+3, end
+4, label, temp
+5, scan, $a
+6, print, $a
+7, incr, $a
+8, ifgoto, neq, $a, 10, 10
+9, ret
+10, call, temp
+11, ret

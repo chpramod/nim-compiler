@@ -1,0 +1,5 @@
+1, =, $a, 0
+2, incr, $a
+3, print, $a
+4, ifgoto, leq, $a, 10, 2
+5, end 
