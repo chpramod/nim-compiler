@@ -93,6 +93,7 @@ def generateAssCode(code):
 		leader_index+=1
 		if basicBlocks.index(basicBlock)==0:
 			fp.write("_start:\n")
+			fp.write("label1:\n")
 		elif basicBlock[0][1]=='label':
 			fp.write("%s:\n" % basicBlock[0][2])
 		else:
@@ -106,25 +107,30 @@ def generateAssCode(code):
 			pprint(regmem.variableList)
 			if line[1]=='=': #a=b[] #a[]=b #a[]=2
 				if line[3].startswith('$'):
-					if line[2].endswith("]"):                                                           #a[]=b
+					if line[2].endswith("]"):
 						regmem.freeReg('%eax')
 						tempIndex=line[2].find('[')
 						tempStr=line[2][1:tempIndex]
 						fp.write("\tmovl $({0}), %eax\n".format(tempStr))
 						tempStr=line[2][tempIndex+1:-1]
-						fp.write("\tmovl %s, %d(%eax)\n" %(regmem.getRegister(line[3]),4*int(tempStr)))
+						if tempStr.startswith('$'):
+							regmem.freeReg('%ebx')
+							regmem.setReg(tempStr[1:],'%ebx')
+						else:                                                        #a[2]=b
+							fp.write("\tmovl {0}, {1}(%eax)\n" .format(regmem.getRegister(line[3]),4*int(tempStr)))
 					else:
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))	#a=b
 				else:
-					if line[2].endswith("]"):                                                           #a[]=2
+					if line[2].endswith("]"):
 						regmem.freeReg('%eax')
 						tempIndex=line[2].find('[')
 						tempStr=line[2][1:tempIndex]
 						fp.write("\tmovl $({0}), %eax\n".format(tempStr))
 						tempStr=line[2][tempIndex+1:-1]
-						fp.write("\tmovl ${0}, {1}(%eax)\n" .format(line[3],4*int(tempStr)))
-					else:
-						fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))	     			#a=2
+						if tempStr.startswith('$'):
+							fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))	     			#a=2
+						else:                                                          #a[2]=2
+							fp.write("\tmovl ${0}, {1}(%eax)\n" .format(line[3],4*int(tempStr)))
 			elif line[1]=='+':
 				if (line[3].startswith('$') and line[4].startswith('$')):
 					if (line[2]==line[3]):																	#a=a+b
