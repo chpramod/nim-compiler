@@ -1,0 +1,10 @@
+1, scan, $x
+2, scan, $y
+3, +, $z, $x, $y
+4, print, $z
+5, -, $z, $x, $y
+6, print, $z
+7, *, $z, $x, $y
+8, print, $z
+9, /, $z, $x, $y
+10, print, $z

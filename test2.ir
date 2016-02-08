@@ -1,0 +1,10 @@
+1, scan, $x
+2, scan, $y
+3, and, $z, $x, $y
+4, print, $z
+5, or, $z, $x, $y
+6, print, $z
+7, xor, $z, $x, $y
+8, print, $z
+9, not, $k, $z
+10, print, $k
