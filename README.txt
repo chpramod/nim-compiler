@@ -91,8 +91,12 @@ NOTE:	Any function call in 3 addr code must be made after the 'end' statement
 
 Array
 -------
+following operations on array 'a' done:
 
-
+definition: lineno, array, $a, 2
+assignment: a[2]=b
+            a[2]=2
+	    b=a[2]	
 
 Points to note :
 -----------------
@@ -101,3 +105,11 @@ Points to note :
 
 2. "lineno" in the above format is the line number of the three address code.
 
+3. A variable cannot be passed as an index to the array yet. 
+
+
+Use Following to generate output:
+---------------------------------
+as -32 AssCode.s -o output.o
+ld output.o -o output -m elf_i386 -lc -dynamic-linker /lib/ld-linux.so.2
+./output
