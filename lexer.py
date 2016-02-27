@@ -103,7 +103,7 @@ reserved = {
 tokens = [
         'EXPONENT','INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT', 'UINT16LIT', 'UINT32LIT', 'UINT64LIT',
          'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'CHARLIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
-        'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',   
+        'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',
         'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'MULTICOMMENT', 'ACCENT', 'IDENTIFIER', 'NUMBER', 'BOOLEAN', 'NEWLINE', 'WS', 'WSI'
         ] + list(reserved.values())
 
@@ -157,19 +157,19 @@ def t_CHARLIT(t):
     r"\'((.)|(\\r)|(\\c)|(\\f)|(\\v)|(\\t)|(\\\\)|(\\\")|(\\')|(\\a)|(\\b)|(\\e)|(0(x|X)[0-9A-Fa-f][0-9A-Fa-f])|(\d+))\'"
     return t;
 
-def t_FLOAT32LIT (t) : 
+def t_FLOAT32LIT (t) :
     r'(((\d*)\.(\d+)) | ((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+) ) (\'[fF]32)'
     return t
 
-def t_FLOAT64LIT (t) : 
+def t_FLOAT64LIT (t) :
     r'(((\d*)\.(\d+)) | ((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+) ) (\'[fF]64)'
     return t
 
-def t_FLOAT128LIT (t) : 
+def t_FLOAT128LIT (t) :
     r'(((\d*)\.(\d+)) | ((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+) ) (\'[fF]128)'
     return t
 
-def t_FLOATLIT (t) : 
+def t_FLOATLIT (t) :
     r'((\d*)\.(\d+))'
     return t
 
@@ -216,7 +216,7 @@ def t_TRIPLESTRLIT(t):
     return t
 
 def t_RSTRLIT(t):
-    r'r(\"[^(\")]*\")' 
+    r'r(\"[^(\")]*\")'
     return t
 
 def t_STRLIT(t):
@@ -246,15 +246,17 @@ def t_error(t):
 lexer = lex.lex()
 prev = 0
 
-with open(sys.argv[1], 'r') as my_file:
-    
-    lexer.input(my_file.read())
+# with open(sys.argv[1], 'r') as my_file:
+#
+#     lexer.input(my_file.read())
+my_file=open('grtngs.nim','r')
+lexer.input(my_file.read())
 
 tok_data = {};
 
 while True:
     tok = lexer.token()
-    if not tok: 
+    if not tok:
         break      # No more input
     tok_data.setdefault(tok.type, list())
     tok_data[tok.type].append(str(tok.value));
@@ -269,4 +271,3 @@ for key,value in tok_data.iteritems():
         print '{:8s}'.format(key) + "          "+str(length)
     else:
         print '{:8s}'.format(key) +"          "+str(length)+"\n\t\t\t    "+'\n\t\t\t    '.join(value)
-
