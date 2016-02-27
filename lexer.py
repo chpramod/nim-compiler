@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import lex
 import sys
+from pprint import pprint
 
 reserved = {
     'addr' : 'ADDR' ,
@@ -76,6 +77,7 @@ reserved = {
     'return' : 'RETURN' ,
     'set' : 'SET' ,
     'seq' : 'SEQ' ,
+    'shared' : 'SHARED' ,
     'shl' : 'SHL' ,
     'shr' : 'SHR' ,
     'static' : 'STATIC' ,
@@ -103,8 +105,8 @@ reserved = {
 tokens = [
         'EXPONENT','INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT', 'UINT16LIT', 'UINT32LIT', 'UINT64LIT',
          'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'CHARLIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
-        'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',
-        'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'MULTICOMMENT', 'ACCENT', 'IDENTIFIER', 'NUMBER', 'BOOLEAN', 'NEWLINE', 'WS', 'WSI'
+        'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',   
+        'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'MULTICOMMENT', 'ACCENT', 'IDENTIFIER', 'NUMBER', 'BOOLEAN', 'NEWLINE', 'WS', 'WSI', 'INDGR','INDLE','INDEQ'
         ] + list(reserved.values())
 
 t_PARLE          = r'\('
@@ -137,8 +139,8 @@ def t_COMMENT(t):
     pass
 
 def t_NEWLINE(t):
-    r'\n+'
-    t.lexer.lineno += len(t.value)
+    r'\n'
+    #t.lexer.lineno += len(t.value)
     return t
 
 def t_WSI(t):
@@ -147,7 +149,7 @@ def t_WSI(t):
 
 def t_WS(t):
     r' [\s ]+ '
-    pass
+    return t
 
 def t_OPR(t):
     r"\+|"r"-|"r"\*|"r"/|"r"\\|"r"\<|"r"\>|"r"\!|"r"\?|"r"\^|"r"\||"r"\%|"r"\&|"r"\$|"r"\@|"r"\~"
@@ -157,19 +159,19 @@ def t_CHARLIT(t):
     r"\'((.)|(\\r)|(\\c)|(\\f)|(\\v)|(\\t)|(\\\\)|(\\\")|(\\')|(\\a)|(\\b)|(\\e)|(0(x|X)[0-9A-Fa-f][0-9A-Fa-f])|(\d+))\'"
     return t;
 
-def t_FLOAT32LIT (t) :
+def t_FLOAT32LIT (t) : 
     r'(((\d*)\.(\d+)) | ((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+) ) (\'[fF]32)'
     return t
 
-def t_FLOAT64LIT (t) :
+def t_FLOAT64LIT (t) : 
     r'(((\d*)\.(\d+)) | ((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+) ) (\'[fF]64)'
     return t
 
-def t_FLOAT128LIT (t) :
+def t_FLOAT128LIT (t) : 
     r'(((\d*)\.(\d+)) | ((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+) ) (\'[fF]128)'
     return t
 
-def t_FLOATLIT (t) :
+def t_FLOATLIT (t) : 
     r'((\d*)\.(\d+))'
     return t
 
@@ -216,7 +218,7 @@ def t_TRIPLESTRLIT(t):
     return t
 
 def t_RSTRLIT(t):
-    r'r(\"[^(\")]*\")'
+    r'r(\"[^(\")]*\")' 
     return t
 
 def t_STRLIT(t):
@@ -246,28 +248,92 @@ def t_error(t):
 lexer = lex.lex()
 prev = 0
 
-# with open(sys.argv[1], 'r') as my_file:
-#
-#     lexer.input(my_file.read())
-my_file=open('grtngs.nim','r')
-lexer.input(my_file.read())
+with open(sys.argv[1], 'r') as my_file:
+    
+    lexer.input(my_file.read())
 
-tok_data = {};
+# def indentation(lexer):
+#     stack = []
+#     stack.append(0);
+#     while True:
+#         tok = lexer.token()
+#         if not tok: 
+#             break      # No more input
+#         tok_data.setdefault(tok.type, list())
+#         tok_data[tok.type].append(str(tok.value));
+#         if (tok.type == "WSI"):
+#             tok.value = len(tok.value)
+#             temp = stack.pop()
+#             if (tok.value > temp):
+#                 tok.type = 'INDGR'
+#                 stack.append(temp)
+#                 stack.append(tok.value)
+#             elif (tok.value == temp):
+#                 tok.type = 'INDEQ'
+#                 stack.append(temp)
+#             else:
+#                 tok.type = 'INDLE'
+#                 while (tok.value > temp):
+#                     yield tok
+#                     temp = stack.pop()
 
+tok_data = [];
+prev_ind = 0
+next_ind = 0
+lineno = 1
+
+tok = lexer.token()
+if(tok.type=="WS"):
+    t_error(tok)
 while True:
-    tok = lexer.token()
-    if not tok:
+    if not tok: 
         break      # No more input
-    tok_data.setdefault(tok.type, list())
-    tok_data[tok.type].append(str(tok.value));
+    tok.lineno = lineno
+    if not (tok.type=="WSI" or tok.type=="WS" or tok.type=="NEWLINE"):
+        tok_data.append(tok)
+    nexttok = lexer.token()
+    # tok_data.setdefault(tok.type, list())
+    # tok_data[tok.type].append(str(tok.value));
+    if (tok.type == "NEWLINE"):
+        lineno+=1
+        if(nexttok.type=="WSI"):
+            if(len(nexttok.value)%2==1):
+                t_error(nexttok)
+        if (nexttok.type == "WSI"):
+            next_ind = len(nexttok.value)/2
+        else:
+            next_ind = 0
+        for i in range(0,next_ind - prev_ind):
+            newtok = lex.LexToken()
+            newtok.type = 'INDGR'
+            newtok.value = 1
+            newtok.lexpos = tok.lexpos
+            newtok.lineno = lineno
+            tok_data.append(newtok)
+        for i in range(0,prev_ind - next_ind):
+            newtok = lex.LexToken()
+            newtok.type = 'INDLE'
+            newtok.value = -1
+            newtok.lexpos = tok.lexpos
+            newtok.lineno = lineno
+            tok_data.append(newtok)
+        if(next_ind == prev_ind):
+            newtok = lex.LexToken()
+            newtok.type = 'INDEQ'
+            newtok.value = 0
+            newtok.lexpos = tok.lexpos
+            newtok.lineno = lineno
+            tok_data.append(newtok)
+        prev_ind = next_ind
+    tok = nexttok
+pprint(tok_data)
 
-    #print(tok)
+# print('\n\nTokens\tOccurances\tLexemes\n')
+# for key,value in tok_data.iteritems():
+#     length = len(value)
+#     value = list(set(value))
+#     if ((key == "WSI") or (key == "NEWLINE")):
+#         print '{:8s}'.format(key) + "          "+str(length)
+#     else:
+#         print '{:8s}'.format(key) +"          "+str(length)+"\n\t\t\t    "+'\n\t\t\t    '.join(value)
 
-print('\n\nTokens\tOccurances\tLexemes\n')
-for key,value in tok_data.iteritems():
-    length = len(value)
-    value = list(set(value))
-    if ((key == "WSI") or (key == "NEWLINE")):
-        print '{:8s}'.format(key) + "          "+str(length)
-    else:
-        print '{:8s}'.format(key) +"          "+str(length)+"\n\t\t\t    "+'\n\t\t\t    '.join(value)
