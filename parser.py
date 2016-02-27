@@ -43,21 +43,97 @@ def p_ifExpr(p):
 def p_whenExpr(p):
     '''whenExpr : WHEN condExpr'''
 
-simpleExpr = arrowExpr (OP0 optInd arrowExpr)*
-arrowExpr = assignExpr (OP1 optInd assignExpr)*
-assignExpr = orExpr (OP2 optInd orExpr)*
-orExpr = andExpr (OP3 optInd andExpr)*
-andExpr = cmpExpr (OP4 optInd cmpExpr)*
-cmpExpr = sliceExpr (OP5 optInd sliceExpr)*
-sliceExpr = ampExpr (OP6 optInd ampExpr)*
-ampExpr = plusExpr (OP7 optInd plusExpr)*
-plusExpr = mulExpr (OP8 optInd mulExpr)*
-mulExpr = dollarExpr (OP9 optInd dollarExpr)*
-dollarExpr = primary (OP10 optInd primary)*
-
 def p_simpleExpr(p):
-    '''simpleExpr : arrowExpr'''
+    '''simpleExpr : arrowExpr interOne'''
+
+def p_interOne(p):
+    '''interOne : op0 arrowExpr interOne | empty '''
+
+def p_arrowExpr(p):
+    '''arrowExpr : assignExpr interTwo'''
+
+def p_interTwo(p):
+    '''interTwo : op1 assignExpr interTwo | empty '''
+
+def p_assignExpr(p):
+    '''assignExpr : orExpr interThree'''
+
+def p_interThree(p):
+    '''interThree : op2 orExpr interThree | empty '''
+
+def p_orExpr(p):
+    '''orExpr : andExpr interFour'''
+
+def p_interFour(p):
+    '''interFour : op3 andExpr interFour | empty '''
+
+def p_andExpr(p):
+    '''andExpr : cmpExpr interFive'''
+
+def p_interFive(p):
+    '''interFive : op4 cmpExpr interFive | empty '''
+
+def p_cmpExpr(p):
+    '''cmpExpr : sliceExpr interSix'''
+
+def p_interSix(p):
+    '''interSix : op5 sliceExpr interSix | empty '''
+
+def p_sliceExpr(p):
+    '''sliceExpr : ampExpr interSeven'''
+
+def p_interSeven(p):
+    '''interSeven : op6 ampExpr interSeven | empty '''
+
+def p_ampExpr(p):
+    '''ampExpr : plusExpr interEight'''
+
+def p_interEight(p):
+    '''interEight : op7 plusExpr interEight | empty '''
+
+def p_plusExpr(p):
+    '''plusExpr : mulExpr interNine'''
+
+def p_interNine(p):
+    '''interNine : op8 mulExpr interNine | empty '''
+
+def p_mulExpr(p):
+    '''mulExpr : dollarExpr interTen'''
+
+def p_interTen(p):
+    '''interTen : op9 dollarExpr interTen | empty '''
+
+def p_dollarExpr(p):
+    '''dollarExpr : primary interElev'''
+
+def p_interElev(p):
+    '''interElev : op10 primary interElev | empty '''
+
+
 def p_condExpr
+def p_op0(p):
+    
+def p_op1
+def p_op2
+def p_op3
+def p_op4
+def p_op5
+def p_op6
+def p_op7
+def p_op8
+def p_op9
+def p_op10
+def p_
+def p_
+def p_
+def p_
+def p_
+def p_
+def p_
+def p_
+def p_
+def p_
+def p_
 def p_
 def p_
 def p_
