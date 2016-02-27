@@ -109,10 +109,59 @@ def p_dollarExpr(p):
 def p_interElev(p):
     '''interElev : op10 primary interElev | empty '''
 
+def p_primary(p):
+    '''primary : typeKeyw typeDescK
+                | interPrefixOperator identOrLiteral interPrimarySuffix
+                | STATIC primary
+                | BIND primary'''
+
+def p_interPrefixOperator(p):
+    '''interPrefixOperator : prefixOperator interPrefixOperator | empty '''
+
+def p_interPrimarySuffix(p):
+    '''interPrimarySuffix : primarySuffix interPrimarySuffix | empty '''
+
+def p_identOrLiteral(p):
+    '''identOrLiteral : symbol
+                      | literal
+                      | par'''
+
+def p_typeKeyw(p):
+    '''typeKeyw : VAR | OUT | PTR | REF | SHARED | TUPLE | PROC | ITERATOR | DISTINCT | OBJECT | ENUM '''
+
+def p_typeDescK(p):
+    '''typeDescK : simpleExpr'''
+
+def p_primarySuffix(p):
+    '''primarySuffix : doBlocks'''
+
+def p_prefixOperator(p):
+    '''prefixOperator : operator'''
+
+def p_symbol
+def p_literal(p):
+    '''literal : INT_LIT | INT8_LIT | INT16_LIT | INT32_LIT | INT64_LIT
+              | FLOAT_LIT | FLOAT32_LIT | FLOAT64_LIT
+              | CHAR_LIT
+              | NIL'''
+def p_par(p):
+
+def p_doBlocks(p):
+    '''doBlocks : doBlock'''
+
+def p_doBlock(p):
+    '''doBlock : DO COLON stmt'''
+def p_operator(p):
+    '''operator : OP0 | OP1 | OP2 | OP5 | OP6 | OP7 | OP8 | OP9 | OR | AND | XOR | IS | ISNOT | IN | NOTIN | OF | DIV | MOD | SHL | SHR | NOT | STATIC | DOTDOT'''
+def p_
+def p_
+def p_
+def p_
+def p_
+
 
 def p_condExpr
 def p_op0(p):
-    
 def p_op1
 def p_op2
 def p_op3
