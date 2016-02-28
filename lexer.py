@@ -105,7 +105,7 @@ reserved = {
 tokens = [
         'EXPONENT','INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT', 'UINT16LIT', 'UINT32LIT', 'UINT64LIT',
          'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'CHARLIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
-        'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',   
+        'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',
         'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'MULTICOMMENT', 'ACCENT', 'IDENTIFIER', 'NUMBER', 'BOOLEAN', 'NEWLINE', 'WS', 'WSI', 'INDGR','INDLE','INDEQ'
         ] + list(reserved.values())
 
@@ -159,19 +159,19 @@ def t_CHARLIT(t):
     r"\'((.)|(\\r)|(\\c)|(\\f)|(\\v)|(\\t)|(\\\\)|(\\\")|(\\')|(\\a)|(\\b)|(\\e)|(0(x|X)[0-9A-Fa-f][0-9A-Fa-f])|(\d+))\'"
     return t;
 
-def t_FLOAT32LIT (t) : 
+def t_FLOAT32LIT (t) :
     r'(((\d*)\.(\d+)) | ((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+) ) (\'[fF]32)'
     return t
 
-def t_FLOAT64LIT (t) : 
+def t_FLOAT64LIT (t) :
     r'(((\d*)\.(\d+)) | ((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+) ) (\'[fF]64)'
     return t
 
-def t_FLOAT128LIT (t) : 
+def t_FLOAT128LIT (t) :
     r'(((\d*)\.(\d+)) | ((0(x|X)[0-9A-Fa-f]+)|(0(o|O)[0-7]+)|(0(b|B)[0-1]]+)|\d+) ) (\'[fF]128)'
     return t
 
-def t_FLOATLIT (t) : 
+def t_FLOATLIT (t) :
     r'((\d*)\.(\d+))'
     return t
 
@@ -218,7 +218,7 @@ def t_TRIPLESTRLIT(t):
     return t
 
 def t_RSTRLIT(t):
-    r'r(\"[^(\")]*\")' 
+    r'r(\"[^(\")]*\")'
     return t
 
 def t_STRLIT(t):
@@ -241,15 +241,15 @@ def t_IDENTIFIER(t):
 
 def t_error(t):
     print "Illegal character '%s'" % t.value[0]
-    tok_data.setdefault('ILLEGAL_CHARACTERS', list())
-    tok_data['ILLEGAL_CHARACTERS'].append(str(t.value[0]))
+    # tok_data.setdefault('ILLEGAL_CHARACTERS', list())
+    tok_data.append(t)
     t.lexer.skip(1)
 
 lexer = lex.lex()
 prev = 0
 
 with open(sys.argv[1], 'r') as my_file:
-    
+
     lexer.input(my_file.read())
 
 # def indentation(lexer):
@@ -257,7 +257,7 @@ with open(sys.argv[1], 'r') as my_file:
 #     stack.append(0);
 #     while True:
 #         tok = lexer.token()
-#         if not tok: 
+#         if not tok:
 #             break      # No more input
 #         tok_data.setdefault(tok.type, list())
 #         tok_data[tok.type].append(str(tok.value));
@@ -286,20 +286,25 @@ tok = lexer.token()
 if(tok.type=="WS"):
     t_error(tok)
 while True:
-    if not tok: 
+    if not tok:
         break      # No more input
     tok.lineno = lineno
     if not (tok.type=="WSI" or tok.type=="WS" or tok.type=="NEWLINE"):
         tok_data.append(tok)
     nexttok = lexer.token()
+    flag=0
+    if not nexttok:
+        flag=0
+    elif nexttok.type=="WSI":
+        flag=1
     # tok_data.setdefault(tok.type, list())
     # tok_data[tok.type].append(str(tok.value));
     if (tok.type == "NEWLINE"):
         lineno+=1
-        if(nexttok.type=="WSI"):
+        if(flag):
             if(len(nexttok.value)%2==1):
                 t_error(nexttok)
-        if (nexttok.type == "WSI"):
+        if (flag):
             next_ind = len(nexttok.value)/2
         else:
             next_ind = 0
@@ -336,4 +341,3 @@ pprint(tok_data)
 #         print '{:8s}'.format(key) + "          "+str(length)
 #     else:
 #         print '{:8s}'.format(key) +"          "+str(length)+"\n\t\t\t    "+'\n\t\t\t    '.join(value)
-
