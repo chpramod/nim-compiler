@@ -139,7 +139,7 @@ def t_COMMENT(t):
     pass
 
 def t_NEWLINE(t):
-    r'\n'
+    r'[\n]+'
     #t.lexer.lineno += len(t.value)
     return t
 
