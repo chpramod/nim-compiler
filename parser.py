@@ -10,11 +10,26 @@ tokens = lexer.tokens
 def p_start(p):
 #ignored extra
 #module = stmt ^* (';' / IND{=})
-    '''start : stmt'''
+    '''start : stmtIndentSemicolon
+              | stmt '''
+
+def p_stmtIndentSemicolon(p):
+    '''stmtIndentSemicolon : stmt INDEQ stmtIndentSemicolon
+                            | stmt SEMICOLON stmtIndentSemicolon
+                            | empty'''
 
 def p_stmt(p):
     '''stmt : complexOrSimpleStmt
              | simpleStmt'''
+
+def p_stmtStar(p):
+    '''stmtStar : stmt stmtStar
+                 | empty'''
+
+def p_suite(p):
+    '''suite : simpleStmt
+              | INDGR stmt stmtStar INDLE'''
+
 
 def p_complexOrSimpleStmt(p):
     '''complexOrSimpleStmt : ifStmt
