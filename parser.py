@@ -3,7 +3,7 @@ import ply.yacc as yacc
 
 #get tokens
 import lexer # our lexer
-tokens = lexer.tokens
+tokens = lexer.tok_data
 
 def p_start(p):
 #ignored extra
@@ -35,7 +35,9 @@ def p_condStmt(p):
     '''condStmt : expr COLON stmt'''
 
 def p_expr(p):
-    '''expr : ifExpr | whenExpr | simpleExpr'''
+    '''expr : ifExpr
+            | whenExpr
+            | simpleExpr'''
 
 def p_ifExpr(p):
     '''ifExpr : IF condExpr'''
@@ -47,67 +49,78 @@ def p_simpleExpr(p):
     '''simpleExpr : arrowExpr interOne'''
 
 def p_interOne(p):
-    '''interOne : op0 arrowExpr interOne | empty '''
+    '''interOne : op0 arrowExpr interOne
+                | empty '''
 
 def p_arrowExpr(p):
     '''arrowExpr : assignExpr interTwo'''
 
 def p_interTwo(p):
-    '''interTwo : op1 assignExpr interTwo | empty '''
+    '''interTwo : op1 assignExpr interTwo
+                | empty '''
 
 def p_assignExpr(p):
     '''assignExpr : orExpr interThree'''
 
 def p_interThree(p):
-    '''interThree : op2 orExpr interThree | empty '''
+    '''interThree : op2 orExpr interThree
+                | empty '''
 
 def p_orExpr(p):
     '''orExpr : andExpr interFour'''
 
 def p_interFour(p):
-    '''interFour : op3 andExpr interFour | empty '''
+    '''interFour : op3 andExpr interFour
+                | empty '''
 
 def p_andExpr(p):
     '''andExpr : cmpExpr interFive'''
 
 def p_interFive(p):
-    '''interFive : op4 cmpExpr interFive | empty '''
+    '''interFive : op4 cmpExpr interFive
+                | empty '''
 
 def p_cmpExpr(p):
     '''cmpExpr : sliceExpr interSix'''
 
 def p_interSix(p):
-    '''interSix : op5 sliceExpr interSix | empty '''
+    '''interSix : op5 sliceExpr interSix
+                | empty '''
 
 def p_sliceExpr(p):
     '''sliceExpr : ampExpr interSeven'''
 
 def p_interSeven(p):
-    '''interSeven : op6 ampExpr interSeven | empty '''
+    '''interSeven : op6 ampExpr interSeven
+                | empty '''
 
 def p_ampExpr(p):
     '''ampExpr : plusExpr interEight'''
 
 def p_interEight(p):
-    '''interEight : op7 plusExpr interEight | empty '''
+    '''interEight : op7 plusExpr interEight
+                | empty '''
 
 def p_plusExpr(p):
     '''plusExpr : mulExpr interNine'''
 
 def p_interNine(p):
-    '''interNine : op8 mulExpr interNine | empty '''
+    '''interNine : op8 mulExpr interNine
+                | empty '''
 
 def p_mulExpr(p):
     '''mulExpr : dollarExpr interTen'''
 
 def p_interTen(p):
-    '''interTen : op9 dollarExpr interTen | empty '''
+    '''interTen : op9 dollarExpr interTen
+                | empty '''
 
 def p_dollarExpr(p):
     '''dollarExpr : primary interElev'''
 
 def p_interElev(p):
-    '''interElev : op10 primary interElev | empty '''
+    '''interElev : op10 primary interElev
+                | empty '''
 
 def p_primary(p):
     '''primary : typeKeyw typeDescK
@@ -116,10 +129,12 @@ def p_primary(p):
                 | BIND primary'''
 
 def p_interPrefixOperator(p):
-    '''interPrefixOperator : prefixOperator interPrefixOperator | empty '''
+    '''interPrefixOperator : prefixOperator interPrefixOperator
+                            | empty '''
 
 def p_interPrimarySuffix(p):
-    '''interPrimarySuffix : primarySuffix interPrimarySuffix | empty '''
+    '''interPrimarySuffix : primarySuffix interPrimarySuffix
+                            | empty '''
 
 def p_identOrLiteral(p):
     '''identOrLiteral : symbol
@@ -127,7 +142,17 @@ def p_identOrLiteral(p):
                       | par'''
 
 def p_typeKeyw(p):
-    '''typeKeyw : VAR | OUT | PTR | REF | SHARED | TUPLE | PROC | ITERATOR | DISTINCT | OBJECT | ENUM '''
+    '''typeKeyw : VAR
+                | OUT
+                | PTR
+                | REF
+                | SHARED
+                | TUPLE
+                | PROC
+                | ITERATOR
+                | DISTINCT
+                | OBJECT
+                | ENUM '''
 
 def p_typeDescK(p):
     '''typeDescK : simpleExpr'''
@@ -138,13 +163,19 @@ def p_primarySuffix(p):
 def p_prefixOperator(p):
     '''prefixOperator : operator'''
 
-def p_symbol
+# def p_symbol
 def p_literal(p):
-    '''literal : INT_LIT | INT8_LIT | INT16_LIT | INT32_LIT | INT64_LIT
-              | FLOAT_LIT | FLOAT32_LIT | FLOAT64_LIT
-              | CHAR_LIT
-              | NIL'''
-def p_par(p):
+    '''literal : INT_LIT
+                | INT8_LIT
+                | INT16_LIT
+                | INT32_LIT
+                | INT64_LIT
+                | FLOAT_LIT
+                | FLOAT32_LIT
+                | FLOAT64_LIT
+                | CHAR_LIT
+                | NIL'''
+# def p_par(p):
 
 def p_doBlocks(p):
     '''doBlocks : doBlock'''
@@ -152,47 +183,69 @@ def p_doBlocks(p):
 def p_doBlock(p):
     '''doBlock : DO COLON stmt'''
 def p_operator(p):
-    '''operator : OP0 | OP1 | OP2 | OP5 | OP6 | OP7 | OP8 | OP9 | OR | AND | XOR | IS | ISNOT | IN | NOTIN | OF | DIV | MOD | SHL | SHR | NOT | STATIC | DOTDOT'''
-def p_
-def p_
-def p_
-def p_
-def p_
-
-
-def p_condExpr
-def p_op0(p):
-def p_op1
-def p_op2
-def p_op3
-def p_op4
-def p_op5
-def p_op6
-def p_op7
-def p_op8
-def p_op9
-def p_op10
-def p_
-def p_
-def p_
-def p_
-def p_
-def p_
-def p_
-def p_
-def p_
-def p_
-def p_
-def p_
-def p_
-def p_
-def p_
-def p_
-def p_
-def p_
-def p_
-def p_
-def p_
+    '''operator : OP0
+                | OP1
+                | OP2
+                | OP5
+                | OP6
+                | OP7
+                | OP8
+                | OP9
+                | OR
+                | AND
+                | XOR
+                | IS
+                | ISNOT
+                | IN
+                | NOTIN
+                | OF
+                | DIV
+                | MOD
+                | SHL
+                | SHR
+                | NOT
+                | STATIC
+                | DOTDOT'''
+# def p_
+# def p_
+# def p_
+# def p_
+# def p_
+#
+#
+# def p_condExpr
+# def p_op0(p):
+# def p_op1
+# def p_op2
+# def p_op3
+# def p_op4
+# def p_op5
+# def p_op6
+# def p_op7
+# def p_op8
+# def p_op9
+# def p_op10
+# def p_
+# def p_
+# def p_
+# def p_
+# def p_
+# def p_
+# def p_
+# def p_
+# def p_
+# def p_
+# def p_
+# def p_
+# def p_
+# def p_
+# def p_
+# def p_
+# def p_
+# def p_
+# def p_
+# def p_
+# def p_
 
 #for epsilon
 def p_empty(p):
