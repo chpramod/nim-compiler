@@ -106,9 +106,41 @@ tokens = [
         'EXPONENT','INTLIT', 'INT8LIT', 'INT16LIT', 'INT32LIT', 'INT64LIT', 'UINTLIT', 'UINT8LIT', 'UINT16LIT', 'UINT32LIT', 'UINT64LIT',
          'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'CHARLIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
         'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',
-        'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OPR', 'COMMENT', 'MULTICOMMENT', 'ACCENT', 'IDENTIFIER', 'NUMBER', 'BOOLEAN', 'NEWLINE', 'WS', 'WSI', 'INDGR','INDLE','INDEQ'
+        'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OP0', 'OP1', 'OP2', 'OP3', 'OP4', 'OP5', 'OP6', 'OP7', 'OP8', 'OP9', 'OP10', 'COMMENT', 'MULTICOMMENT',
+         'ACCENT', 'IDENTIFIER', 'NUMBER', 'BOOLEAN', 'NEWLINE', 'WS', 'WSI', 'INDGR','INDLE','INDEQ'
         ] + list(reserved.values())
 
+def t_OP0(t):
+    r"-\>|"r"=\>"
+    return t
+
+def t_OP1(t):
+    r"\+=|"r"\*=|"r"\\="
+
+def t_OP2(t):
+    r"\?|"r"\@"
+    return t
+
+def t_OP5(t):
+    r"==|"r"\<=|"r"\>=|"r"\!=|"r"\<|"r"\>|"r"\!"
+    return t
+
+def t_OP7(t):
+    r"\&"
+    return t
+
+def t_OP8(t):
+    r"\+|"r"-|"r"\||"r"\~"
+    return t
+
+def t_OP9(t):
+    r"\*|"r"/|"r"\\|"r"\%"
+    return t
+
+def t_OP10(t):
+    r"\$|"r"\^"
+    return t
+    
 t_PARLE          = r'\('
 t_PARRI          = r'\)'
 t_BRACKETLE      = r'\['
@@ -151,9 +183,9 @@ def t_WS(t):
     r' [\s ]+ '
     return t
 
-def t_OPR(t):
-    r"\+|"r"-|"r"\*|"r"/|"r"\\|"r"\<|"r"\>|"r"\!|"r"\?|"r"\^|"r"\||"r"\%|"r"\&|"r"\$|"r"\@|"r"\~"
-    return t
+# def t_OPR(t):
+#     r"\+|"r"-|"r"\*|"r"/|"r"\\|"r"\<|"r"\>|"r"\!|"r"\?|"r"\^|"r"\||"r"\%|"r"\&|"r"\$|"r"\@|"r"\~"
+#     return t
 
 def t_CHARLIT(t):
     r"\'((.)|(\\r)|(\\c)|(\\f)|(\\v)|(\\t)|(\\\\)|(\\\")|(\\')|(\\a)|(\\b)|(\\e)|(0(x|X)[0-9A-Fa-f][0-9A-Fa-f])|(\d+))\'"
