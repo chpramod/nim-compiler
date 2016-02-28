@@ -279,9 +279,10 @@ def parseProgram(program):
 
 # a function to test the parser
 def testYacc(inputFile):
-    program = open(inputFile).read()
+    program = open(inputFile)
+    data = program.read()
     customLexer = lexer.customLexer()
-    result=parser.parse(program, lexer=customLexer, debug=log)
+    result=parser.parse(data, lexer=customLexer, debug=log)
     print result
     # parser.parse(program, lexer=lexer, debug=1)
 
@@ -309,6 +310,38 @@ if __name__ == "__main__":
     rulelist.close()
 
     #code to create the graphviz flowchart
+    lineno = 1;
+    nodeno = 1;
+    nodes = {}
+    data = open(inputFile)
+    inputFile = inputFile[0:len(inputFile)-4]
+    rulelist = open("rulelist.txt",'r')
+    dotfile = open(inputFile+".dot",'w')
+    dotfile.write("strict digraph G {"+"\n\n")
+    for line in rulelist:
+        colsplit = line.split(" ")
+        if (len(colsplit)<=3):
+            colsplit[2] = colsplit[2][0:len(colsplit[2])-1]
+        else:
+            k = len(colsplit)-1
+            colsplit[k] = colsplit[k][0:len(colsplit[k])-1]
+        nodes[colsplit[0]]=nodeno
+        nodeno+=1
+        for i in range(1,len(colsplit)):
+            try:
+                temp = nodes[colsplit[i]]
+            except KeyError:
+                nodes[colsplit[i]]=nodeno
+                nodeno+=1
+        innode="node"+str(nodes[colsplit[0]])
+        dotfile.write(innode+" [ label = \""+colsplit[0]+"\" ];\n")
+        for i in range(2,len(colsplit)):
+            outnode="node"+str(nodes[colsplit[i]])
+            dotfile.write(outnode+" [ label = \""+colsplit[i]+"\" ];\n")
+            dotfile.write(innode+" -> "+outnode+";\n")
+    dotfile.write("}")
+
+
 
 
 
