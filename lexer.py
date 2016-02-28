@@ -140,7 +140,7 @@ def t_OP9(t):
 def t_OP10(t):
     r"\$|"r"\^"
     return t
-    
+
 t_PARLE          = r'\('
 t_PARRI          = r'\)'
 t_BRACKETLE      = r'\['
@@ -277,12 +277,12 @@ def t_error(t):
     tok_data.append(t)
     t.lexer.skip(1)
 
-lexer = lex.lex()
-prev = 0
+# lexer = lex.lex()
+# prev = 0
 
-with open(sys.argv[1], 'r') as my_file:
+# with open(sys.argv[1], 'r') as my_file:
 
-    lexer.input(my_file.read())
+#     lexer.input(my_file.read())
 
 # def indentation(lexer):
 #     stack = []
@@ -308,62 +308,84 @@ with open(sys.argv[1], 'r') as my_file:
 #                 while (tok.value > temp):
 #                     yield tok
 #                     temp = stack.pop()
+def generateIndentation(lexer):
+    tok_data = [];
+    prev_ind = 0
+    next_ind = 0
+    lineno = 1
+    tok = lexer.token()
+    if(tok.type=="WS"):
+        t_error(tok)
+    while True:
+        if not tok:
+            break      # No more input
+        tok.lineno = lineno
+        if not (tok.type=="WSI" or tok.type=="WS" or tok.type=="NEWLINE"):
+            tok_data.append(tok)
+        nexttok = lexer.token()
+        flag=0
+        if not nexttok:
+            flag=0
+        elif nexttok.type=="WSI":
+            flag=1
+        # tok_data.setdefault(tok.type, list())
+        # tok_data[tok.type].append(str(tok.value));
+        if (tok.type == "NEWLINE"):
+            lineno+=1
+            if(flag):
+                if(len(nexttok.value)%2==1):
+                    t_error(nexttok)
+            if (flag):
+                next_ind = len(nexttok.value)/2
+            else:
+                next_ind = 0
+            for i in range(0,next_ind - prev_ind):
+                newtok = lex.LexToken()
+                newtok.type = 'INDGR'
+                newtok.value = 1
+                newtok.lexpos = tok.lexpos
+                newtok.lineno = lineno
+                tok_data.append(newtok)
+            for i in range(0,prev_ind - next_ind):
+                newtok = lex.LexToken()
+                newtok.type = 'INDLE'
+                newtok.value = -1
+                newtok.lexpos = tok.lexpos
+                newtok.lineno = lineno
+                tok_data.append(newtok)
+            if(next_ind == prev_ind):
+                newtok = lex.LexToken()
+                newtok.type = 'INDEQ'
+                newtok.value = 0
+                newtok.lexpos = tok.lexpos
+                newtok.lineno = lineno
+                tok_data.append(newtok)
+            prev_ind = next_ind
+        tok = nexttok
+    return tok_data
+class customLexer(object):
+    def __init__(self):
+        self.lexer = lex.lex()
+        self.tok_data = None
+    def input(self,data):
+        self.lexer.input(data)
+        self.tok_data = iter(generateIndentation(self.lexer))
+    def token(self):
+        try:
+            return self.tok_data.next()
+        except StopIteration:
+            return None
 
-tok_data = [];
-prev_ind = 0
-next_ind = 0
-lineno = 1
-
-tok = lexer.token()
-if(tok.type=="WS"):
-    t_error(tok)
+cLexer = customLexer()
+data = open(sys.argv[1], 'r').read()
+cLexer.input(data)
+tok = cLexer.token()
 while True:
     if not tok:
-        break      # No more input
-    tok.lineno = lineno
-    if not (tok.type=="WSI" or tok.type=="WS" or tok.type=="NEWLINE"):
-        tok_data.append(tok)
-    nexttok = lexer.token()
-    flag=0
-    if not nexttok:
-        flag=0
-    elif nexttok.type=="WSI":
-        flag=1
-    # tok_data.setdefault(tok.type, list())
-    # tok_data[tok.type].append(str(tok.value));
-    if (tok.type == "NEWLINE"):
-        lineno+=1
-        if(flag):
-            if(len(nexttok.value)%2==1):
-                t_error(nexttok)
-        if (flag):
-            next_ind = len(nexttok.value)/2
-        else:
-            next_ind = 0
-        for i in range(0,next_ind - prev_ind):
-            newtok = lex.LexToken()
-            newtok.type = 'INDGR'
-            newtok.value = 1
-            newtok.lexpos = tok.lexpos
-            newtok.lineno = lineno
-            tok_data.append(newtok)
-        for i in range(0,prev_ind - next_ind):
-            newtok = lex.LexToken()
-            newtok.type = 'INDLE'
-            newtok.value = -1
-            newtok.lexpos = tok.lexpos
-            newtok.lineno = lineno
-            tok_data.append(newtok)
-        if(next_ind == prev_ind):
-            newtok = lex.LexToken()
-            newtok.type = 'INDEQ'
-            newtok.value = 0
-            newtok.lexpos = tok.lexpos
-            newtok.lineno = lineno
-            tok_data.append(newtok)
-        prev_ind = next_ind
-    tok = nexttok
-pprint(tok_data)
+        break
+    print tok
+    tok = cLexer.token()
+
 
 # print('\n\nTokens\tOccurances\tLexemes\n')
 # for key,value in tok_data.iteritems():
