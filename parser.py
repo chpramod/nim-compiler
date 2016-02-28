@@ -24,7 +24,7 @@ def p_simpleStmt(p):
     '''simpleStmt : exprStmt'''
 
 def p_exprStmt(p):
-    '''exprStmt : simpleExpr EQUALS simpleExpr '''
+    '''exprStmt : simpleExpr EQUALS expr '''
 
 def p_ifStmt(p):
     '''ifStmt : IF condStmt'''
@@ -48,145 +48,145 @@ def p_expr(p):
 #     '''whenExpr : WHEN condExpr'''
 
 def p_simpleExpr(p):
-    # '''simpleExpr : arrowExpr interOne'''
-    '''simpleExpr : IDENTIFIER'''
+    '''simpleExpr : arrowExpr interOne'''
 
-# def p_interOne(p):
-#     '''interOne : op0 arrowExpr interOne
-#                 | empty '''
+def p_interOne(p):
+    '''interOne : OP0 arrowExpr interOne
+                | empty '''
 
-# def p_arrowExpr(p):
-#     '''arrowExpr : assignExpr interTwo'''
+def p_arrowExpr(p):
+    '''arrowExpr : assignExpr interTwo'''
 
-# def p_interTwo(p):
-#     '''interTwo : op1 assignExpr interTwo
-#                 | empty '''
+def p_interTwo(p):
+    '''interTwo : OP1 assignExpr interTwo
+                | empty '''
 
-# def p_assignExpr(p):
-#     '''assignExpr : orExpr interThree'''
+def p_assignExpr(p):
+    '''assignExpr : orExpr interThree'''
 
-# def p_interThree(p):
-#     '''interThree : op2 orExpr interThree
-#                 | empty '''
+def p_interThree(p):
+    '''interThree : OP2 orExpr interThree
+                | empty '''
 
-# def p_orExpr(p):
-#     '''orExpr : andExpr interFour'''
+def p_orExpr(p):
+    '''orExpr : andExpr interFour'''
 
-# def p_interFour(p):
-#     '''interFour : op3 andExpr interFour
-#                 | empty '''
+def p_interFour(p):
+    '''interFour : OR andExpr interFour
+                | XOR andExpr interFour
+                | empty '''
 
-# def p_andExpr(p):
-#     '''andExpr : cmpExpr interFive'''
+def p_andExpr(p):
+    '''andExpr : cmpExpr interFive'''
 
-# def p_interFive(p):
-#     '''interFive : op4 cmpExpr interFive
-#                 | empty '''
+def p_interFive(p):
+    '''interFive : AND cmpExpr interFive
+                | empty '''
 
-# def p_cmpExpr(p):
-#     '''cmpExpr : sliceExpr interSix'''
+def p_cmpExpr(p):
+    '''cmpExpr : sliceExpr interSix'''
 
-# def p_interSix(p):
-#     '''interSix : op5 sliceExpr interSix
-#                 | empty '''
+def p_interSix(p):
+    '''interSix : OP5 sliceExpr interSix
+                | empty '''
 
-# def p_sliceExpr(p):
-#     '''sliceExpr : ampExpr interSeven'''
+def p_sliceExpr(p):
+    '''sliceExpr : ampExpr interSeven'''
 
-# def p_interSeven(p):
-#     '''interSeven : op6 ampExpr interSeven
-#                 | empty '''
+def p_interSeven(p):
+    '''interSeven : DOTDOT ampExpr interSeven
+                | empty '''
 
-# def p_ampExpr(p):
-#     '''ampExpr : plusExpr interEight'''
+def p_ampExpr(p):
+    '''ampExpr : plusExpr interEight'''
 
-# def p_interEight(p):
-#     '''interEight : op7 plusExpr interEight
-#                 | empty '''
+def p_interEight(p):
+    '''interEight : OP7 plusExpr interEight
+                | empty '''
 
-# def p_plusExpr(p):
-#     '''plusExpr : mulExpr interNine'''
+def p_plusExpr(p):
+    '''plusExpr : mulExpr interNine'''
 
-# def p_interNine(p):
-#     '''interNine : op8 mulExpr interNine
-#                 | empty '''
+def p_interNine(p):
+    '''interNine : OP8 mulExpr interNine
+                | empty '''
 
-# def p_mulExpr(p):
-#     '''mulExpr : dollarExpr interTen'''
+def p_mulExpr(p):
+    '''mulExpr : dollarExpr interTen'''
 
-# def p_interTen(p):
-#     '''interTen : op9 dollarExpr interTen
-#                 | empty '''
+def p_interTen(p):
+    '''interTen : OP9 dollarExpr interTen
+                | empty '''
 
-# def p_dollarExpr(p):
-#     '''dollarExpr : primary interElev'''
+def p_dollarExpr(p):
+    '''dollarExpr : primary interElev'''
 
-# def p_interElev(p):
-#     '''interElev : op10 primary interElev
-#                 | empty '''
+def p_interElev(p):
+    '''interElev : OP10 primary interElev
+                | empty '''
 
-# def p_primary(p):
-#     '''primary : typeKeyw typeDescK
-#                 | interPrefixOperator identOrLiteral interPrimarySuffix
-#                 | STATIC primary
-#                 | BIND primary'''
+def p_primary(p):
+    '''primary : typeKeyw typeDescK
+                | interPrefixOperator identOrLiteral interPrimarySuffix
+                | STATIC primary
+                | BIND primary'''
 
-# def p_interPrefixOperator(p):
-#     '''interPrefixOperator : prefixOperator interPrefixOperator
-#                             | empty '''
+def p_interPrefixOperator(p):
+    '''interPrefixOperator : prefixOperator interPrefixOperator
+                            | empty '''
 
-# def p_interPrimarySuffix(p):
-#     '''interPrimarySuffix : primarySuffix interPrimarySuffix
-#                             | empty '''
+def p_interPrimarySuffix(p):
+    '''interPrimarySuffix : primarySuffix interPrimarySuffix
+                            | empty '''
 
-# def p_identOrLiteral(p):
-#     # '''identOrLiteral : symbol
-#     #                   | literal
-#     #                   | par
-#     #                   | IDENTIFIER'''
-#     '''identOrLiteral : IDENTIFIER'''
+def p_identOrLiteral(p):
+    # '''identOrLiteral : symbol
+    #                   | literal
+    #                   | par
+    #                   | IDENTIFIER'''
+    '''identOrLiteral : IDENTIFIER'''
 
-# def p_typeKeyw(p):
-#     '''typeKeyw : VAR
-#                 | OUT
-#                 | PTR
-#                 | REF
-#                 | SHARED
-#                 | TUPLE
-#                 | PROC
-#                 | ITERATOR
-#                 | DISTINCT
-#                 | OBJECT
-#                 | ENUM '''
+def p_typeKeyw(p):
+    '''typeKeyw : VAR
+                | OUT
+                | PTR
+                | REF
+                | SHARED
+                | TUPLE
+                | PROC
+                | ITERATOR
+                | DISTINCT
+                | OBJECT
+                | ENUM '''
 
-# def p_typeDescK(p):
-#     '''typeDescK : simpleExpr'''
+def p_typeDescK(p):
+    '''typeDescK : simpleExpr'''
 
-# def p_primarySuffix(p):
-#     '''primarySuffix : doBlocks'''
+def p_primarySuffix(p):
+    '''primarySuffix : doBlocks'''
 
-# def p_prefixOperator(p):
-#     '''prefixOperator : operator'''
+def p_prefixOperator(p):
+    '''prefixOperator : operator'''
 
-# # def p_symbol
-# def p_literal(p):
-#     '''literal : INTLIT
-#                 | INT8LIT
-#                 | INT16LIT
-#                 | INT32LIT
-#                 | INT64LIT
-#                 | FLOATLIT
-#                 | FLOAT32LIT
-#                 | FLOAT64LIT
-#                 | CHARLIT
-#                 | NIL'''
-# def p_par(p):
+# def p_symbol
+def p_literal(p):
+    '''literal : INTLIT
+                | INT8LIT
+                | INT16LIT
+                | INT32LIT
+                | INT64LIT
+                | FLOATLIT
+                | FLOAT32LIT
+                | FLOAT64LIT
+                | CHARLIT
+                | NIL'''
+def p_par(p):
 
-# def p_doBlocks(p):
-#     '''doBlocks : doBlock'''
+def p_doBlocks(p):
+    '''doBlocks : doBlock'''
 
-# def p_doBlock(p):
-#     '''doBlock : DO COLON stmt'''
+def p_doBlock(p):
+    '''doBlock : DO COLON stmt'''
 # def p_operator(p):
 #     '''operator : OP0
 #                 | OP1
