@@ -1,6 +1,8 @@
 #!/usr/bin/python
 import ply.yacc as yacc
-
+import logging
+import sys, re
+from collections import defaultdict
 #get tokens
 #import lexer #as ourLexer# our lexer
 # tokens = lexer.tok_data
@@ -264,6 +266,11 @@ def p_error(p):
     print("Syntax error!")
 
 # Build the parser
+logging.basicConfig(
+    level = logging.DEBUG,
+    filename = "parselog.txt",
+    filemode = "w")
+log = logging.getLogger()
 parser = yacc.yacc()
 
 def parseProgram(program):
@@ -274,12 +281,35 @@ def parseProgram(program):
 def testYacc(inputFile):
     program = open(inputFile).read()
     customLexer = lexer.customLexer()
-    result=parser.parse(program, lexer=customLexer)
+    result=parser.parse(program, lexer=customLexer, debug=log)
     print result
     # parser.parse(program, lexer=lexer, debug=1)
 
 if __name__ == "__main__":
     from sys import argv
     filename, inputFile = argv
-
     testYacc(inputFile)
+    #code to get reduced rules as an output file
+    actionfile = open("actionfile.txt", 'w')
+    with open("parselog.txt") as f:
+        for line in f:
+            if line.startswith("INFO:root:Action"):
+                actionfile.write(line)
+    reverse = []
+    actionfile = open("actionfile.txt", 'r')
+    for line in actionfile:
+        rule = re.findall('rule \[(.*)\] with', line)
+        reverse.append(rule[0])
+    #rulelist.txt contains the final production rules 
+    rulelist = open("rulelist.txt", 'w')
+    while (reverse):
+        temp = reverse.pop()
+        rulelist.write(temp+'\n')
+    actionfile.close()
+    rulelist.close()
+
+    #code to create the graphviz flowchart
+
+
+
+
