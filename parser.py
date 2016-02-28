@@ -4,7 +4,8 @@ import ply.yacc as yacc
 #get tokens
 #import lexer #as ourLexer# our lexer
 # tokens = lexer.tok_data
-from lexer import tokens, lexer
+import lexer
+tokens = lexer.tokens
 
 def p_start(p):
 #ignored extra
@@ -180,37 +181,37 @@ def p_literal(p):
                 | FLOAT64LIT
                 | CHARLIT
                 | NIL'''
-def p_par(p):
+# def p_par(p):
 
 def p_doBlocks(p):
     '''doBlocks : doBlock'''
 
 def p_doBlock(p):
     '''doBlock : DO COLON stmt'''
-# def p_operator(p):
-#     '''operator : OP0
-#                 | OP1
-#                 | OP2
-#                 | OP5
-#                 | OP6
-#                 | OP7
-#                 | OP8
-#                 | OP9
-#                 | OR
-#                 | AND
-#                 | XOR
-#                 | IS
-#                 | ISNOT
-#                 | IN
-#                 | NOTIN
-#                 | OF
-#                 | DIV
-#                 | MOD
-#                 | SHL
-#                 | SHR
-#                 | NOT
-#                 | STATIC
-#                 | DOTDOT'''
+def p_operator(p):
+    '''operator : OP0
+                | OP1
+                | OP2
+                | OP5
+                | OP6
+                | OP7
+                | OP8
+                | OP9
+                | OR
+                | AND
+                | XOR
+                | IS
+                | ISNOT
+                | IN
+                | NOTIN
+                | OF
+                | DIV
+                | MOD
+                | SHL
+                | SHR
+                | NOT
+                | STATIC
+                | DOTDOT'''
 # def p_
 # def p_
 # def p_
@@ -272,7 +273,8 @@ def parseProgram(program):
 # a function to test the parser
 def testYacc(inputFile):
     program = open(inputFile).read()
-    result=parser.parse(program, lexer=lexer)
+    customLexer = lexer.customLexer()
+    result=parser.parse(program, lexer=customLexer)
     print result
     # parser.parse(program, lexer=lexer, debug=1)
 
