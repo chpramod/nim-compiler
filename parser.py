@@ -24,13 +24,14 @@ def p_stmt(p):
     '''stmt : complexOrSimpleStmt
              | simpleStmt'''
 
-def p_stmtStar(p):
-    '''stmtStar : stmt stmtStar
+def p_stmtStar(p):                      # changed a bit
+    '''stmtStar : stmt INDEQ stmtStar
+                 | stmt
                  | empty'''
 
-def p_suite(p):
+def p_suite(p):                         # changed it too
     '''suite : simpleStmt
-              | INDGR stmt stmtStar INDLE'''
+              | INDGR stmtStar INDLE'''
 
 
 def p_complexOrSimpleStmt(p):
@@ -51,7 +52,7 @@ def p_whenStmt(p):
     '''whenStmt : WHEN condStmt'''
 
 def p_condStmt(p):
-    '''condStmt : expr COLON stmt'''
+    '''condStmt : expr COLON suite'''
 
 def p_expr(p):
     # '''expr : ifExpr
@@ -157,7 +158,9 @@ def p_interPrimarySuffix(p):
     '''interPrimarySuffix : primarySuffix interPrimarySuffix
                             | empty '''
 
-def p_identOrLiteral(p):
+def p_identOrLiteral(p):                    # Revant's question :
+                                            # why not literals ?
+                                            # we can compare with numbers
     # '''identOrLiteral : symbol
     #                   | literal
     #                   | par
