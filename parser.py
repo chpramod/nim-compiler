@@ -47,7 +47,8 @@ def p_exprStmt(p):
     '''exprStmt : simpleExpr EQUALS expr '''
 
 def p_ifStmt(p):
-    '''ifStmt : IF condStmt'''
+    '''ifStmt : IF condStmt
+                | IF condStmt INDEQ ELSE COLON suite'''
 
 def p_whenStmt(p):
     '''whenStmt : WHEN condStmt'''
