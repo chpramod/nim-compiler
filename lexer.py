@@ -180,7 +180,7 @@ def t_WSI(t):
     return t
 
 def t_WS(t):
-    r' [\s ]+ '
+    r' [\s]'
     return t
 
 # def t_OPR(t):
@@ -320,6 +320,7 @@ def generateIndentation(lexer):
         if not tok:
             break      # No more input
         tok.lineno = lineno
+        # if 1:
         if not (tok.type=="WSI" or tok.type=="WS" or tok.type=="NEWLINE"):
             tok_data.append(tok)
         nexttok = lexer.token()
@@ -362,6 +363,7 @@ def generateIndentation(lexer):
                 tok_data.append(newtok)
             prev_ind = next_ind
         tok = nexttok
+    pprint(tok_data)
     return tok_data
 class customLexer(object):
     def __init__(self):
@@ -383,7 +385,7 @@ tok = cLexer.token()
 while True:
     if not tok:
         break
-    print tok
+    # print tok
     tok = cLexer.token()
 
 
