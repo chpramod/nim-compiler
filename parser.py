@@ -51,7 +51,8 @@ def p_ifStmt(p):
                 | IF condStmt INDEQ ELSE COLON suite'''
 
 def p_whenStmt(p):
-    '''whenStmt : WHEN condStmt'''
+    '''whenStmt : WHEN condStmt
+                | WHEN condStmt INDEQ ELSE COLON suite'''
 
 def p_condStmt(p):
     '''condStmt : expr COLON suite'''
