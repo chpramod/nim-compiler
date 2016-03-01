@@ -26,6 +26,7 @@ def p_stmt(p):
 
 def p_stmtStar(p):                      # changed a bit
     '''stmtStar : stmt INDEQ stmtStar
+                 | stmt SEMICOLON stmtStar
                  | stmt
                  | empty'''
 
@@ -165,7 +166,8 @@ def p_identOrLiteral(p):                    # Revant's question :
     #                   | literal
     #                   | par
     #                   | IDENTIFIER'''
-    '''identOrLiteral : IDENTIFIER'''
+    '''identOrLiteral : IDENTIFIER
+                        | literal'''
 
 def p_typeKeyw(p):
     '''typeKeyw : VAR
