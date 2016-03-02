@@ -180,7 +180,7 @@ def t_WSI(t):
     return t
 
 def t_WS(t):
-    r' [\s ]+ '
+    r' [\s]'
     return t
 
 # def t_OPR(t):
@@ -316,10 +316,19 @@ def generateIndentation(lexer):
     tok = lexer.token()
     if(tok.type=="WS"):
         t_error(tok)
+
+    # newtok = lex.LexToken()
+    # newtok.type = 'INDGR'
+    # newtok.value = 1
+    # newtok.lexpos = tok.lexpos
+    # newtok.lineno = lineno
+    # tok_data.append(newtok)
+    
     while True:
         if not tok:
             break      # No more input
         tok.lineno = lineno
+        # if 1:
         if not (tok.type=="WSI" or tok.type=="WS" or tok.type=="NEWLINE"):
             tok_data.append(tok)
         nexttok = lexer.token()
@@ -353,6 +362,12 @@ def generateIndentation(lexer):
                 newtok.lexpos = tok.lexpos
                 newtok.lineno = lineno
                 tok_data.append(newtok)
+                newtok = lex.LexToken()
+                newtok.type = 'INDEQ'
+                newtok.value = 0
+                newtok.lexpos = tok.lexpos
+                newtok.lineno = lineno
+                tok_data.append(newtok)
             if(next_ind == prev_ind):
                 newtok = lex.LexToken()
                 newtok.type = 'INDEQ'
@@ -362,6 +377,15 @@ def generateIndentation(lexer):
                 tok_data.append(newtok)
             prev_ind = next_ind
         tok = nexttok
+    
+    # newtok = lex.LexToken()
+    # newtok.type = 'INDLE'
+    # newtok.value = -1
+    # newtok.lexpos = -1
+    # newtok.lineno = lineno
+    # tok_data.append(newtok)
+
+    pprint(tok_data)
     return tok_data
 class customLexer(object):
     def __init__(self):
@@ -376,15 +400,15 @@ class customLexer(object):
         except StopIteration:
             return None
 
-cLexer = customLexer()
-data = open(sys.argv[1], 'r').read()
-cLexer.input(data)
-tok = cLexer.token()
-while True:
-    if not tok:
-        break
-    print tok
-    tok = cLexer.token()
+# cLexer = customLexer()
+# data = open(sys.argv[1], 'r').read()
+# cLexer.input(data)
+# tok = cLexer.token()
+# while True:
+#     if not tok:
+#         break
+#     # print tok
+#     tok = cLexer.token()
 
 
 # print('\n\nTokens\tOccurances\tLexemes\n')
