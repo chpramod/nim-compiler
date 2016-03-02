@@ -362,13 +362,7 @@ def generateIndentation(lexer):
                 newtok.lexpos = tok.lexpos
                 newtok.lineno = lineno
                 tok_data.append(newtok)
-                newtok = lex.LexToken()
-                newtok.type = 'INDEQ'
-                newtok.value = 0
-                newtok.lexpos = tok.lexpos
-                newtok.lineno = lineno
-                tok_data.append(newtok)
-            if(next_ind == prev_ind):
+            if(next_ind <= prev_ind):
                 newtok = lex.LexToken()
                 newtok.type = 'INDEQ'
                 newtok.value = 0
