@@ -38,6 +38,8 @@ def p_suite(p):                         # changed it too
 def p_complexOrSimpleStmt(p):
     '''complexOrSimpleStmt : ifStmt
                             | whenStmt
+                            | whileStmt
+                            | forStmt
                             | simpleStmt '''
 
 def p_simpleStmt(p):
@@ -45,6 +47,43 @@ def p_simpleStmt(p):
 
 def p_exprStmt(p):
     '''exprStmt : simpleExpr EQUALS expr '''
+
+def p_whileStmt(p):
+    '''whileStmt : WHILE condStmt'''
+
+def p_identWithPragmaInter(p):
+    '''identWithPragmaInter : COMMA identWithPragma identWithPragmaInter
+                            | empty'''
+
+def p_identWithPragma(p):
+    '''identWithPragma : identVis pragmaInter'''
+
+def p_pragmaInter(p):
+    '''pragmaInter : pragma
+                    | empty'''    
+
+def p_pragma(p):
+    '''pragma : CURLYDOTLE pragmaInter optPar CURLYDOTRI
+               | CURLYDOTLE pragmaInter optPar CURLYRI''' 
+
+def p_pragmaInter(p):
+    '''pragmaInter : expr COLON expr pragmaInter
+                   | empty'''
+
+def p_optpar(p):
+    '''optPar : INDEQ
+              | INDGR
+              | empty'''
+
+def p_identVis(p):
+    '''identVis : symbol oprInter'''
+
+def p_oprInter(p):
+    #should be opr
+    '''oprInter : empty'''    
+
+def p_forStmt(p):
+    '''forStmt : FOR identWithPragma identWithPragmaInter IN expr COLON suite'''
 
 def p_ifStmt(p):
     '''ifStmt : IF condStmt
@@ -149,9 +188,10 @@ def p_interElev(p):
 
 def p_primary(p):
     '''primary : typeKeyw typeDescK
-                | interPrefixOperator identOrLiteral interPrimarySuffix
+                | identOrLiteral interPrimarySuffix
                 | STATIC primary
                 | BIND primary'''
+#shd be interPrefixOperator identOrLiteral interPrimarySuffix
 
 def p_interPrefixOperator(p):
     '''interPrefixOperator : prefixOperator interPrefixOperator
@@ -193,7 +233,11 @@ def p_primarySuffix(p):
 def p_prefixOperator(p):
     '''prefixOperator : operator'''
 
-# def p_symbol
+def p_symbol(p):
+    '''symbol : IDENTIFIER
+                | ADDR
+                | TYPE'''
+
 def p_literal(p):
     '''literal : INTLIT
                 | INT8LIT
@@ -226,8 +270,8 @@ def p_operator(p):
                 | XOR
                 | IS
                 | ISNOT
-                | IN
                 | NOTIN
+                | IN
                 | OF
                 | DIV
                 | MOD
