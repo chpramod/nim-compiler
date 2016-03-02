@@ -51,7 +51,8 @@ def p_ifStmt(p):
                 | IF condStmt INDEQ ELSE COLON suite'''
 
 def p_whenStmt(p):
-    '''whenStmt : WHEN condStmt'''
+    '''whenStmt : WHEN condStmt
+                | WHEN condStmt INDEQ ELSE COLON suite'''
 
 def p_condStmt(p):
     '''condStmt : expr COLON suite'''
@@ -341,16 +342,14 @@ if __name__ == "__main__":
     dotfile.write("strict digraph G {"+"\n\n")
     for line in rulelist:
         colsplit = line.split(" ")
-        if (len(colsplit)<=3):
-            colsplit[2] = colsplit[2][0:len(colsplit[2])-1]
-        else:
-            k = len(colsplit)-1
-            colsplit[k] = colsplit[k][0:len(colsplit[k])-1]
-        nodes[colsplit[0]]=nodeno
-        nodeno+=1
-        for i in range(1,len(colsplit)):
+        k = len(colsplit)-1
+        colsplit[k] = colsplit[k][0:len(colsplit[k])-1]
+        prev = {}
+        for i in range(2,len(colsplit)):
+            prev[colsplit[i]] = True
+        for i in range(0,len(colsplit)):
             try:
-                temp = nodes[colsplit[i]]
+                prev[colsplit[i]]
             except KeyError:
                 nodes[colsplit[i]]=nodeno
                 nodeno+=1
