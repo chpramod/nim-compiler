@@ -320,45 +320,43 @@ if __name__ == "__main__":
                 actionfile.write(line)
     reverse = []
     actionfile = open("actionfile.txt", 'r')
+    rulelist = open("rulelist.txt", 'w')
     for line in actionfile:
         rule = re.findall('rule \[(.*)\] with', line)
-        reverse.append(rule[0])
+        rulelist.write(rule[0]+'\n')
     #rulelist.txt contains the final production rules 
-    rulelist = open("rulelist.txt", 'w')
-    while (reverse):
-        temp = reverse.pop()
-        rulelist.write(temp+'\n')
     actionfile.close()
     rulelist.close()
 
     #code to create the graphviz flowchart
-    lineno = 1;
     nodeno = 1;
-    nodes = {}
+    nodes = defaultdict(list)
     data = open(inputFile)
     inputFile = inputFile[0:len(inputFile)-4]
     rulelist = open("rulelist.txt",'r')
     dotfile = open(inputFile+".dot",'w')
-    dotfile.write("strict digraph G {"+"\n\n")
+    dotfile.write("digraph G {"+"\n graph [ordering=\"out\"];\n")
     for line in rulelist:
         colsplit = line.split(" ")
         k = len(colsplit)-1
         colsplit[k] = colsplit[k][0:len(colsplit[k])-1]
-        prev = {}
-        for i in range(2,len(colsplit)):
-            prev[colsplit[i]] = True
-        for i in range(0,len(colsplit)):
-            try:
-                prev[colsplit[i]]
-            except KeyError:
-                nodes[colsplit[i]]=nodeno
-                nodeno+=1
-        innode="node"+str(nodes[colsplit[0]])
+        pid = nodeno
+        innode="node"+str(nodeno)
         dotfile.write(innode+" [ label = \""+colsplit[0]+"\" ];\n")
+        nodeno+=1
         for i in range(2,len(colsplit)):
-            outnode="node"+str(nodes[colsplit[i]])
-            dotfile.write(outnode+" [ label = \""+colsplit[i]+"\" ];\n")
-            dotfile.write(innode+" -> "+outnode+";\n")
+            if colsplit[i] in nodes:
+                temp = nodes[colsplit[i]].pop(len(nodes[colsplit[i]])-1)
+                outnode="node"+str(temp)
+                dotfile.write(innode+" -> "+outnode+";\n")
+                if len(colsplit[i])==0:
+                    del nodes[colsplit[i]]
+            else:
+                outnode="node"+str(nodeno)
+                dotfile.write(outnode+" [ label = \""+colsplit[i]+"\" ];\n")    
+                dotfile.write(innode+" -> "+outnode+";\n")
+                nodeno+=1
+        nodes[colsplit[0]].append(pid)
     dotfile.write("}")
 
 
