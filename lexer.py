@@ -107,7 +107,7 @@ tokens = [
          'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'CHARLIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
         'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',
         'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OP0', 'OP1', 'OP2', 'OP3', 'OP4', 'OP5', 'OP6', 'OP7', 'OP8', 'OP9', 'OP10', 'COMMENT', 'MULTICOMMENT',
-         'ACCENT', 'IDENTIFIER', 'NUMBER', 'BOOLEAN', 'NEWLINE', 'WS', 'WSI', 'INDGR','INDLE','INDEQ', 'ENDMARKER'
+         'ACCENT', 'IDENTIFIER', 'NUMBER', 'BOOLEAN', 'NEWLINE', 'WS', 'WSI', 'INDGR','INDLE', 'ENDMARKER'
         ] + list(reserved.values())
 
 def t_OP0(t):
@@ -327,6 +327,10 @@ def generateIndentation(lexer):
     while True:
         if not tok:
             break      # No more input
+        if tok.type=="ELSE":
+            temp = tok_data[-1]
+            if temp.type=="NEWLINE":
+                del tok_data[-1]
         tok.lineno = lineno
         # if 1:
         if not (tok.type=="WSI" or tok.type=="WS" or tok.type=="NEWLINE"):
