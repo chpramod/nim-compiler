@@ -327,7 +327,7 @@ def generateIndentation(lexer):
     while True:
         if not tok:
             break      # No more input
-        if tok.type=="ELSE":
+        if tok.type=="ELSE" or tok.type=="EXCEPT" or tok.type=="FINALLY":
             temp = tok_data[-1]
             if temp.type=="NEWLINE":
                 del tok_data[-1]
