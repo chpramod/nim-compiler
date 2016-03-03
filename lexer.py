@@ -167,7 +167,7 @@ def t_MULTICOMMENT(t):
     pass
 
 def t_COMMENT(t):
-    r"[\s ]*\#[^\n]*\n"  # \043 is '#'
+    r"[\s ]*\#[^\n]*"  # \043 is '#'
     pass
 
 def t_NEWLINE(t):
@@ -314,23 +314,20 @@ def generateIndentation(lexer):
     next_ind = 0
     lineno = 1
     tok = lexer.token()
+    while tok.type=="NEWLINE":
+        tok = lexer.token()
     if(tok.type=="WS"):
         t_error(tok)
-
-    # newtok = lex.LexToken()
-    # newtok.type = 'INDGR'
-    # newtok.value = 1
-    # newtok.lexpos = tok.lexpos
-    # newtok.lineno = lineno
-    # tok_data.append(newtok)
 
     while True:
         if not tok:
             break      # No more input
-        if tok.type=="ELSE" or tok.type=="EXCEPT" or tok.type=="FINALLY":
+        if tok.type=="ELSE" or tok.type=="EXCEPT" or tok.type=="FINALLY" or tok.type=="OF" or tok.type == "ELIF":
             temp = tok_data[-1]
             if temp.type=="NEWLINE":
                 del tok_data[-1]
+            elif temp.type!="INDGR":
+                t_error(tok)
         tok.lineno = lineno
         # if 1:
         if not (tok.type=="WSI" or tok.type=="WS" or tok.type=="NEWLINE"):
@@ -406,7 +403,6 @@ class customLexer(object):
 # while True:
 #     if not tok:
 #         break
-#     # print tok
 #     tok = cLexer.token()
 
 
