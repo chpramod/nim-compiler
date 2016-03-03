@@ -63,11 +63,11 @@ def p_pragmaInter(p):
                     | empty'''
 
 def p_pragma(p):
-    '''pragma : CURLYDOTLE pragmaInter optPar CURLYDOTRI
-               | CURLYDOTLE pragmaInter optPar CURLYRI'''
+    '''pragma : CURLYDOTLE pragmaInterInter optPar CURLYDOTRI
+               | CURLYDOTLE pragmaInterInter optPar CURLYRI'''
 
-def p_pragmaInter(p):
-    '''pragmaInter : expr COLON expr pragmaInter
+def p_pragmaInterInter(p):
+    '''pragmaInterInter : expr COLON expr pragmaInter
                    | empty'''
 
 def p_optpar(p):
@@ -84,6 +84,9 @@ def p_oprInter(p):
 
 def p_forStmt(p):
     '''forStmt : FOR identWithPragma identWithPragmaInter IN expr COLON suite'''
+
+def p_tryStmt(p):
+    '''tryStmt : TRY COLON suite'''
 
 def p_ifStmt(p):
     '''ifStmt : IF condStmt'''
