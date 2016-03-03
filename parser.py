@@ -368,7 +368,8 @@ def p_identOrLiteral(p):                    # Revant's question :
     #                   | par
     #                   | IDENTIFIER'''
     '''identOrLiteral : IDENTIFIER
-                        | literal'''
+                        | literal
+                        | arrayConstr '''
 
 def p_arrayConstr(p):
     ''' arrayConstr : BRACKETLE arrayConstrInter BRACKETRI '''
@@ -381,7 +382,7 @@ def p_arrayConstrInter(p) :
 def p_exprColonEqExpr(p) :
     ''' exprColonEqExpr : expr 
                         | expr COLON expr
-                        | expr EQUALS expr
+                        | expr EQUALS expr  
                         | castExpr'''
 
 
