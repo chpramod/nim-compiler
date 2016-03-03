@@ -12,11 +12,11 @@ tokens = lexer.tokens
 def p_start(p):
 #ignored extra
 #module = stmt ^* (';' / IND{=})
-    '''start : stmtIndentSemicolon
-              | stmt '''
+    '''start : stmtIndentSemicolon ENDMARKER
+              | stmt ENDMARKER'''
 
 def p_stmtIndentSemicolon(p):
-    '''stmtIndentSemicolon : stmt INDEQ stmtIndentSemicolon
+    '''stmtIndentSemicolon : stmt NEWLINE stmtIndentSemicolon
                             | stmt SEMICOLON stmtIndentSemicolon
                             | empty'''
 
@@ -25,14 +25,14 @@ def p_stmt(p):
              | simpleStmt'''
 
 def p_stmtStar(p):                      # changed a bit
-    '''stmtStar : stmt INDEQ stmtStar
+    '''stmtStar : stmt NEWLINE stmtStar
                  | stmt SEMICOLON stmtStar
                  | stmt
                  | empty'''
 
 def p_suite(p):                         # changed it too
     '''suite : simpleStmt
-              | INDGR stmtStar INDLE'''
+              | NEWLINE INDGR stmtStar INDLE'''
 
 
 def p_complexOrSimpleStmt(p):
@@ -60,19 +60,19 @@ def p_identWithPragma(p):
 
 def p_pragmaInter(p):
     '''pragmaInter : pragma
-                    | empty'''    
+                    | empty'''
 
 def p_pragma(p):
     '''pragma : CURLYDOTLE pragmaInter optPar CURLYDOTRI
-               | CURLYDOTLE pragmaInter optPar CURLYRI''' 
+               | CURLYDOTLE pragmaInter optPar CURLYRI'''
 
 def p_pragmaInter(p):
     '''pragmaInter : expr COLON expr pragmaInter
                    | empty'''
 
 def p_optpar(p):
-    '''optPar : INDEQ
-              | INDGR
+    '''optPar : NEWLINE
+              | NEWLINE INDGR
               | empty'''
 
 def p_identVis(p):
@@ -80,18 +80,17 @@ def p_identVis(p):
 
 def p_oprInter(p):
     #should be opr
-    '''oprInter : empty'''    
+    '''oprInter : empty'''
 
 def p_forStmt(p):
     '''forStmt : FOR identWithPragma identWithPragmaInter IN expr COLON suite'''
 
 def p_ifStmt(p):
-    '''ifStmt : IF condStmt
-                | IF condStmt INDEQ ELSE COLON suite'''
+    '''ifStmt : IF condStmt'''
 
 def p_whenStmt(p):
     '''whenStmt : WHEN condStmt
-                | WHEN condStmt INDEQ ELSE COLON suite'''
+                | WHEN condStmt NEWLINE ELSE COLON suite'''
 
 def p_condStmt(p):
     '''condStmt : expr COLON suite'''
@@ -368,7 +367,7 @@ if __name__ == "__main__":
     for line in actionfile:
         rule = re.findall('rule \[(.*)\] with', line)
         rulelist.write(rule[0]+'\n')
-    #rulelist.txt contains the final production rules 
+    #rulelist.txt contains the final production rules
     actionfile.close()
     rulelist.close()
 
@@ -381,6 +380,7 @@ if __name__ == "__main__":
     dotfile = open(inputFile+".dot",'w')
     dotfile.write("digraph G {"+"\n graph [ordering=\"out\"];\n")
     for line in rulelist:
+        if "empty -> <empty>" in line: continue
         colsplit = line.split(" ")
         k = len(colsplit)-1
         colsplit[k] = colsplit[k][0:len(colsplit[k])-1]
@@ -397,14 +397,8 @@ if __name__ == "__main__":
                     del nodes[colsplit[i]]
             else:
                 outnode="node"+str(nodeno)
-                dotfile.write(outnode+" [ label = \""+colsplit[i]+"\" ];\n")    
+                dotfile.write(outnode+" [ label = \""+colsplit[i]+"\" ];\n")
                 dotfile.write(innode+" -> "+outnode+";\n")
                 nodeno+=1
         nodes[colsplit[0]].append(pid)
     dotfile.write("}")
-
-
-
-
-
-
