@@ -1,3 +1,5 @@
+a = cast [a](c)
+a = 2*3+4
 try:
   if a == b: # Hello
     if a == b:
@@ -34,6 +36,6 @@ break
 raise a
 discard f
 echo hi,hi
-include hello, HELLO
+include "hello", HELLO
 from hello import a,b,d
 import hello except a,b
