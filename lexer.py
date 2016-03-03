@@ -107,7 +107,7 @@ tokens = [
          'FLOATLIT', 'FLOAT32LIT', 'FLOAT64LIT', 'FLOAT128LIT', 'CHARLIT', 'STRLIT', 'RSTRLIT', 'TRIPLESTRLIT', 'PARLE', 'PARRI',
         'BRACKETLE', 'BRACKETRI', 'CURLYLE', 'CURLYRI', 'BRACKETDOTLE', 'BRACKETDOTRI', 'CURLYDOTLE', 'CURLYDOTRI', 'PARDOTLE', 'PARDOTRI', 'COMMA', 'SEMICOLON',
         'COLON', 'COLONCOLON', 'EQUALS', 'DOT', 'DOTDOT', 'OP0', 'OP1', 'OP2', 'OP3', 'OP4', 'OP5', 'OP6', 'OP7', 'OP8', 'OP9', 'OP10', 'COMMENT', 'MULTICOMMENT',
-         'ACCENT', 'IDENTIFIER', 'NUMBER', 'BOOLEAN', 'NEWLINE', 'WS', 'WSI', 'INDGR','INDLE','INDEQ'
+         'ACCENT', 'IDENTIFIER', 'NUMBER', 'BOOLEAN', 'NEWLINE', 'WS', 'WSI', 'INDGR','INDLE','INDEQ', 'ENDMARKER'
         ] + list(reserved.values())
 
 def t_OP0(t):
@@ -323,7 +323,7 @@ def generateIndentation(lexer):
     # newtok.lexpos = tok.lexpos
     # newtok.lineno = lineno
     # tok_data.append(newtok)
-    
+
     while True:
         if not tok:
             break      # No more input
@@ -348,13 +348,6 @@ def generateIndentation(lexer):
                 next_ind = len(nexttok.value)/2
             else:
                 next_ind = 0
-            for i in range(0,next_ind - prev_ind):
-                newtok = lex.LexToken()
-                newtok.type = 'INDGR'
-                newtok.value = 1
-                newtok.lexpos = tok.lexpos
-                newtok.lineno = lineno
-                tok_data.append(newtok)
             for i in range(0,prev_ind - next_ind):
                 newtok = lex.LexToken()
                 newtok.type = 'INDLE'
@@ -362,22 +355,30 @@ def generateIndentation(lexer):
                 newtok.lexpos = tok.lexpos
                 newtok.lineno = lineno
                 tok_data.append(newtok)
-            if(next_ind <= prev_ind):
+            tok_data.append(tok)
+            for i in range(0,next_ind - prev_ind):
                 newtok = lex.LexToken()
-                newtok.type = 'INDEQ'
-                newtok.value = 0
+                newtok.type = 'INDGR'
+                newtok.value = 1
                 newtok.lexpos = tok.lexpos
                 newtok.lineno = lineno
                 tok_data.append(newtok)
+            # if(next_ind <= prev_ind):
+            #     newtok = lex.LexToken()
+            #     newtok.type = 'INDEQ'
+            #     newtok.value = 0
+            #     newtok.lexpos = tok.lexpos
+            #     newtok.lineno = lineno
+            #     tok_data.append(newtok)
             prev_ind = next_ind
         tok = nexttok
-    
-    # newtok = lex.LexToken()
-    # newtok.type = 'INDLE'
-    # newtok.value = -1
-    # newtok.lexpos = -1
-    # newtok.lineno = lineno
-    # tok_data.append(newtok)
+
+    newtok = lex.LexToken()
+    newtok.type = 'ENDMARKER'
+    newtok.value = -1
+    newtok.lexpos = -1
+    newtok.lineno = lineno
+    tok_data.append(newtok)
 
     pprint(tok_data)
     return tok_data
