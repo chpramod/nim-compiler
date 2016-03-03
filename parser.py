@@ -41,7 +41,8 @@ def p_complexOrSimpleStmt(p):
                             | whileStmt
                             | forStmt
                             | tryStmt
-                            | simpleStmt '''
+                            | simpleStmt 
+                            | 'proc' routine '''
 
 def p_simpleStmt(p):
     '''simpleStmt : exprStmt'''
@@ -77,7 +78,7 @@ def p_optpar(p):
               | empty'''
 
 def p_identVis(p):
-    '''identVis : symbol oprInter'''
+    '''identVis : symbol '''  # oprInter''' should be opr = `+*` sort of
 
 def p_oprInter(p):
     #should be opr
@@ -292,7 +293,24 @@ def p_operator(p):
                 | NOT
                 | STATIC
                 | DOTDOT'''
-# def p_
+
+def p_routine(p):
+    ''' routine : identVis paramListColon EQUALS suite '''
+
+def p_paramListColon(p):
+    ''' paramListColon : paramListInter 
+                        | paramListInter COLON typeDesc'''
+
+def p_paramListInter(p):
+    ''' paramListInter : PARLE declColonEqualsInter PARRI'''
+def p_declColonEqualsInter(p):
+    ''' declColonEqualsInter = declColonEquals COMMA declColonEqualsInter
+                            |  declColonEquals SEMICOLON declColonEqualsInter
+                            |  declColonEquals '''
+
+
+    # original rule : routine = optInd identVis pattern? genericParamList? paramListColon pragma? ('=' COMMENT? stmt)? indAndComment
+
 # def p_
 # def p_
 # def p_
