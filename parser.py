@@ -317,7 +317,7 @@ def p_typeKeyw(p):
                 | ITERATOR
                 | DISTINCT
                 | OBJECT
-                | ENUM 
+                | ENUM
                 | INT
                 | FLOAT
                 | CHAR
@@ -348,6 +348,9 @@ def p_literal(p):
                 | FLOAT32LIT
                 | FLOAT64LIT
                 | CHARLIT
+                | STRLIT
+                | RSTRLIT
+                | TRIPLESTRLIT
                 | NIL'''
 # def p_par(p):
 
