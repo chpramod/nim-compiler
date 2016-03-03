@@ -1,10 +1,39 @@
-
-x= 5'i8
-y = 1.2'f32
-z= 5'f64
-# This is a comment
-#[This is 
-a multiline comment]#
-echo("What's your name?")
-var name: string = readLine(stdin)
-echo("Hi, ", name, "!")
+try:
+  if a == b: # Hello
+    if a == b:
+      b = 1;a = 0
+    else:
+      chut = pussy
+    b = 9
+  else:
+    if a == b:
+      b = 1;a = 0
+    else:
+      chut = pussy
+  b = 9
+  case a == b:
+    of a == b:
+      A = b
+    of a == b:
+      A = b
+    of a == b:
+      A = b
+    else:
+      b = A
+except a==b:
+  a=b
+finally:
+  a=b
+while fu==asd:
+  da=ad
+c = if a==b: c elif b==d: c else: d
+return q
+yield q
+continue g
+break
+raise a
+discard f
+echo hi,hi
+include hello, HELLO
+from hello import a,b,d
+import hello except a,b
