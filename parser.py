@@ -89,11 +89,12 @@ def p_tryStmt(p):
     '''tryStmt : TRY COLON suite'''
 
 def p_ifStmt(p):
-    '''ifStmt : IF condStmt'''
+    '''ifStmt : IF condStmt
+                | IF condStmt ELSE COLON suite'''
 
 def p_whenStmt(p):
     '''whenStmt : WHEN condStmt
-                | WHEN condStmt NEWLINE ELSE COLON suite'''
+                | WHEN condStmt ELSE COLON suite'''
 
 def p_condStmt(p):
     '''condStmt : expr COLON suite'''
