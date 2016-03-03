@@ -256,10 +256,15 @@ def p_typeKeyw(p):
                 | ITERATOR
                 | DISTINCT
                 | OBJECT
-                | ENUM '''
+                | ENUM 
+                | INT
+                | FLOAT
+                | CHAR
+                | STRING '''
 
 def p_typeDescK(p):
-    '''typeDescK : simpleExpr'''
+    '''typeDescK : simpleExpr
+                 | empty'''
 
 def p_primarySuffix(p):
     '''primarySuffix : doBlocks'''
