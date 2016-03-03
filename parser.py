@@ -40,6 +40,7 @@ def p_complexOrSimpleStmt(p):
                             | whenStmt
                             | whileStmt
                             | forStmt
+                            | tryStmt
                             | simpleStmt '''
 
 def p_simpleStmt(p):
@@ -86,7 +87,15 @@ def p_forStmt(p):
     '''forStmt : FOR identWithPragma identWithPragmaInter IN expr COLON suite'''
 
 def p_tryStmt(p):
-    '''tryStmt : TRY COLON suite'''
+    '''tryStmt : TRY COLON suite exceptInter finallyInter'''
+
+def p_exceptInter(p):
+    '''exceptInter : EXCEPT expr COLON suite exceptInter
+                   | empty'''
+
+def p_finallyInter(p):
+    '''finallyInter : FINALLY COLON suite
+                    | empty'''                   
 
 def p_ifStmt(p):
     '''ifStmt : IF condStmt
