@@ -408,9 +408,15 @@ def p_operator(p):
 def p_routine(p):
     ''' routine : identVis paramListColon EQUALS suite '''
 
+def p_typeKeyww(p):
+    ''' typeKeyww   :     INT
+                        | FLOAT
+                        | CHAR
+                        | STRING '''
+
 def p_paramListColon(p):
     ''' paramListColon : paramListInter
-                        | paramListInter COLON typeDescK'''
+                        | paramListInter COLON typeKeyww'''
 
 def p_paramListInter(p):
     ''' paramListInter : PARLE declColonEqualsInter PARRI'''
@@ -437,7 +443,7 @@ def p_commaInter(p):
                    | empty'''
 
 def p_colonTypeDescKInter(p):
-    ''' colonTypeDescKInter : COLON typeDescK
+    ''' colonTypeDescKInter : COLON typeKeyww
                             | empty '''
 
 def p_equalExprInter(p):
