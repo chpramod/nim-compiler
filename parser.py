@@ -42,12 +42,23 @@ def p_complexOrSimpleStmt(p):
                             | forStmt
                             | caseStmt
                             | tryStmt
-                            | simpleStmt 
+                            | simpleStmt
                             | PROC routine
                             | ITERATOR routine '''
 
 def p_simpleStmt(p):
-    '''simpleStmt : exprStmt'''
+    '''simpleStmt : returnStmt
+                | raiseStmt
+                | yieldStmt
+                | discardStmt
+                | breakStmt
+                | continueStmt
+                | pragmaStmt
+                | importStmt
+                | echoStmt
+                | fromStmt
+                | includeStmt
+                | exprStmt'''
 
 def p_exprStmt(p):
     '''exprStmt : simpleExpr EQUALS expr '''
@@ -73,6 +84,9 @@ def p_pragma(p):
 def p_pragmaInterInter(p):
     '''pragmaInterInter : expr COLON expr pragmaInter
                    | empty'''
+
+def p_pragmaStmt(p):
+    '''pragmaStmt : empty'''
 
 def p_optpar(p):
     '''optPar : NEWLINE
@@ -129,6 +143,43 @@ def p_ofBranches(p):
 
 def p_caseStmt(p):
     '''caseStmt : CASE expr COLON NEWLINE INDGR ofBranch ofBranches INDLE'''
+
+def p_echoStmt(p):
+    '''echoStmt : ECHO exprList'''
+
+def p_importStmt(p):
+    '''importStmt : IMPORT exprList
+                | IMPORT expr EXCEPT exprList'''
+
+def p_includeStmt(p):
+     '''includeStmt : INCLUDE exprList''' # should be list of IDENTIFIER instead of exprList
+
+def p_fromStmt(p):
+     '''fromStmt : FROM IDENTIFIER IMPORT exprList'''
+
+def p_returnStmt(p):
+    '''returnStmt : RETURN expr
+                | RETURN'''
+
+def p_raiseStmt(p):
+    '''raiseStmt : RAISE expr
+                | RAISE'''
+
+def p_yieldStmt(p):
+    '''yieldStmt : YIELD expr
+                | YIELD'''
+
+def p_discardStmt(p):
+    '''discardStmt : DISCARD expr
+                | DISCARD'''
+
+def p_breakStmt(p):
+    '''breakStmt : BREAK expr
+                | BREAK'''
+
+def p_continueStmt(p):
+    '''continueStmt : CONTINUE expr
+                | CONTINUE'''
 
 def p_expr(p):
     '''expr : ifExpr
@@ -329,7 +380,7 @@ def p_routine(p):
     ''' routine : identVis paramListColon EQUALS suite '''
 
 def p_paramListColon(p):
-    ''' paramListColon : paramListInter 
+    ''' paramListColon : paramListInter
                         | paramListInter COLON typeDescK'''
 
 def p_paramListInter(p):
@@ -345,7 +396,7 @@ def p_declColonEqualsInter(p):
 
 def p_declColonEquals(p) :
     ''' declColonEquals : identWithPragma commaIdentWithPragmaInter commaInter colonTypeDescKInter equalExprInter'''
-                  
+
 
 def p_commaIdentWithPragmaInter(p) :
     '''commaIdentWithPragmaInter : empty
@@ -362,7 +413,7 @@ def p_colonTypeDescKInter(p):
 
 def p_equalExprInter(p):
     ''' equalExprInter : EQUALS expr
-                            | empty '''                            
+                            | empty '''
 # def p_
 #
 #
