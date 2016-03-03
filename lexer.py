@@ -317,13 +317,6 @@ def generateIndentation(lexer):
     if(tok.type=="WS"):
         t_error(tok)
 
-    # newtok = lex.LexToken()
-    # newtok.type = 'INDGR'
-    # newtok.value = 1
-    # newtok.lexpos = tok.lexpos
-    # newtok.lineno = lineno
-    # tok_data.append(newtok)
-
     while True:
         if not tok:
             break      # No more input
@@ -401,14 +394,14 @@ class customLexer(object):
         except StopIteration:
             return None
 
-cLexer = customLexer()
-data = open(sys.argv[1], 'r').read()
-cLexer.input(data)
-tok = cLexer.token()
-while True:
-    if not tok:
-        break
-    tok = cLexer.token()
+# cLexer = customLexer()
+# data = open(sys.argv[1], 'r').read()
+# cLexer.input(data)
+# tok = cLexer.token()
+# while True:
+#     if not tok:
+#         break
+#     tok = cLexer.token()
 
 
 # print('\n\nTokens\tOccurances\tLexemes\n')
