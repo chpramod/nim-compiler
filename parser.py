@@ -34,6 +34,17 @@ def p_suite(p):                         # changed it too
     '''suite : simpleStmt
               | NEWLINE INDGR stmtStar INDLE'''
 
+def p_typeDefSuite(p):                         # changed it too
+    '''typeDefSuite : typeDef
+              | NEWLINE INDGR typeDefStar INDLE'''
+
+def p_typeDefStar(p):                      # changed a bit
+    '''typeDefStar : typeDef NEWLINE typeDefStar
+                 | typeDef SEMICOLON typeDefStar
+                 | typeDef
+                 | empty'''
+
+
 
 def p_complexOrSimpleStmt(p):
     '''complexOrSimpleStmt : ifStmt
@@ -44,7 +55,12 @@ def p_complexOrSimpleStmt(p):
                             | tryStmt
                             | simpleStmt
                             | PROC routine
-                            | ITERATOR routine '''
+                            | MACRO routine
+                            | ITERATOR routine 
+                            | METHOD routine
+                            | TYPE typeDefSuite '''
+
+                            ## we are not implementing 'template' routine , 'converter'
 
 def p_simpleStmt(p):
     '''simpleStmt : returnStmt
@@ -398,15 +414,21 @@ def p_paramListColon(p):
                         | paramListInter COLON typeKeyww'''
 
 def p_paramListInter(p):
-    ''' paramListInter : PARLE declColonEqualsInter PARRI'''
+    ''' paramListInter : PARLE declColonEqualsInter2 PARRI'''
+
+def p_declColonEqualsInter2(p): 
+    ''' declColonEqualsInter2 : empty
+                              | declColonEqualsInter '''   
 
 def p_declColonEqualsInter(p):
     ''' declColonEqualsInter : declColonEquals COMMA declColonEqualsInter
                             |  declColonEquals SEMICOLON declColonEqualsInter
-                            |  declColonEquals '''
+                            |  declColonEquals  '''
 
 
-    # original rule : routine = optInd identVis pattern? genericParamList? paramListColon pragma? ('=' COMMENT? stmt)? indAndComment
+    ## original rule : routine = optInd identVis pattern? genericParamList? paramListColon pragma? ('=' COMMENT? stmt)? indAndComment
+    ## pattern is used in template hence not implemented
+
 
 def p_declColonEquals(p) :
     ''' declColonEquals : identWithPragma commaIdentWithPragmaInter commaInter colonTypeDescKInter equalExprInter'''
@@ -428,8 +450,47 @@ def p_colonTypeDescKInter(p):
 def p_equalExprInter(p):
     ''' equalExprInter : EQUALS expr
                             | empty '''
-# def p_
-#
+def p_typeDef(p) :
+    ''' typeDef : identWithPragma genericParamListInter EQUALS typeDefAux '''
+
+def p_typeDefAux(p) :
+    '''  typeDefAux : simpleExpr   '''
+##  concept not implemented
+
+def p_genericParam(p) :
+    '''  genericParam : symbol genericParamInter1 genericParamInter2 genericParamInter3   '''
+
+def p_genericParamInter1(p) : 
+    ''' genericParamInter1 : COMMA symbol genericParamInter1
+                           | empty ''' 
+
+def p_genericParamInter2(p) : 
+    ''' genericParamInter2 : COLON expr 
+                           | empty '''
+
+
+def p_genericParamInter3(p) : 
+    ''' genericParamInter3 : EQUALS expr 
+                           | empty ''' 
+
+def p_genericParamListInter(p):
+    ''' genericParamListInter : genericParamList 
+                              | empty '''
+
+def p_genericParamList(p):
+    '''genericParamList  : BRACKETLE genericParamInter4 optPar BRACKETRI   '''
+
+
+def p_genericParamInter4(p): 
+    ''' genericParamInter4 : empty
+                              | genericParamInter5 '''   
+
+def p_genericParamInter5(p):
+    ''' genericParamInter5 : genericParam COMMA genericParamInter5
+                            |  genericParam SEMICOLON genericParamInter5
+                            |  genericParam  '''
+
+
 #
 # def p_condExpr
 # def p_op0(p):
