@@ -320,21 +320,39 @@ def p_routine(p):
 
 def p_paramListColon(p):
     ''' paramListColon : paramListInter 
-                        | paramListInter COLON typeDesc'''
+                        | paramListInter COLON typeDescK'''
 
 def p_paramListInter(p):
     ''' paramListInter : PARLE declColonEqualsInter PARRI'''
+
 def p_declColonEqualsInter(p):
-    ''' declColonEqualsInter = declColonEquals COMMA declColonEqualsInter
+    ''' declColonEqualsInter : declColonEquals COMMA declColonEqualsInter
                             |  declColonEquals SEMICOLON declColonEqualsInter
                             |  declColonEquals '''
 
 
     # original rule : routine = optInd identVis pattern? genericParamList? paramListColon pragma? ('=' COMMENT? stmt)? indAndComment
 
-# def p_
-# def p_
-# def p_
+def p_declColonEquals(p) :
+    ''' declColonEquals : identWithPragma commaIdentWithPragmaInter commaInter colonTypeDescKInter equalExprInter'''
+                  
+
+def p_commaIdentWithPragmaInter(p) :
+    '''commaIdentWithPragmaInter : empty
+                                  | COMMA identWithPragma commaIdentWithPragmaInter '''
+
+
+def p_commaInter(p):
+    ''' commaInter : COMMA
+                   | empty'''
+
+def p_colonTypeDescKInter(p):
+    ''' colonTypeDescKInter : COLON typeDescK
+                            | empty '''
+
+def p_equalExprInter(p):
+    ''' equalExprInter : EQUALS expr
+                            | empty '''                            
 # def p_
 #
 #
