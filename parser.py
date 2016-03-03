@@ -44,6 +44,25 @@ def p_typeDefStar(p):                      # changed a bit
                  | typeDef
                  | empty'''
 
+def p_constantSuite(p):                         # changed it too
+    '''constantSuite : constant
+              | NEWLINE INDGR constantStar INDLE'''
+
+def p_constantStar(p):                      # changed a bit
+    '''constantStar : constant NEWLINE constantStar
+                 | constant SEMICOLON constantStar
+                 | constant
+                 | empty'''
+
+def p_variableSuite(p):                         # changed it too
+    '''variableSuite : variable
+              | NEWLINE INDGR variableStar INDLE'''
+
+def p_variableStar(p):                      # changed a bit
+    '''variableStar : variable NEWLINE variableStar
+                 | variable SEMICOLON variableStar
+                 | variable
+                 | empty'''
 
 
 def p_complexOrSimpleStmt(p):
@@ -62,7 +81,10 @@ def p_complexOrSimpleStmt(p):
                             | MACRO routine
                             | ITERATOR routine 
                             | METHOD routine
-                            | TYPE typeDefSuite '''
+                            | TYPE typeDefSuite 
+                            | CONST constantSuite
+                            | LET variableSuite
+                            | VAR variableSuite '''
 
                             ## we are not implementing 'template' routine , 'converter'
 
@@ -343,7 +365,21 @@ def p_identOrLiteral(p):                    # Revant's question :
     #                   | par
     #                   | IDENTIFIER'''
     '''identOrLiteral : IDENTIFIER
-                        | literal'''
+                        | literal
+                        | arrayConstr '''
+
+def p_arrayConstr(p):
+    ''' arrayConstr : BRACKETLE arrayConstrInter BRACKETRI '''
+
+def p_arrayConstrInter(p) :
+    ''' arrayConstrInter : exprColonEqExpr COMMA arrayConstrInter 
+                         | exprColonEqExpr  arrayConstrInter
+                         | empty''' 
+
+def p_exprColonEqExpr(p) :
+    ''' exprColonEqExpr : expr 
+                        | expr COLON expr
+                        | expr EQUALS expr  '''
 
 def p_typeKeyw(p):
     '''typeKeyw : VAR
@@ -512,7 +548,45 @@ def p_genericParamInter5(p):
                             |  genericParam  '''
 
 
-#
+def p_constant(p) :
+    ''' constant : identWithPragma constantInter1 EQUALS expr'''
+
+def p_constantInter1(p) :
+    ''' constantInter1 : empty
+                       | COLON typeKeyww '''
+
+def p_variable(p):
+    ''' variable : varTuple
+                 | identColonEquals '''
+
+def p_varTuple(p) :
+    ''' varTuple : PARLE identWithPragma varTupleInter PARRI EQUALS expr '''            
+
+def p_varTupleInter(p) : 
+    ''' varTupleInter : COMMA identWithPragma varTupleInter
+                      | empty '''
+
+def p_identColonEquals(p) :
+    ''' identColonEquals : identOrLiteral identColonEqualsInter1 identColonEqualsInter2 identColonEqualsInter3 identColonEqualsInter4  '''
+
+def p_identColonEqualsInter1(p) :
+    ''' identColonEqualsInter1 : empty 
+                               | COMMA identOrLiteral identColonEqualsInter1'''
+
+def p_identColonEqualsInter2(p) :
+    ''' identColonEqualsInter2 : empty 
+                               | COMMA'''
+
+def p_identColonEqualsInter3(p) :
+    ''' identColonEqualsInter3 : empty 
+                               | COLON typeKeyww'''
+
+def p_identColonEqualsInter4(p) :
+    ''' identColonEqualsInter4 : empty 
+                               | EQUALS expr '''         
+
+
+
 # def p_condExpr
 # def p_op0(p):
 # def p_op1
