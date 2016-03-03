@@ -40,6 +40,7 @@ def p_complexOrSimpleStmt(p):
                             | whenStmt
                             | whileStmt
                             | forStmt
+                            | caseStmt
                             | simpleStmt '''
 
 def p_simpleStmt(p):
@@ -86,15 +87,34 @@ def p_forStmt(p):
     '''forStmt : FOR identWithPragma identWithPragmaInter IN expr COLON suite'''
 
 def p_ifStmt(p):
-    '''ifStmt : IF condStmt
-                | IF condStmt ELSE COLON suite'''
+    '''ifStmt : IF condStmt elifBranch elseBranch'''
 
 def p_whenStmt(p):
-    '''whenStmt : WHEN condStmt
-                | WHEN condStmt ELSE COLON suite'''
+    '''whenStmt : WHEN condStmt elifBranch elseBranch'''
 
 def p_condStmt(p):
     '''condStmt : expr COLON suite'''
+
+def p_elseBranch(p):
+    '''elseBranch : ELSE COLON suite
+                    | empty'''
+def p_elifBranch(p):
+    '''elifBranch : ELIF condStmt elifBranch
+                    | empty'''
+
+def p_exprList(p):
+    '''exprList : expr COMMA exprList
+                | expr'''
+
+def p_ofBranch(p):
+    '''ofBranch : OF exprList COLON suite'''
+
+def p_ofBranches(p):
+    '''ofBranches : ofBranch ofBranches elifBranch elseBranch
+                    | empty'''
+
+def p_caseStmt(p):
+    '''caseStmt : CASE expr COLON NEWLINE INDGR ofBranch ofBranches INDLE'''
 
 def p_expr(p):
     # '''expr : ifExpr

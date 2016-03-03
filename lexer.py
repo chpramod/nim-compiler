@@ -314,13 +314,15 @@ def generateIndentation(lexer):
     next_ind = 0
     lineno = 1
     tok = lexer.token()
+    while tok.type=="NEWLINE":
+        tok = lexer.token()
     if(tok.type=="WS"):
         t_error(tok)
 
     while True:
         if not tok:
             break      # No more input
-        if tok.type=="ELSE" or tok.type=="EXCEPT" or tok.type=="FINALLY" or tok.type=="OF":
+        if tok.type=="ELSE" or tok.type=="EXCEPT" or tok.type=="FINALLY" or tok.type=="OF" or tok.type == "ELIF":
             temp = tok_data[-1]
             if temp.type=="NEWLINE":
                 del tok_data[-1]
