@@ -43,6 +43,10 @@ def p_complexOrSimpleStmt(p):
                             | caseStmt
                             | tryStmt
                             | simpleStmt
+                            | blockStmt
+                            | staticStmt
+                            | deferStmt
+                            | asmStmt
                             | PROC routine
                             | ITERATOR routine '''
 
@@ -180,6 +184,25 @@ def p_breakStmt(p):
 def p_continueStmt(p):
     '''continueStmt : CONTINUE expr
                 | CONTINUE'''
+
+def p_blockStmt(p):
+    '''blockStmt : BLOCK symbol COLON suite
+                | BLOCK COLON suite'''
+
+def p_staticStmt(p):
+    '''staticStmt : STATIC COLON suite'''
+
+def p_deferStmt(p):
+    '''deferStmt : DEFER COLON suite'''
+
+def p_asmStmt(p):
+    '''asmStmt : ASM pragma strings
+                | ASM strings'''
+
+def p_strings(p):
+    '''strings : STRLIT
+                | RSTRLIT
+                | TRIPLESTRLIT'''
 
 def p_expr(p):
     '''expr : ifExpr
@@ -348,9 +371,7 @@ def p_literal(p):
                 | FLOAT32LIT
                 | FLOAT64LIT
                 | CHARLIT
-                | STRLIT
-                | RSTRLIT
-                | TRIPLESTRLIT
+                | strings
                 | NIL'''
 # def p_par(p):
 
