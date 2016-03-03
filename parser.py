@@ -43,7 +43,8 @@ def p_complexOrSimpleStmt(p):
                             | caseStmt
                             | tryStmt
                             | simpleStmt 
-                            | 'proc' routine '''
+                            | PROC routine
+                            | ITERATOR routine '''
 
 def p_simpleStmt(p):
     '''simpleStmt : exprStmt'''
