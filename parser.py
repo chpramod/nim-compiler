@@ -99,19 +99,19 @@ def p_finallyInter(p):
                     | empty'''
 
 def p_ifStmt(p):
-    '''ifStmt : IF condStmt elifBranch elseBranch'''
+    '''ifStmt : IF condStmt elifStmt elseStmt'''
 
 def p_whenStmt(p):
-    '''whenStmt : WHEN condStmt elifBranch elseBranch'''
+    '''whenStmt : WHEN condStmt elifStmt elseStmt'''
 
 def p_condStmt(p):
     '''condStmt : expr COLON suite'''
 
-def p_elseBranch(p):
-    '''elseBranch : ELSE COLON suite
+def p_elseStmt(p):
+    '''elseStmt : ELSE COLON suite
                     | empty'''
-def p_elifBranch(p):
-    '''elifBranch : ELIF condStmt elifBranch
+def p_elifStmt(p):
+    '''elifStmt : ELIF condStmt elifStmt
                     | empty'''
 
 def p_exprList(p):
@@ -122,23 +122,33 @@ def p_ofBranch(p):
     '''ofBranch : OF exprList COLON suite'''
 
 def p_ofBranches(p):
-    '''ofBranches : ofBranch ofBranches elifBranch elseBranch
+    '''ofBranches : ofBranch ofBranches elifStmt elseStmt
                     | empty'''
 
 def p_caseStmt(p):
     '''caseStmt : CASE expr COLON NEWLINE INDGR ofBranch ofBranches INDLE'''
 
 def p_expr(p):
-    # '''expr : ifExpr
-    #         | whenExpr
-    #         | simpleExpr'''
-    '''expr : simpleExpr'''
+    '''expr : ifExpr
+            | whenExpr
+            | simpleExpr'''
 
-# def p_ifExpr(p):
-#     '''ifExpr : IF condExpr'''
+def p_ifExpr(p):
+    '''ifExpr : IF condExpr elifExpr elseExpr'''
 
-# def p_whenExpr(p):
-#     '''whenExpr : WHEN condExpr'''
+def p_whenExpr(p):
+    '''whenExpr : WHEN condExpr elifExpr elseExpr'''
+
+def p_condExpr(p):
+    '''condExpr : expr COLON expr'''
+
+def p_elifExpr(p):
+    '''elifExpr : ELIF expr COLON expr elifExpr
+        | empty'''
+
+def p_elseExpr(p):
+     '''elseExpr : ELSE COLON expr
+        | empty'''
 
 def p_simpleExpr(p):
     '''simpleExpr : arrowExpr interOne'''
