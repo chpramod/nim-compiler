@@ -342,6 +342,9 @@ def p_interElev(p):
     '''interElev : OP10 primary interElev
                 | empty '''
 
+def p_castExpr(p):
+    '''castExpr : CAST BRACKETLE simpleExpr BRACKETRI PARLE expr PARRI'''
+
 def p_primary(p):
     '''primary : typeKeyw typeDescK
                 | identOrLiteral interPrimarySuffix
@@ -365,8 +368,7 @@ def p_identOrLiteral(p):                    # Revant's question :
     #                   | par
     #                   | IDENTIFIER'''
     '''identOrLiteral : IDENTIFIER
-                        | literal
-                        | arrayConstr '''
+                        | literal'''
 
 def p_arrayConstr(p):
     ''' arrayConstr : BRACKETLE arrayConstrInter BRACKETRI '''
@@ -379,7 +381,9 @@ def p_arrayConstrInter(p) :
 def p_exprColonEqExpr(p) :
     ''' exprColonEqExpr : expr 
                         | expr COLON expr
-                        | expr EQUALS expr  '''
+                        | expr EQUALS expr
+                        | castExpr'''
+
 
 def p_typeKeyw(p):
     '''typeKeyw : VAR
