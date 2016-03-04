@@ -86,6 +86,7 @@ def p_complexOrSimpleStmt(p):
                             | LET variableSuite
                             | VAR variableSuite '''
 
+                            ## bind and mixin are also not implemented
                             ## we are not implementing 'template' routine , 'converter'
 
 def p_simpleStmt(p):
@@ -101,6 +102,8 @@ def p_simpleStmt(p):
                 | fromStmt
                 | includeStmt
                 | exprStmt'''
+
+## we are not implementing exportStmt
 
 def p_exprStmt(p):
     '''exprStmt : simpleExpr EQUALS expr '''
@@ -128,7 +131,11 @@ def p_pragmaInterInter(p):
                    | empty'''
 
 def p_pragmaStmt(p):
-    '''pragmaStmt : empty'''
+    '''pragmaStmt : pragma pragmaStmtInter'''
+
+def p_pragmaStmtInter(p) :
+    ''' pragmaStmtInter : COLON suite
+                        | empty '''
 
 def p_optpar(p):
     '''optPar : NEWLINE
@@ -360,16 +367,15 @@ def p_interPrimarySuffix(p):
     '''interPrimarySuffix : primarySuffix interPrimarySuffix
                             | empty '''
 
-def p_identOrLiteral(p):                    # Revant's question :
-                                            # why not literals ?
-                                            # we can compare with numbers
+def p_identOrLiteral(p):                    
     # '''identOrLiteral : symbol
     #                   | literal
     #                   | par
     #                   | IDENTIFIER'''
     '''identOrLiteral : IDENTIFIER
                         | literal
-                        | arrayConstr '''
+                        | arrayConstr
+                        | symbol '''
 
 def p_arrayConstr(p):
     ''' arrayConstr : BRACKETLE arrayConstrInter BRACKETRI '''
@@ -408,7 +414,18 @@ def p_typeDescK(p):
                  | empty'''
 
 def p_primarySuffix(p):
-    '''primarySuffix : doBlocks'''
+    '''primarySuffix : doBlocks
+                     | PARLE  primarySuffixInter     PARRI
+                     | DOT symbol 
+                     | BRACKETLE  exprList  BRACKETRI 
+                     | CURLYLE  exprList  CURLYRI'''
+
+## we are not implementing generalised lit etc  ## Last rule is also not implemented
+
+def p_primarySuffixInter(p):
+    ''' primarySuffixInter : exprColonEqExpr COMMA primarySuffixInter
+                           | exprColonEqExpr  primarySuffixInter
+                           | empty'''                     
 
 def p_prefixOperator(p):
     '''prefixOperator : operator'''
@@ -433,10 +450,11 @@ def p_literal(p):
 # def p_par(p):
 
 def p_doBlocks(p):
-    '''doBlocks : doBlock'''
+    '''doBlocks : doBlock NEWLINE doBlocks
+                | empty '''
 
 def p_doBlock(p):
-    '''doBlock : DO COLON stmt'''
+    '''doBlock : DO COLON suite'''
 def p_operator(p):
     '''operator : OP0
                 | OP1
@@ -592,30 +610,6 @@ def p_identColonEqualsInter4(p) :
 
 
 
-# def p_condExpr
-# def p_op0(p):
-# def p_op1
-# def p_op2
-# def p_op3
-# def p_op4
-# def p_op5
-# def p_op6
-# def p_op7
-# def p_op8
-# def p_op9
-# def p_op10
-# def p_
-# def p_
-# def p_
-# def p_
-# def p_
-# def p_
-# def p_
-# def p_
-# def p_
-# def p_
-# def p_
-# def p_
 # def p_
 # def p_
 # def p_
