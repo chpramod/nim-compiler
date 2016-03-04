@@ -326,8 +326,8 @@ def generateIndentation(lexer):
             temp = tok_data[-1]
             if temp.type=="NEWLINE":
                 del tok_data[-1]
-            elif temp.type!="INDGR":
-                t_error(tok)
+            # elif temp.type!="INDGR":
+            #     t_error(tok)
         tok.lineno = lineno
         # if 1:
         if not (tok.type=="WSI" or tok.type=="WS" or tok.type=="NEWLINE"):
@@ -352,7 +352,7 @@ def generateIndentation(lexer):
             for i in range(0,prev_ind - next_ind):
                 newtok = lex.LexToken()
                 newtok.type = 'INDLE'
-                newtok.value = -1
+                newtok.value = 'indle'
                 newtok.lexpos = tok.lexpos
                 newtok.lineno = lineno
                 tok_data.append(newtok)
@@ -360,7 +360,7 @@ def generateIndentation(lexer):
             for i in range(0,next_ind - prev_ind):
                 newtok = lex.LexToken()
                 newtok.type = 'INDGR'
-                newtok.value = 1
+                newtok.value = 'indgr'
                 newtok.lexpos = tok.lexpos
                 newtok.lineno = lineno
                 tok_data.append(newtok)
@@ -376,7 +376,7 @@ def generateIndentation(lexer):
 
     newtok = lex.LexToken()
     newtok.type = 'ENDMARKER'
-    newtok.value = -1
+    newtok.value = 'endmarker'
     newtok.lexpos = -1
     newtok.lineno = lineno
     tok_data.append(newtok)
