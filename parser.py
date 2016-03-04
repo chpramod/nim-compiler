@@ -376,6 +376,7 @@ def p_identOrLiteral(p):
                         | literal
                         | castExpr
                         | arrayConstr
+                        | tupleConstr
                         | symbol '''
 
 def p_arrayConstr(p):
@@ -384,6 +385,14 @@ def p_arrayConstr(p):
 def p_arrayConstrInter(p) :
     ''' arrayConstrInter : exprColonEqExpr COMMA arrayConstrInter
                          | exprColonEqExpr  arrayConstrInter
+                         | empty'''
+
+def p_tupleConstr(p):
+    ''' tupleConstr : PARLE tupleConstrInter PARRI '''
+
+def p_arrayConstrInter(p) :
+    ''' tupleConstrInter : exprColonEqExpr COMMA tupleConstrInter
+                         | exprColonEqExpr  tupleConstrInter
                          | empty'''
 
 def p_exprColonEqExpr(p) :
