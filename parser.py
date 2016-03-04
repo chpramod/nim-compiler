@@ -415,10 +415,10 @@ def p_typeDescK(p):
 
 def p_primarySuffix(p):
     '''primarySuffix : doBlocks
-                     | PARLE  primarySuffixInter     PARRI
+                     | PARLE primarySuffixInter PARRI
                      | DOT symbol
-                     | BRACKETLE  exprList  BRACKETRI
-                     | CURLYLE  exprList  CURLYRI'''
+                     | BRACKETLE exprList BRACKETRI
+                     | CURLYLE exprList CURLYRI'''
 
 ## we are not implementing generalised lit etc  ## Last rule is also not implemented
 
