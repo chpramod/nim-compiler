@@ -390,7 +390,7 @@ def p_arrayConstrInter(p) :
 def p_tupleConstr(p):
     ''' tupleConstr : PARLE tupleConstrInter PARRI '''
 
-def p_arrayConstrInter(p) :
+def p_tupleConstrInter(p) :
     ''' tupleConstrInter : exprColonEqExpr COMMA tupleConstrInter
                          | exprColonEqExpr  tupleConstrInter
                          | empty'''
