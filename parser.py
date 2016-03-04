@@ -783,12 +783,20 @@ if __name__ == "__main__":
             </table>
         </td>''' %(final[j]))
             else:
-                html.write('''
+                if i!=lines:
+                    html.write('''
         <td>
         <table>
            <tr> <font color="red"><u>%s</u></font></tr>
         </table>
         </td>''' %(final[j]))
+                else:
+                    html.write('''
+        <td>
+            <table>
+               <tr> %s </tr>
+            </table>
+        </td>''' %(final[j]))            
         html.write('''
     </tr>
 </table>''')
