@@ -79,9 +79,9 @@ def p_complexOrSimpleStmt(p):
                             | asmStmt
                             | PROC routine
                             | MACRO routine
-                            | ITERATOR routine 
+                            | ITERATOR routine
                             | METHOD routine
-                            | TYPE typeDefSuite 
+                            | TYPE typeDefSuite
                             | CONST constantSuite
                             | LET variableSuite
                             | VAR variableSuite '''
@@ -367,7 +367,7 @@ def p_interPrimarySuffix(p):
     '''interPrimarySuffix : primarySuffix interPrimarySuffix
                             | empty '''
 
-def p_identOrLiteral(p):                    
+def p_identOrLiteral(p):
     # '''identOrLiteral : symbol
     #                   | literal
     #                   | par
@@ -381,14 +381,14 @@ def p_arrayConstr(p):
     ''' arrayConstr : BRACKETLE arrayConstrInter BRACKETRI '''
 
 def p_arrayConstrInter(p) :
-    ''' arrayConstrInter : exprColonEqExpr COMMA arrayConstrInter 
+    ''' arrayConstrInter : exprColonEqExpr COMMA arrayConstrInter
                          | exprColonEqExpr  arrayConstrInter
-                         | empty''' 
+                         | empty'''
 
 def p_exprColonEqExpr(p) :
-    ''' exprColonEqExpr : expr 
+    ''' exprColonEqExpr : expr
                         | expr COLON expr
-                        | expr EQUALS expr  
+                        | expr EQUALS expr
                         | castExpr'''
 
 
@@ -416,8 +416,8 @@ def p_typeDescK(p):
 def p_primarySuffix(p):
     '''primarySuffix : doBlocks
                      | PARLE  primarySuffixInter     PARRI
-                     | DOT symbol 
-                     | BRACKETLE  exprList  BRACKETRI 
+                     | DOT symbol
+                     | BRACKETLE  exprList  BRACKETRI
                      | CURLYLE  exprList  CURLYRI'''
 
 ## we are not implementing generalised lit etc  ## Last rule is also not implemented
@@ -425,7 +425,7 @@ def p_primarySuffix(p):
 def p_primarySuffixInter(p):
     ''' primarySuffixInter : exprColonEqExpr COMMA primarySuffixInter
                            | exprColonEqExpr  primarySuffixInter
-                           | empty'''                     
+                           | empty'''
 
 def p_prefixOperator(p):
     '''prefixOperator : operator'''
@@ -496,9 +496,9 @@ def p_paramListColon(p):
 def p_paramListInter(p):
     ''' paramListInter : PARLE declColonEqualsInter2 PARRI'''
 
-def p_declColonEqualsInter2(p): 
+def p_declColonEqualsInter2(p):
     ''' declColonEqualsInter2 : empty
-                              | declColonEqualsInter '''   
+                              | declColonEqualsInter '''
 
 def p_declColonEqualsInter(p):
     ''' declColonEqualsInter : declColonEquals COMMA declColonEqualsInter
@@ -540,30 +540,30 @@ def p_typeDefAux(p) :
 def p_genericParam(p) :
     '''  genericParam : symbol genericParamInter1 genericParamInter2 genericParamInter3   '''
 
-def p_genericParamInter1(p) : 
+def p_genericParamInter1(p) :
     ''' genericParamInter1 : COMMA symbol genericParamInter1
-                           | empty ''' 
+                           | empty '''
 
-def p_genericParamInter2(p) : 
-    ''' genericParamInter2 : COLON expr 
+def p_genericParamInter2(p) :
+    ''' genericParamInter2 : COLON expr
                            | empty '''
 
 
-def p_genericParamInter3(p) : 
-    ''' genericParamInter3 : EQUALS expr 
-                           | empty ''' 
+def p_genericParamInter3(p) :
+    ''' genericParamInter3 : EQUALS expr
+                           | empty '''
 
 def p_genericParamListInter(p):
-    ''' genericParamListInter : genericParamList 
+    ''' genericParamListInter : genericParamList
                               | empty '''
 
 def p_genericParamList(p):
     '''genericParamList  : BRACKETLE genericParamInter4 optPar BRACKETRI   '''
 
 
-def p_genericParamInter4(p): 
+def p_genericParamInter4(p):
     ''' genericParamInter4 : empty
-                              | genericParamInter5 '''   
+                              | genericParamInter5 '''
 
 def p_genericParamInter5(p):
     ''' genericParamInter5 : genericParam COMMA genericParamInter5
@@ -583,9 +583,9 @@ def p_variable(p):
                  | identColonEquals '''
 
 def p_varTuple(p) :
-    ''' varTuple : PARLE identWithPragma varTupleInter PARRI EQUALS expr '''            
+    ''' varTuple : PARLE identWithPragma varTupleInter PARRI EQUALS expr '''
 
-def p_varTupleInter(p) : 
+def p_varTupleInter(p) :
     ''' varTupleInter : COMMA identWithPragma varTupleInter
                       | empty '''
 
@@ -593,22 +593,32 @@ def p_identColonEquals(p) :
     ''' identColonEquals : identOrLiteral identColonEqualsInter1 identColonEqualsInter2 identColonEqualsInter3 identColonEqualsInter4  '''
 
 def p_identColonEqualsInter1(p) :
-    ''' identColonEqualsInter1 : empty 
+    ''' identColonEqualsInter1 : empty
                                | COMMA identOrLiteral identColonEqualsInter1'''
 
 def p_identColonEqualsInter2(p) :
-    ''' identColonEqualsInter2 : empty 
+    ''' identColonEqualsInter2 : empty
                                | COMMA'''
 
 def p_identColonEqualsInter3(p) :
-    ''' identColonEqualsInter3 : empty 
+    ''' identColonEqualsInter3 : empty
                                | COLON typeKeyww'''
 
 def p_identColonEqualsInter4(p) :
-    ''' identColonEqualsInter4 : empty 
-                               | EQUALS expr '''         
+    ''' identColonEqualsInter4 : empty
+                               | EQUALS expr '''
 
-
+def p_error(p):
+# 	global haltExecution
+# 	haltExecution = True
+	try:
+		print "Syntax Error near '"+str(p.value)+ "' in line "+str(p.lineno)
+	except:
+		try:
+			print "Syntax Error in line "+str(p.lineno)
+		except:
+			print "Syntax Error"
+	sys.exit()
 
 # def p_
 # def p_
@@ -627,8 +637,8 @@ def p_empty(p):
     p[0] = {}
 
 # Error rule for syntax errors
-def p_error(p):
-    print("Syntax error!")
+# def p_error(p):
+#     print("Syntax error!")
 
 # Build the parser
 logging.basicConfig(
