@@ -374,6 +374,7 @@ def p_identOrLiteral(p):
     #                   | IDENTIFIER'''
     '''identOrLiteral : IDENTIFIER
                         | literal
+                        | castExpr
                         | arrayConstr
                         | symbol '''
 
@@ -388,8 +389,7 @@ def p_arrayConstrInter(p) :
 def p_exprColonEqExpr(p) :
     ''' exprColonEqExpr : expr
                         | expr COLON expr
-                        | expr EQUALS expr
-                        | castExpr'''
+                        | expr EQUALS expr '''
 
 
 def p_typeKeyw(p):
