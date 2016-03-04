@@ -376,7 +376,6 @@ def p_identOrLiteral(p):
                         | literal
                         | castExpr
                         | arrayConstr
-                        | tupleConstr
                         | symbol '''
 
 def p_arrayConstr(p):
@@ -385,14 +384,6 @@ def p_arrayConstr(p):
 def p_arrayConstrInter(p) :
     ''' arrayConstrInter : exprColonEqExpr COMMA arrayConstrInter
                          | exprColonEqExpr  arrayConstrInter
-                         | empty'''
-
-def p_tupleConstr(p):
-    ''' tupleConstr : PARLE tupleConstrInter PARRI '''
-
-def p_arrayConstrInter(p) :
-    ''' tupleConstrInter : exprColonEqExpr COMMA tupleConstrInter
-                         | exprColonEqExpr  tupleConstrInter
                          | empty'''
 
 def p_exprColonEqExpr(p) :
@@ -627,7 +618,7 @@ def p_error(p):
 			print "Syntax Error in line "+str(p.lineno)
 		except:
 			print "Syntax Error"
-	sys.exit()
+	# sys.exit()
 
 # def p_
 # def p_
@@ -680,31 +671,26 @@ if __name__ == "__main__":
         for line in f:
             if line.startswith("INFO:root:Action"):
                 actionfile.write(line)
-    invert = []
+    reverse = []
     actionfile = open("actionfile.txt", 'r')
-    reverselist = open("reverselist.txt", 'w')
+    rulelist = open("rulelist.txt", 'w')
     for line in actionfile:
         rule = re.findall('rule \[(.*)\] with', line)
-        if (rule[0]!="empty -> <empty>"):
-            reverselist.write(rule[0]+'\n')
-            invert.append(rule[0]+'\n')
-    #reverselist.txt contains the final production rules
+        rulelist.write(rule[0]+'\n')
+    #rulelist.txt contains the final production rules
     actionfile.close()
-    reverselist.close()
-    rulelist = open("rulelist.txt","w")
-    while invert:
-        rulelist.write(invert.pop())
     rulelist.close()
+
     #code to create the graphviz flowchart
     nodeno = 1;
     nodes = defaultdict(list)
     data = open(inputFile)
     inputFile = inputFile[0:len(inputFile)-4]
-    reverselist = open("reverselist.txt",'r')
+    rulelist = open("rulelist.txt",'r')
     dotfile = open(inputFile+".dot",'w')
     dotfile.write("digraph G {"+"\n graph [ordering=\"out\"];\n")
-    for line in reverselist:
-        # if "empty -> <empty>" in line: continue
+    for line in rulelist:
+        if "empty -> <empty>" in line: continue
         colsplit = line.split(" ")
         k = len(colsplit)-1
         colsplit[k] = colsplit[k][0:len(colsplit[k])-1]
@@ -726,68 +712,3 @@ if __name__ == "__main__":
                 nodeno+=1
         nodes[colsplit[0]].append(pid)
     dotfile.write("}")
-
-    #code to generate html file
-    rulelist = open("rulelist.txt","r")
-    final = ["init"]
-    lhs = []
-    lines = 0
-    flag = 0
-    for line in rulelist:
-        split = line.split(" ")
-        lhs.append(split[0])
-        lines+=1
-    i=1
-    html = open("output.html","w")
-    rulelist = open("rulelist.txt","r")
-    for line in rulelist:
-        colsplit = line.split(" ")
-        k = len(colsplit)-1
-        colsplit[k] = colsplit[k][0:len(colsplit[k])-1]
-        html.write('''
-<table>
-   <tr>
-      <td>
-        <table>
-          <tr>%d. </tr>
-        </table>
-      </td>
-      <td>
-        <table>
-          <tr>start</tr>
-        </table>
-      </td>
-      <td>
-        <table>
-           <tr> ==> </tr>
-        </table>
-      </td>''' %(i))
-        final.pop(flag)
-        for j in xrange(len(colsplit)-1,1,-1):
-            if (colsplit[j]!="empty"):
-                final.insert(flag,colsplit[j])
-
-        for j in xrange(len(final)-1,-1,-1):
-            if i!=lines:
-                if lhs[i]==final[j]:
-                    flag=j
-                    break
-        for j in range(0,len(final)):
-            if j!=flag:
-                html.write('''
-        <td>
-            <table>
-               <tr> %s </tr>
-            </table>
-        </td>''' %(final[j]))
-            else:
-                html.write('''
-        <td>
-        <table>
-           <tr> <font color="red"><u>%s</u></font></tr>
-        </table>
-        </td>''' %(final[j]))
-        html.write('''
-    </tr>
-</table>''')
-        i+=1
