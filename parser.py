@@ -387,6 +387,7 @@ def p_arrayConstrInter(p) :
                          | exprColonEqExpr  arrayConstrInter
                          | empty'''
 
+
 def p_tupleConstr(p):
     ''' tupleConstr : PARLE tupleConstrInter PARRI '''
 
@@ -394,6 +395,7 @@ def p_tupleConstrInter(p) :
     ''' tupleConstrInter : exprColonEqExpr COMMA tupleConstrInter
                          | exprColonEqExpr  tupleConstrInter
                          | empty'''
+
 
 def p_exprColonEqExpr(p) :
     ''' exprColonEqExpr : expr
@@ -627,7 +629,7 @@ def p_error(p):
 			print "Syntax Error in line "+str(p.lineno)
 		except:
 			print "Syntax Error"
-	sys.exit()
+	# sys.exit()
 
 # def p_
 # def p_
@@ -680,31 +682,26 @@ if __name__ == "__main__":
         for line in f:
             if line.startswith("INFO:root:Action"):
                 actionfile.write(line)
-    invert = []
+    reverse = []
     actionfile = open("actionfile.txt", 'r')
-    reverselist = open("reverselist.txt", 'w')
+    rulelist = open("rulelist.txt", 'w')
     for line in actionfile:
         rule = re.findall('rule \[(.*)\] with', line)
-        if (rule[0]!="empty -> <empty>"):
-            reverselist.write(rule[0]+'\n')
-            invert.append(rule[0]+'\n')
-    #reverselist.txt contains the final production rules
+        rulelist.write(rule[0]+'\n')
+    #rulelist.txt contains the final production rules
     actionfile.close()
-    reverselist.close()
-    rulelist = open("rulelist.txt","w")
-    while invert:
-        rulelist.write(invert.pop())
     rulelist.close()
+
     #code to create the graphviz flowchart
     nodeno = 1;
     nodes = defaultdict(list)
     data = open(inputFile)
     inputFile = inputFile[0:len(inputFile)-4]
-    reverselist = open("reverselist.txt",'r')
+    rulelist = open("rulelist.txt",'r')
     dotfile = open(inputFile+".dot",'w')
     dotfile.write("digraph G {"+"\n graph [ordering=\"out\"];\n")
-    for line in reverselist:
-        # if "empty -> <empty>" in line: continue
+    for line in rulelist:
+        if "empty -> <empty>" in line: continue
         colsplit = line.split(" ")
         k = len(colsplit)-1
         colsplit[k] = colsplit[k][0:len(colsplit[k])-1]
@@ -727,7 +724,7 @@ if __name__ == "__main__":
         nodes[colsplit[0]].append(pid)
     dotfile.write("}")
 
-    #code to generate html file
+   #code to generate html file
     rulelist = open("rulelist.txt","r")
     final = ["init"]
     lhs = []
