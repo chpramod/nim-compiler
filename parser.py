@@ -264,6 +264,7 @@ def p_strings(p):
 def p_expr(p):
     '''expr : ifExpr
             | whenExpr
+            | caseStmt
             | simpleExpr'''
 
 def p_ifExpr(p):
@@ -282,6 +283,9 @@ def p_elifExpr(p):
 def p_elseExpr(p):
      '''elseExpr : ELSE COLON expr
         | empty'''
+
+def p_caseExpr(p):
+    '''caseExpr : CASE expr COLON NEWLINE INDGR ofBranch ofBranches INDLE'''
 
 def p_simpleExpr(p):
     '''simpleExpr : arrowExpr interOne'''

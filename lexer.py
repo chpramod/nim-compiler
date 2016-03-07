@@ -275,7 +275,7 @@ def t_IDENTIFIER(t):
 def t_error(t):
     print "Illegal character '%s'" % t.value[0]
     # tok_data.setdefault('ILLEGAL_CHARACTERS', list())
-    tok_data.append(t)
+    # tok_data.append(t)
     t.lexer.skip(1)
 
 # lexer = lex.lex()
