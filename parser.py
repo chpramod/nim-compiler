@@ -21,8 +21,7 @@ def p_stmtIndentSemicolon(p):
                             | empty'''
 
 def p_stmt(p):
-    '''stmt : complexOrSimpleStmt
-             | simpleStmt'''
+    '''stmt : complexOrSimpleStmt '''
 
 def p_stmtStar(p):                      # changed a bit
     '''stmtStar : stmt NEWLINE stmtStar
@@ -372,8 +371,7 @@ def p_identOrLiteral(p):
     #                   | literal
     #                   | par
     #                   | IDENTIFIER'''
-    '''identOrLiteral : IDENTIFIER
-                        | literal
+    '''identOrLiteral :  literal
                         | castExpr
                         | arrayConstr
                         | tupleConstr
