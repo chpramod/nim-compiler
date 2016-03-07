@@ -105,7 +105,16 @@ def p_simpleStmt(p):
 ## we are not implementing exportStmt
 
 def p_exprStmt(p):
-    '''exprStmt : simpleExpr EQUALS expr '''
+    '''exprStmt : simpleExpr exprStmtInter '''
+
+def p_exprStmtInter(p):
+    ''' exprStmtInter : EQUALS expr
+                      | expr exprStmtInter2 doBlocks 
+                      | empty '''
+
+def p_exprStmtInter2(p):
+    ''' exprStmtInter2 : COMMA expr exprStmtInter2
+                       | empty '''
 
 def p_whileStmt(p):
     '''whileStmt : WHILE condStmt'''
