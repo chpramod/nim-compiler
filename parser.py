@@ -408,13 +408,22 @@ def p_typeKeyw(p):
                 | REF
                 | SHARED
                 | TUPLE
+                | ARRAY
                 | PROC
                 | ITERATOR
                 | DISTINCT
                 | OBJECT
                 | ENUM
                 | INT
+                | INT8
+                | INT16
+                | INT32
+                | INT64
                 | FLOAT
+                | FLOAT8
+                | FLOAT16
+                | FLOAT32
+                | FLOAT64
                 | CHAR
                 | STRING '''
 
@@ -501,7 +510,7 @@ def p_typeKeyww(p):
 
 def p_paramListColon(p):
     ''' paramListColon : paramListInter
-                        | paramListInter COLON typeKeyww'''
+                        | paramListInter COLON typeDescK'''
 
 def p_paramListInter(p):
     ''' paramListInter : PARLE declColonEqualsInter2 PARRI'''
@@ -534,7 +543,7 @@ def p_commaInter(p):
                    | empty'''
 
 def p_colonTypeDescKInter(p):
-    ''' colonTypeDescKInter : COLON typeKeyww
+    ''' colonTypeDescKInter : COLON typeDescK
                             | empty '''
 
 def p_equalExprInter(p):

@@ -163,7 +163,7 @@ t_DOTDOT         = r'\.\.'
 t_ACCENT         = r'`'
 
 def t_MULTICOMMENT(t):
-    r"[\s ]*\#\[[^\]]*[^\#]*\]\#\n"
+    r"[\s ]*\#\[[^\]]*[^\#]*\]\#"
     pass
 
 def t_COMMENT(t):
