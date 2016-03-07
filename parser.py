@@ -362,7 +362,7 @@ def p_castExpr(p):
 
 def p_primary(p):
     '''primary : typeKeyw typeDescK
-                | identOrLiteral interPrimarySuffix
+                | interPrefixOperator identOrLiteral interPrimarySuffix
                 | STATIC primary
                 | BIND primary'''
 #shd be interPrefixOperator identOrLiteral interPrimarySuffix
