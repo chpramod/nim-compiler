@@ -442,7 +442,8 @@ def p_prefixOperator(p):
 def p_symbol(p):
     '''symbol : IDENTIFIER
                 | ADDR
-                | TYPE'''
+                | TYPE
+                | BOOLEAN'''
 
 def p_literal(p):
     '''literal : INTLIT
