@@ -47,6 +47,7 @@ reserved = {
     'if' : 'IF' ,
     'import' : 'IMPORT' ,
     'in' : 'IN' ,
+    'inc' : 'INC' ,
     'include' : 'INCLUDE' ,
     'int' : 'INT' ,
     'int8' : 'INT8' ,

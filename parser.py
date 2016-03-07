@@ -100,7 +100,8 @@ def p_simpleStmt(p):
                 | echoStmt
                 | fromStmt
                 | includeStmt
-                | exprStmt'''
+                | exprStmt
+                | incStmt'''
 
 ## we are not implementing exportStmt
 
@@ -237,6 +238,9 @@ def p_breakStmt(p):
 def p_continueStmt(p):
     '''continueStmt : CONTINUE expr
                 | CONTINUE'''
+
+def p_incStmt(p):
+    '''incStmt : INC expr'''
 
 def p_blockStmt(p):
     '''blockStmt : BLOCK symbol COLON suite
