@@ -1,0 +1,19 @@
+label, main
+call, func
+end
+label, func
+=, $g.0, $g
+ifgoto, eq, $g.0, 0, $D.2046
+ifgoto, neq, $g.0, 0, $D.2047
+label, $D.2046
+ret
+label, $D.2047
+=, $g.1, $g
+#
+# printing a string ??
+#
+
+=, $g.2, $g
+-, $g3, $g.2, 1
+=, $g, $g.3
+call func
