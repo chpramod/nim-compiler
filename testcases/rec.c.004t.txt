@@ -4,16 +4,13 @@ call, mfunc
 end
 label, mfunc
 =, $g.0, $g
-ifgoto, eq, $g.0, 0, 10
-print, $g
-ifgoto, neq, $g.0, 0, 11
+ifgoto, eq, $g.0, 0, 9
+ifgoto, neq, $g.0, 0, 10
 ret
 =, $g.1, $g
 print, $g.1
 =, $g.2, $g
-print, $g.2
 -, $g3, $g.2, 1
-print, $g3
 =, $g, $g3
 call, mfunc
 end
