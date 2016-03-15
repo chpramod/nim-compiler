@@ -1,19 +1,19 @@
 label, main
-call, func
++, $g, 2, 3
+call, mfunc
 end
-label, func
+label, mfunc
 =, $g.0, $g
-ifgoto, eq, $g.0, 0, $D.2046
-ifgoto, neq, $g.0, 0, $D.2047
-label, $D.2046
+ifgoto, eq, $g.0, 0, 10
+print, $g
+ifgoto, neq, $g.0, 0, 11
 ret
-label, $D.2047
 =, $g.1, $g
-#
-# printing a string ??
-#
-
+print, $g.1
 =, $g.2, $g
+print, $g.2
 -, $g3, $g.2, 1
+print, $g3
 =, $g, $g.3
-call func
+call, mfunc
+end
