@@ -14,6 +14,6 @@ print, $g.1
 print, $g.2
 -, $g3, $g.2, 1
 print, $g3
-=, $g, $g.3
+=, $g, $g3
 call, mfunc
 end
