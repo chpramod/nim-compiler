@@ -3,66 +3,102 @@ import ply.yacc as yacc
 import logging
 import sys, re
 from collections import defaultdict
+from pprint import pprint
 #get tokens
 #import lexer #as ourLexer# our lexer
 # tokens = lexer.tok_data
 import lexer
 tokens = lexer.tokens
 
+identifier = {}
+
 def p_start(p):
 #ignored extra
 #module = stmt ^* (';' / IND{=})
     '''start : stmtIndentSemicolon ENDMARKER
-              | stmt ENDMARKER'''
+            | stmt ENDMARKER'''
+    p[0] = p[1]
 
 def p_stmtIndentSemicolon(p):
     '''stmtIndentSemicolon : stmt NEWLINE stmtIndentSemicolon
                             | stmt SEMICOLON stmtIndentSemicolon
                             | empty'''
+    if len(p) > 2:
+        p[0] = [p[1]] + p[3]
+    else:
+        p[0] = [p[1]]
 
 def p_stmt(p):
     '''stmt : complexOrSimpleStmt '''
+    p[0] = p[1]
 
 def p_stmtStar(p):                      # changed a bit
     '''stmtStar : stmt NEWLINE stmtStar
                  | stmt SEMICOLON stmtStar
-                 | stmt
-                 | empty'''
+                 | stmt'''
+    if len(p) > 2:
+        p[0] = [p[1]] + p[3]
+    else:
+        p[0] = [p[1]]
 
 def p_suite(p):                         # changed it too
     '''suite : simpleStmt
-              | NEWLINE INDGR stmtStar INDLE'''
+                  | NEWLINE INDGR stmtStar INDLE'''
+    if len(p) > 2:
+        p[0] = p[3]
+    else:
+        p[0] = [p[1]]
 
 def p_typeDefSuite(p):                         # changed it too
     '''typeDefSuite : typeDef
               | NEWLINE INDGR typeDefStar INDLE'''
+    if len(p) > 2:
+        p[0] = p[3]
+    else:
+        p[0] = [p[1]]
 
 def p_typeDefStar(p):                      # changed a bit
     '''typeDefStar : typeDef NEWLINE typeDefStar
                  | typeDef SEMICOLON typeDefStar
-                 | typeDef
-                 | empty'''
+                 | typeDef'''
+    if len(p) > 2:
+        p[0] = [p[1]] + p[3]
+    else:
+        p[0] = [p[1]]
 
 def p_constantSuite(p):                         # changed it too
     '''constantSuite : constant
               | NEWLINE INDGR constantStar INDLE'''
+    if len(p) > 2:
+        p[0] = [p[1]] + p[3]
+    else:
+        p[0] = [p[1]]
 
 def p_constantStar(p):                      # changed a bit
     '''constantStar : constant NEWLINE constantStar
                  | constant SEMICOLON constantStar
-                 | constant
-                 | empty'''
+                 | constant'''
+    if len(p) > 2:
+        p[0] = [p[1]] + p[3]
+    else:
+        p[0] = [p[1]]
 
 def p_variableSuite(p):                         # changed it too
     '''variableSuite : variable
               | NEWLINE INDGR variableStar INDLE'''
+    if len(p) > 2:
+        p[0] = [p[1]] + p[3]
+    else:
+        p[0] = [p[1]]
 
 def p_variableStar(p):                      # changed a bit
     '''variableStar : variable NEWLINE variableStar
                  | variable SEMICOLON variableStar
-                 | variable
-                 | empty'''
-
+                 | variable'''
+    if len(p) > 2:
+        p[0] = [p[1]] + p[3]
+    else:
+        p[0] = [p[1]]
 
 def p_complexOrSimpleStmt(p):
     '''complexOrSimpleStmt : ifStmt
@@ -84,7 +120,10 @@ def p_complexOrSimpleStmt(p):
                             | CONST constantSuite
                             | LET variableSuite
                             | VAR variableSuite '''
-
+    if len(p) > 2:
+        p[0] = {'type': p[1], 'content': p[2]}
+    else:
+        p[0] = p[1]
                             ## bind and mixin are also not implemented
                             ## we are not implementing 'template' routine , 'converter'
 
@@ -102,6 +141,7 @@ def p_simpleStmt(p):
                 | includeStmt
                 | exprStmt
                 | incStmt'''
+    p[0] = p[1]
 
 ## we are not implementing exportStmt
 
@@ -110,8 +150,9 @@ def p_exprStmt(p):
 
 def p_exprStmtInter(p):
     ''' exprStmtInter : EQUALS expr
-                      | expr exprStmtInter2 doBlocks 
+                      | expr exprStmtInter2 doBlocks
                       | empty '''
+
 
 def p_exprStmtInter2(p):
     ''' exprStmtInter2 : COMMA expr exprStmtInter2
@@ -119,6 +160,12 @@ def p_exprStmtInter2(p):
 
 def p_whileStmt(p):
     '''whileStmt : WHILE condStmt'''
+    p[0] = {
+    'inline': False,
+    'type': p[1],
+    'cond': p[2]['cond'],
+    'then': p[2]['then']
+    }
 
 def p_identWithPragmaInter(p):
     '''identWithPragmaInter : COMMA identWithPragma identWithPragmaInter
@@ -153,6 +200,7 @@ def p_optpar(p):
 
 def p_identVis(p):
     '''identVis : symbol '''  # oprInter''' should be opr = `+*` sort of
+    p[0] = p[1]
 
 def p_oprInter(p):
     #should be opr
@@ -163,94 +211,277 @@ def p_forStmt(p):
 
 def p_tryStmt(p):
     '''tryStmt : TRY COLON suite exceptInter finallyInter'''
+    p[0] = {
+    'type': p[1],
+    'try': p[3],
+    'except': p[4],
+    'finally': p[5]
+    }
 
 def p_exceptInter(p):
     '''exceptInter : EXCEPT expr COLON suite exceptInter
                    | empty'''
+    if len(p) > 2:
+        p[0] = [{'except': p[2], 'then': p[4]}] + p[5]
+    else:
+        p[0] = [p[1]]
 
 def p_finallyInter(p):
     '''finallyInter : FINALLY COLON suite
                     | empty'''
+    if len(p) > 2:
+        p[0] = p[2]
+    else:
+        p[0] = p[1]
 
 def p_ifStmt(p):
     '''ifStmt : IF condStmt elifStmt elseStmt'''
+    p[0] = {
+    'inline': False,
+    'type': p[1],
+    'cond': p[2]['cond'],
+    'then': p[2]['then'],
+    'elif': p[3],
+    'else': p[4]
+    }
 
 def p_whenStmt(p):
     '''whenStmt : WHEN condStmt elifStmt elseStmt'''
+    p[0] = {
+    'inline': False,
+    'type': p[1],
+    'cond': p[2]['cond'],
+    'then': p[2]['then'],
+    'elif': p[3],
+    'else': p[4]
+    }
 
 def p_condStmt(p):
     '''condStmt : expr COLON suite'''
+    p[0] = {
+    'inline': False,
+    'cond': p[1],
+    'then': p[2]
+    }
 
 def p_elseStmt(p):
     '''elseStmt : ELSE COLON suite
                     | empty'''
+    if len(p) > 2:
+        p[0] = {
+        'inline': False,
+        'type': p[1],
+        'then': p[3]
+        }
+    else:
+        p[0] = p[1]
+
 def p_elifStmt(p):
     '''elifStmt : ELIF condStmt elifStmt
                     | empty'''
+    if len(p) > 2:
+        p[0] = {
+        'inline': False,
+        'type': p[1],
+        'cond': p[2]['cond'],
+        'then': p[2]['then'],
+        'next': p[3]
+        }
+    else:
+        p[0] = p[1]
 
 def p_exprList(p):
     '''exprList : expr COMMA exprList
                 | expr'''
+    if len(p) > 2:
+        p[0] = [p[1]] + p[3]
+    else:
+        p[0] = [p[1]]
 
 def p_ofBranch(p):
     '''ofBranch : OF exprList COLON suite'''
+    p[0] = {
+    'cond': p[2],
+    'then': p[4]
+    }
 
 def p_ofBranches(p):
-    '''ofBranches : ofBranch ofBranches elifStmt elseStmt
+    '''ofBranches : ofBranch ofBranches
                     | empty'''
+    if len(p) > 2:
+        p[0] = [p[1]] + p[2]
+    else:
+        p[0] = [p[1]]
 
 def p_caseStmt(p):
-    '''caseStmt : CASE expr COLON NEWLINE INDGR ofBranch ofBranches INDLE'''
+    '''caseStmt : CASE expr COLON NEWLINE INDGR ofBranch ofBranches elifStmt elseStmt INDLE'''
+    p[0] = {
+    'inline': False,
+    'type': p[1],
+    'case': p[2],
+    'branches': [p[6]] + p[7],
+    'elif': p[8],
+    'else': p[9]
+    }
 
 def p_echoStmt(p):
     '''echoStmt : ECHO exprList'''
+    p[0] = {
+    'type': p[1],
+    'echo': p[2]
+    }
 
 def p_importStmt(p):
     '''importStmt : IMPORT exprList
                 | IMPORT expr EXCEPT exprList'''
+    if len(p) > 3:
+        p[0] = {
+        'type': p[1],
+        'import': p[2],
+        'except': None
+        }
+    else:
+        p[0] = {
+        'type': p[1],
+        'import': p[2],
+        'except': p[4]
+        }
 
 def p_includeStmt(p):
-     '''includeStmt : INCLUDE exprList''' # should be list of IDENTIFIER instead of exprList
+    '''includeStmt : INCLUDE exprList''' # should be list of IDENTIFIER instead of exprList
+    p[0] = {
+    'type': p[1],
+    'include': p[2]
+    }
 
 def p_fromStmt(p):
-     '''fromStmt : FROM IDENTIFIER IMPORT exprList'''
+    '''fromStmt : FROM IDENTIFIER IMPORT exprList'''
+    p[0] = {
+    'type': p[1],
+    'from': p[2],
+    'import': p[4]
+    }
 
 def p_returnStmt(p):
     '''returnStmt : RETURN expr
                 | RETURN'''
+    if len(p) > 2:
+        p[0] = {
+        'type': p[1],
+        'return': p[2]
+        }
+    else:
+        p[0] = {
+        'type': p[1],
+        'return': None
+        }
 
 def p_raiseStmt(p):
     '''raiseStmt : RAISE expr
                 | RAISE'''
+    if len(p) > 2:
+        p[0] = {
+        'type': p[1],
+        'raise': p[2]
+        }
+    else:
+        p[0] = {
+        'type': p[1],
+        'raise': None
+        }
 
 def p_yieldStmt(p):
     '''yieldStmt : YIELD expr
                 | YIELD'''
+    if len(p) > 2:
+        p[0] = {
+        'type': p[1],
+        'yield': p[2]
+        }
+    else:
+        p[0] = {
+        'type': p[1],
+        'yield': None
+        }
 
 def p_discardStmt(p):
     '''discardStmt : DISCARD expr
                 | DISCARD'''
+    if len(p) > 2:
+        p[0] = {
+        'type': p[1],
+        'discard': p[2]
+        }
+    else:
+        p[0] = {
+        'type': p[1],
+        'discard': None
+        }
 
 def p_breakStmt(p):
     '''breakStmt : BREAK expr
                 | BREAK'''
+    if len(p) > 2:
+        p[0] = {
+        'type': p[1],
+        'break': p[2]
+        }
+    else:
+        p[0] = {
+        'type': p[1],
+        'break': None
+        }
 
 def p_continueStmt(p):
     '''continueStmt : CONTINUE expr
                 | CONTINUE'''
+    if len(p) > 2:
+        p[0] = {
+        'type': p[1],
+        'continue': p[2]
+        }
+    else:
+        p[0] = {
+        'type': p[1],
+        'continue': None
+        }
 
 def p_incStmt(p):
     '''incStmt : INC expr'''
+    p[0] = {
+    'type': p[1],
+    'increment': p[2]
+    }
 
 def p_blockStmt(p):
     '''blockStmt : BLOCK symbol COLON suite
                 | BLOCK COLON suite'''
+    if len(p) > 4:
+        p[0] = {
+        'type': p[1],
+        'symbol': p[2],
+        'block': p[4]
+        }
+    else:
+        p[0] = {
+        'type': p[1],
+        'symbol': None,
+        'block': p[3]
+        }
 
 def p_staticStmt(p):
     '''staticStmt : STATIC COLON suite'''
+    p[0] = {
+    'type': p[1],
+    'static': p[2]
+    }
 
 def p_deferStmt(p):
     '''deferStmt : DEFER COLON suite'''
+    p[0] = {
+    'type': p[1],
+    'defer': p[2]
+    }
 
 def p_asmStmt(p):
     '''asmStmt : ASM pragma strings
@@ -260,35 +491,87 @@ def p_strings(p):
     '''strings : STRLIT
                 | RSTRLIT
                 | TRIPLESTRLIT'''
+    p[0] = p[1]
 
 def p_expr(p):
     '''expr : ifExpr
             | whenExpr
-            | caseStmt
+            | caseExpr
             | simpleExpr'''
+    p[0] = p[1]
 
 def p_ifExpr(p):
     '''ifExpr : IF condExpr elifExpr elseExpr'''
+    p[0] = {
+    'inline': True,
+    'type': p[1],
+    'cond': p[2]['cond'],
+    'then': p[2]['then'],
+    'elif': p[3],
+    'else': p[4]
+    }
 
 def p_whenExpr(p):
     '''whenExpr : WHEN condExpr elifExpr elseExpr'''
+    p[0] = {
+    'inline': True,
+    'type': p[1],
+    'cond': p[2]['cond'],
+    'then': p[2]['then'],
+    'elif': p[3],
+    'else': p[4]
+    }
 
 def p_condExpr(p):
     '''condExpr : expr COLON expr'''
+    p[0] = {
+    'inline': True,
+    'cond': p[1],
+    'then': p[3],
+    }
 
 def p_elifExpr(p):
     '''elifExpr : ELIF expr COLON expr elifExpr
         | empty'''
+    if len(p) > 2:
+        p[0] = {
+        'inline': True,
+        'type': p[1],
+        'cond': p[2],
+        'then': p[4],
+        'next': p[5],
+        }
+    else:
+        p[0] = p[1]
 
 def p_elseExpr(p):
-     '''elseExpr : ELSE COLON expr
+    '''elseExpr : ELSE COLON expr
         | empty'''
+    if len(p) > 2:
+        p[0] = {
+        'inline': True,
+        'type': p[1],
+        'then': p[3],
+        }
+    else:
+        p[0] = p[1]
 
 def p_caseExpr(p):
-    '''caseExpr : CASE expr COLON NEWLINE INDGR ofBranch ofBranches INDLE'''
+    '''caseExpr : CASE expr COLON NEWLINE INDGR ofBranch ofBranches elifExpr elseExpr INDLE'''
+    p[0] = {
+    'inline': True,
+    'type': p[1],
+    'case': p[2],
+    'branches': [p[6]] + p[7],
+    'elif': p[8],
+    'else': p[9]
+    }
 
 def p_simpleExpr(p):
     '''simpleExpr : arrowExpr interOne'''
+    p[0] = {
+    'type' : 'simple'
+    }
 
 def p_interOne(p):
     '''interOne : OP0 arrowExpr interOne
@@ -393,6 +676,7 @@ def p_identOrLiteral(p):
                         | arrayConstr
                         | tupleConstr
                         | symbol '''
+    p[0] = p[1]
 
 def p_arrayConstr(p):
     ''' arrayConstr : BRACKETLE arrayConstrInter BRACKETRI '''
@@ -443,6 +727,7 @@ def p_typeKeyw(p):
                 | FLOAT64
                 | CHAR
                 | STRING '''
+    p[0] = p[1]
 
 def p_typeDescK(p):
     '''typeDescK : simpleExpr
@@ -470,6 +755,7 @@ def p_symbol(p):
                 | ADDR
                 | TYPE
                 | BOOLEAN'''
+    p[0] = p[1]
 
 def p_literal(p):
     '''literal : INTLIT
@@ -483,14 +769,27 @@ def p_literal(p):
                 | CHARLIT
                 | strings
                 | NIL'''
+    p[0] = p[1]
 # def p_par(p):
 
 def p_doBlocks(p):
     '''doBlocks : doBlock NEWLINE doBlocks
                 | empty '''
+    if len(p) > 2:
+        p[0] = {
+        'type': 'do',
+        'blocks': [p[1]] + p[3]
+        }
+    else:
+        p[0] = {
+        'type': 'do',
+        'blocks': [p[1]]
+        }
 
 def p_doBlock(p):
     '''doBlock : DO COLON suite'''
+    p[0] = p[3]
+
 def p_operator(p):
     '''operator : OP0
                 | OP1
@@ -515,15 +814,16 @@ def p_operator(p):
                 | NOT
                 | STATIC
                 | DOTDOT'''
+    p[0] = p[1]
 
 def p_routine(p):
     ''' routine : identVis paramListColon EQUALS suite '''
 
 def p_typeKeyww(p):
-    ''' typeKeyww   :     INT
-                        | FLOAT
-                        | CHAR
-                        | STRING '''
+    ''' typeKeyww : INT
+                    | FLOAT
+                    | CHAR
+                    | STRING '''
 
 def p_paramListColon(p):
     ''' paramListColon : paramListInter
@@ -686,7 +986,7 @@ parser = yacc.yacc()
 
 def parseProgram(program):
     parser.parse(program, lexer=lexer)
-    print(result)
+    pprint(result)
 
 # a function to test the parser
 def testYacc(inputFile):
@@ -694,7 +994,7 @@ def testYacc(inputFile):
     data = program.read()
     customLexer = lexer.customLexer()
     result=parser.parse(data, lexer=customLexer, debug=log)
-    print result
+    pprint(result)
     # parser.parse(program, lexer=lexer, debug=1)
 
 if __name__ == "__main__":
@@ -821,7 +1121,7 @@ if __name__ == "__main__":
             <table>
                <tr> %s </tr>
             </table>
-        </td>''' %(final[j]))            
+        </td>''' %(final[j]))
         html.write('''
     </tr>
 </table>''')
