@@ -4,7 +4,7 @@
 import sys
 import pprint
 from symbolTable import *
-from threeAC import *
+from regmem import *
 
 jumpLabels=["goto","ifgoto","call","label","ret"]
 reservedLabels = jumpLabels
@@ -87,7 +87,7 @@ def generateAssCode(code):
 	#print len(leaders)
 	basicBlocks,variables = BasicBlocks(TAC, leaders)
 	regmem = regmemDescriptor(register_list,variables,fp)
-	#pprint.pprint(basicBlocks)
+	print(basicBlocks)
 	GenerateSymbolTable(basicBlocks,SymbolTable,variables)
 	#pprint.pprint(SymbolTable)
 	# for i in SymbolTable:
