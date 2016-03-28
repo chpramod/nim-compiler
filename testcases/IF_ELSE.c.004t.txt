@@ -1,0 +1,25 @@
+label, main
+=, $j, 1
+=, $sum, 0
+=, $i, 0
+=, $j, 1
+goto, 19
+label, D.1727
+mod, $D.1732, $j, 10
+ifgoto, eq, $D.1732, 0, 12
+ifgoto, neq, $D.1732, 0, 15
+label, D.1733
+print, $j
+goto, 17
+label, D.1734
++, $sum, $sum, $i
+label, D.1735
++, $i, $i, 1
+*, $j, $i, 2
+label, D.1728
+ifgoto, leq, $i, 99, 8
+ifgoto, gr, $i, 99, 23
+label, D.1729
+print, $sum
+=, $D.1736, 0
+end

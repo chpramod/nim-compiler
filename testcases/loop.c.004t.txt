@@ -1,0 +1,29 @@
+label, main
+=, $res, 0
+=, $i, 0
+goto, 25
+label, D.2051
+=, $j, 0
+goto, 20
+label, D.2048
+=, $k, 0
+goto, 15
+label, D.2045
++, $res, $res, 1
++, $k, $k, 1
+label, D.2046
+ifgoto, leq, $k, 9, 12
+ifgoto, gr, $k, 9, 18
+label, D.2047
++, $j, $j, 1
+label, D.2049
+ifgoto, leq, $j, 9, 9
+ifgoto, gr, $j, 9, 23
+label, D.2050
++, $i, $i, 1
+label, D.2052
+ifgoto, leq, $i, 9, 6
+ifgoto, gr, $i, 9, 28
+label, D.2053
+print, $res
+end
