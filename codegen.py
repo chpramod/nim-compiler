@@ -37,10 +37,20 @@ def generateAssCode(code):
 			elif splitLine[1] in jumpLabels:
 				if splitLine[1]=='goto':
 					leaders.append(int(splitLine[0])+1)
-					leaders.append(int(splitLine[2]))              #for statements like 4, goto, 2
+					if splitLine[2].isdigit():
+						leaders.append(int(splitLine[2]))              #for statements like 4, goto, 2
+					elif splitLine[2]=="main":
+						splitLine[2] = "_start"
+					# else:
+					# 	leaders.append(splitLine[2])              #for statements like 4, goto, LabelX
 				elif splitLine[1]=='ifgoto':
 					leaders.append(int(splitLine[0])+1)
-					leaders.append(int(splitLine[5]))              #for statements like 4, ifgoto, leq, a, 50, 2
+					if splitLine[5].isdigit():
+						leaders.append(int(splitLine[5]))              #for statements like 4, ifgoto, leq, a, 50, 2
+					elif splitLine[5]=="main":
+						splitLine[5] = "_start"
+					# else:
+					# 	leaders.append(splitLine[5])              #for statements like 4, ifgoto, leq, a, 50, LabelX
 				elif splitLine[1]=='label':
 					leaders.append(int(splitLine[0]))
 				elif splitLine[1]=='ret':                          #not sure of we need to do this for the 'ret' oper.
@@ -56,7 +66,7 @@ def generateAssCode(code):
 					leaders.append(int(splitLine[0])+1)
 	#following lines improve leaders array
 	#print leaders
-	leaders.sort(key=int)
+	#leaders.sort(key=int)
 	#print leaders
 	extra=totalLines+1
 	if extra in	leaders:
@@ -139,7 +149,7 @@ def generateAssCode(code):
 						else:                                                          #a[2]=2
 							fp.write("\tmovl ${0}, {1}(%eax)\n" .format(line[3],4*int(tempStr)))
 					else:
-						fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))	 
+						fp.write("\tmovl $%s, %s\n" %(line[3],regmem.getRegister(line[2])))
 			elif line[1]=='+':
 				if (line[3].startswith('$') and line[4].startswith('$')):
 					if (line[2]==line[3]):																	#a=a+b
