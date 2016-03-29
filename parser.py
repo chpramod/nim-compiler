@@ -831,49 +831,82 @@ def p_typeKeyww(p):
 def p_paramListColon(p):
     ''' paramListColon : paramListInter
                         | paramListInter COLON typeDescK'''
+    p[0] = {
+    'vars': p[1],
+    'type': (p[3] if len(p)>2 else None)
+    }
 
 def p_paramListInter(p):
     ''' paramListInter : PARLE declColonEqualsInter2 PARRI'''
+    p[0] = p[2]
 
 def p_declColonEqualsInter2(p):
     ''' declColonEqualsInter2 : empty
                               | declColonEqualsInter '''
+    p[0] = p[1]
 
 def p_declColonEqualsInter(p):
     ''' declColonEqualsInter : declColonEquals COMMA declColonEqualsInter
                             |  declColonEquals SEMICOLON declColonEqualsInter
                             |  declColonEquals  '''
-
+    if len(p) > 2:
+        p[0] = [p[1]] + p[3]
+    else:
+        p[0] = [p[1]]
 
     ## original rule : routine = optInd identVis pattern? genericParamList? paramListColon pragma? ('=' COMMENT? stmt)? indAndComment
     ## pattern is used in template hence not implemented
 
-
 def p_declColonEquals(p) :
-    ''' declColonEquals : identWithPragma commaIdentWithPragmaInter commaInter colonTypeDescKInter equalExprInter'''
-
+    ''' declColonEquals : commaIdentWithPragmaInter commaInter colonTypeDescKInter equalExprInter'''
+    # p[0] = { # Not sure what identColonEqualsInter2 does
+    # 'vars': p[1],
+    # 'type': p[3],
+    # 'value': p[4]
+    # }
+    # for i in p[0]['vars']:
+    #     if i in identifierList:
+    #         global msg
+    #         msg = "Redeclaring Variable \"" + str(i) + "\""
+    #         p_error(p)
+    #     else:
+    #         identifier[i] = {'type': p[3], 'value': p[4]}
+    #         identifierList.append(i)
 
 def p_commaIdentWithPragmaInter(p) :
-    '''commaIdentWithPragmaInter : empty
+    '''commaIdentWithPragmaInter : identWithPragma
                                   | COMMA identWithPragma commaIdentWithPragmaInter '''
+    if len(p) > 2:
+        p[0] = [p[2]] + p[3]
+    else:
+        p[0] = [p[1]]
 
-
-def p_commaInter(p):
+def p_commaInter(p): # Not sure what this does
     ''' commaInter : COMMA
                    | empty'''
 
 def p_colonTypeDescKInter(p):
     ''' colonTypeDescKInter : COLON typeDescK
                             | empty '''
+    if len(p) > 2:
+        p[0] = p[2]
+    else:
+        p[0] = p[1]
 
 def p_equalExprInter(p):
     ''' equalExprInter : EQUALS expr
                             | empty '''
+    if len(p) > 2:
+        p[0] = p[2]
+    else:
+        p[0] = p[1]
+
 def p_typeDef(p) :
     ''' typeDef : identWithPragma genericParamListInter EQUALS typeDefAux '''
 
 def p_typeDefAux(p) :
     '''  typeDefAux : simpleExpr   '''
+    p[0] = p[1]
 ##  concept not implemented
 
 def p_genericParam(p) :
