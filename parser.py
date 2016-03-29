@@ -11,6 +11,7 @@ import lexer
 tokens = lexer.tokens
 
 identifier = {}
+identifierList = []
 
 def p_start(p):
 #ignored extra
@@ -732,6 +733,7 @@ def p_typeKeyw(p):
 def p_typeDescK(p):
     '''typeDescK : simpleExpr
                  | empty'''
+    p[0] = p[1]
 
 def p_primarySuffix(p):
     '''primarySuffix : doBlocks
@@ -824,6 +826,7 @@ def p_typeKeyww(p):
                     | FLOAT
                     | CHAR
                     | STRING '''
+    p[0] = p[1]
 
 def p_paramListColon(p):
     ''' paramListColon : paramListInter
@@ -917,6 +920,7 @@ def p_constantInter1(p) :
 def p_variable(p):
     ''' variable : varTuple
                  | identColonEquals '''
+    p[0] = p[1]
 
 def p_varTuple(p) :
     ''' varTuple : PARLE identWithPragma varTupleInter PARRI EQUALS expr '''
@@ -926,11 +930,26 @@ def p_varTupleInter(p) :
                       | empty '''
 
 def p_identColonEquals(p) :
-    ''' identColonEquals : identOrLiteral identColonEqualsInter1 identColonEqualsInter2 identColonEqualsInter3 identColonEqualsInter4  '''
+    ''' identColonEquals : identColonEqualsInter1 identColonEqualsInter2 identColonEqualsInter3 identColonEqualsInter4  '''
+    p[0] = { # Not sure what identColonEqualsInter2 does
+    'vars': p[1],
+    'type': p[3],
+    'value': p[4]
+    }
+    for i in p[0]['vars']:
+        if i in identifierList:
+            p_error(p,"Redeclaring Variable " + str(i))
+        else:
+            identifier[i] = {'type': p[3], 'value': p[4]}
+            identifierList.append(i)
 
 def p_identColonEqualsInter1(p) :
-    ''' identColonEqualsInter1 : empty
+    ''' identColonEqualsInter1 : identOrLiteral
                                | COMMA identOrLiteral identColonEqualsInter1'''
+    if len(p) > 2:
+        p[0] = [p[2]] + p[3]
+    else:
+        p[0] = [p[1]]
 
 def p_identColonEqualsInter2(p) :
     ''' identColonEqualsInter2 : empty
@@ -939,21 +958,31 @@ def p_identColonEqualsInter2(p) :
 def p_identColonEqualsInter3(p) :
     ''' identColonEqualsInter3 : empty
                                | COLON typeKeyww'''
+    if len(p) > 2:
+        p[0] = p[2]
+    else:
+        p[0] = None
 
 def p_identColonEqualsInter4(p) :
     ''' identColonEqualsInter4 : empty
                                | EQUALS expr '''
-
+    if len(p) > 2:
+        p[0] = p[2]
+    else:
+        p[0] = None
+msg = ''
 def p_error(p):
-# 	global haltExecution
-# 	haltExecution = True
-	try:
-		print "Syntax Error near '"+str(p.value)+ "' in line "+str(p.lineno)
-	except:
+    global msg
+	# global haltExecution
+	# haltExecution = True
+    try:
+		print "Syntax Error near '"+str(p.value)+ "' in line "+str(p.lineno) + ": " + str(msg)
+    except:
 		try:
-			print "Syntax Error in line "+str(p.lineno)
+			print "Syntax Error in line "+str(p.lineno) + ": " + str(msg)
 		except:
-			print "Syntax Error"
+			print "Syntax Error: " + str(msg)
+
 	# sys.exit()
 
 # def p_
