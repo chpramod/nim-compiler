@@ -147,17 +147,40 @@ def p_simpleStmt(p):
 ## we are not implementing exportStmt
 
 def p_exprStmt(p):
-    '''exprStmt : simpleExpr exprStmtInter '''
+    #not doing lhs expr exprStmtInter2 doBlocks
+    # '''exprStmt : simpleExpr
+    #             | lhs exprStmtInter
+    #             | IDENTIFIER exprStmtInter'''
+        '''exprStmt : simpleExpr
+                    | lhs EQUALS expr
+                    | IDENTIFIER EQUALS expr'''
 
-def p_exprStmtInter(p):
-    ''' exprStmtInter : EQUALS expr
-                      | expr exprStmtInter2 doBlocks
-                      | empty '''
+    if len(p)==2:
+        p[0]=p[1]
+        return
+    p[0] = {
+	      'place' : 'undef',
+	      'type' : 'ERROR_TYPE'
+    }
+    if p[3]['type'] == 'ERROR_TYPE':
+        return
+    #identifier will have attri. name, type and place
+    lhsIdentifier=p[1]['name']
+    lhsType=p[1]['type']
+    lhsPlace=p[1]['place']
+    if lhsType!=p[3]['type']:
+        msg_error('Type mismatch in assignment with variable (%s)!'%lhsIdentifier)
+    else:
 
+#
+# def p_exprStmtInter(p):
+#     ''' exprStmtInter : EQUALS expr
+#                       | expr exprStmtInter2 doBlocks'''
 
-def p_exprStmtInter2(p):
-    ''' exprStmtInter2 : COMMA expr exprStmtInter2
-                       | empty '''
+#
+# def p_exprStmtInter2(p):
+#     ''' exprStmtInter2 : COMMA expr exprStmtInter2
+#                        | empty '''
 
 def p_whileStmt(p):
     '''whileStmt : WHILE condStmt'''
@@ -672,11 +695,20 @@ def p_identOrLiteral(p):
     #                   | literal
     #                   | par
     #                   | IDENTIFIER'''
+    # '''identOrLiteral :  literal
+    #                     | castExpr
+    #                     | arrayConstr
+    #                     | tupleConstr
+    #                     | symbol '''
     '''identOrLiteral :  literal
                         | castExpr
-                        | arrayConstr
-                        | tupleConstr
-                        | symbol '''
+                        | symbol
+                        | lhs'''
+    p[0] = p[1]
+
+def p_lhs(p):
+    '''lhs : arrayConstr
+            | tupleConstr'''
     p[0] = p[1]
 
 def p_arrayConstr(p):
