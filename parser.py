@@ -938,7 +938,9 @@ def p_identColonEquals(p) :
     }
     for i in p[0]['vars']:
         if i in identifierList:
-            p_error(p,"Redeclaring Variable " + str(i))
+            global msg
+            msg = "Redeclaring Variable \"" + str(i) + "\""
+            p_error(p)
         else:
             identifier[i] = {'type': p[3], 'value': p[4]}
             identifierList.append(i)
