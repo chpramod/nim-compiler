@@ -866,9 +866,7 @@ def p_declColonEquals(p) :
     # }
     # for i in p[0]['vars']:
     #     if i in identifierList:
-    #         global msg
-    #         msg = "Redeclaring Variable \"" + str(i) + "\""
-    #         p_error(p)
+    #     msg_error(p,"Redeclaring Variable \"" + str(i) + "\"")
     #     else:
     #         identifier[i] = {'type': p[3], 'value': p[4]}
     #         identifierList.append(i)
@@ -971,9 +969,7 @@ def p_identColonEquals(p) :
     }
     for i in p[0]['vars']:
         if i in identifierList:
-            global msg
-            msg = "Redeclaring Variable \"" + str(i) + "\""
-            p_error(p)
+            msg_error(p,"Redeclaring Variable \"" + str(i) + "\"")
         else:
             identifier[i] = {'type': p[3], 'value': p[4]}
             identifierList.append(i)
@@ -1005,18 +1001,26 @@ def p_identColonEqualsInter4(p) :
         p[0] = p[2]
     else:
         p[0] = None
+
 msg = ''
+
+def msg_error(p,_msg=''):
+    global msg
+    msg = ": " + _msg
+    p_error(p)
+    msg = ''
+
 def p_error(p):
     global msg
 	# global haltExecution
 	# haltExecution = True
     try:
-		print "Syntax Error near '"+str(p.value)+ "' in line "+str(p.lineno) + ": " + str(msg)
+		print "Syntax Error near '"+str(p.stack[-1].value)+ "' in line "+str(p.stack[-1].lineno) + str(msg)
     except:
 		try:
-			print "Syntax Error in line "+str(p.lineno) + ": " + str(msg)
+			print "Syntax Error in line "+str(p.stack[-1].lineno) + str(msg)
 		except:
-			print "Syntax Error: " + str(msg)
+			print "Syntax Error" + str(msg)
 
 	# sys.exit()
 
