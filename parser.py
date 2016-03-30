@@ -1002,9 +1002,50 @@ def p_interTen(p):
 def p_dollarExpr(p):
     '''dollarExpr : primary interElev'''
 
+    if p[2]['place']==None:
+        p[0] = p[1]
+    elif p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
+        msg_error(p,'Unsupported type')
+    elif p[1]['type']!=p[2]['type']:
+        msg_error(p,'Type mismatch')
+    else:
+        temp = TAC.createTemp()
+        TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
+        p[0] = {
+        'type': p[1]['type'],
+        'place': temp
+        }
+
 def p_interElev(p):
     '''interElev : OP10 primary interElev
                 | empty '''
+
+    if len(p)>2:
+        msg_error(p,'$ and ^ not implemented right now')
+    elif len(p)==2:
+        p[0] = {
+        'type': None,
+        'value': None,
+        'place': None
+        }
+    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+        msg_error(p,'Unsupported type')
+    elif p[3]['place']==None:
+        p[0] = {
+        'type': p[2]['type']
+        'value': p[1],
+        'place': p[2]['place']
+        }
+    elif p[2]['type']!=p[3]['type']:
+        msg_error(p,'Type mismatch')
+    else:
+        temp = TAC.createTemp()
+        TAC.emit(p[3]['value'],temp,p[2]['place'],p[3]['place'])
+        p[0] = {
+        'type': p[2]['type'],
+        'value': p[1],
+        'place': temp
+        }
 
 def p_castExpr(p):
     '''castExpr : CAST BRACKETLE simpleExpr BRACKETRI PARLE expr PARRI'''
@@ -1014,15 +1055,38 @@ def p_primary(p):
                 | interPrefixOperator identOrLiteral interPrimarySuffix
                 | STATIC primary
                 | BIND primary'''
+
+    if len(p)!=4:
+        msg_error(p,'currently primary can go to only identOrLiteral')
+    else :
+        p[0] = p[2]
+
+
 #shd be interPrefixOperator identOrLiteral interPrimarySuffix
 
 def p_interPrefixOperator(p):
     '''interPrefixOperator : prefixOperator interPrefixOperator
                             | empty '''
-
+    if len(p) == 2 :
+        p[0] = {
+        'type': None,
+        'value': None,
+        'place': None
+        }
+    else :
+        msg_error(p,'currently interPrefixOperator -> empty')
+        
 def p_interPrimarySuffix(p):
     '''interPrimarySuffix : primarySuffix interPrimarySuffix
                             | empty '''
+    if len(p) == 2 :
+        p[0] = {
+        'type': None,
+        'value': None,
+        'place': None
+        }
+    else :
+        msg_error(p,'currently interPrimarySuffix -> empty')
 
 def p_identOrLiteral(p):
     # '''identOrLiteral : symbol
@@ -1038,7 +1102,15 @@ def p_identOrLiteral(p):
     #                     | castExpr
     #                     | symbol
     #                     | lhs'''
+
     p[0] = p[1]
+    temp = TAC.createTemp()
+        TAC.emit('=',temp,p[1])
+        p[0] = {
+        'type': p[1]['type'],
+        'value': p[1],
+        'place': temp
+        }
 
 def p_lhs(p):
     '''lhs : arrayConstr
@@ -1125,8 +1197,8 @@ def p_symbol(p):
                 | BOOLEAN'''
     p[0] = p[1]
 
-def p_literal(p):
-    '''literal : INTLIT
+def p_literal(p):# was INTLIT in place of INT
+    '''literal : int             
                 | INT8LIT
                 | INT16LIT
                 | INT32LIT
@@ -1137,8 +1209,21 @@ def p_literal(p):
                 | CHARLIT
                 | strings
                 | NIL'''
+    
     p[0] = p[1]
+
+    
 # def p_par(p):
+
+def p_int(p):
+    ''' int : INTLIT '''
+    temp = TAC.createTemp()
+        TAC.emit('=',temp,p[1])
+        p[0] = {
+        'type': 'int',
+        'value': p[1],
+        'place': temp
+        }
 
 def p_doBlocks(p):
     '''doBlocks : doBlock NEWLINE doBlocks
