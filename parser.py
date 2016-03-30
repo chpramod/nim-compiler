@@ -627,6 +627,7 @@ def p_arrowExpr(p):
             msg_error(p,'Type mismatch')
         else:
             TAC.emit(p[2][0],p[1]['place'],p[1]['place'],p[3]['place'])
+            p[0] = p[1]
         # p[0] = {
         # 'type:' ("OP1" if len(p) > 2 else None),
         # 'value': p[1],
@@ -654,7 +655,9 @@ def p_interThree(p):
 
 def p_orExpr(p): # Assuming Bitwise integer operations
     '''orExpr : andExpr interFour'''
-    if p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
+    if p[2]['place']==None:
+        p[0] = p[1]
+    elif p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
@@ -673,16 +676,17 @@ def p_interFour(p):
     if len(p)==2:
         p[0] = {
         'type': None,
+        'value': None,
         'place': None
         }
+    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+        msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
         'type': p[2]['type']
         'value': p[1],
         'place': p[2]['place']
         }
-    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
-        msg_error(p,'Unsupported type')
     elif p[2]['type']!=p[3]['type']:
         msg_error(p,'Type mismatch')
     else:
@@ -690,13 +694,16 @@ def p_interFour(p):
         TAC.emit(p[3]['value'],temp,p[2]['place'],p[3]['place'])
         p[0] = {
         'type': p[2]['type'],
+        'value': p[1],
         'place': temp
         }
 
 
 def p_andExpr(p):
     '''andExpr : cmpExpr interFive'''
-    if p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
+    if p[2]['place']==None:
+        p[0] = p[1]
+    elif p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
@@ -710,20 +717,21 @@ def p_andExpr(p):
 
 def p_interFive(p):
     '''interFive : AND cmpExpr interFive
-                | empty ''''
+                | empty '''
     if len(p)==2:
         p[0] = {
         'type': None,
+        'value': None,
         'place': None
         }
+    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+        msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
         'type': p[2]['type']
         'value': p[1],
         'place': p[2]['place']
         }
-    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
-        msg_error(p,'Unsupported type')
     elif p[2]['type']!=p[3]['type']:
         msg_error(p,'Type mismatch')
     else:
@@ -731,6 +739,7 @@ def p_interFive(p):
         TAC.emit(p[3]['value'],temp,p[2]['place'],p[3]['place'])
         p[0] = {
         'type': p[2]['type'],
+        'value': p[1],
         'place': temp
         }
 
