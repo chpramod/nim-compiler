@@ -595,42 +595,144 @@ def p_caseExpr(p):
 
 def p_simpleExpr(p):
     '''simpleExpr : arrowExpr interOne'''
-    p[0] = {
-    'type' : 'simple'
-    }
+    # p[0] = {
+    # 'type' : 'simple'
+    # }
+    if p[2]['type']==None:
+        p[0]=p[1]
 
 def p_interOne(p):
     '''interOne : OP0 arrowExpr interOne
                 | empty '''
+    p[0] = {
+    'type:' ("OP0" if len(p) > 2 else None),
+    'value': p[1],
+    }
+    if len(p) > 2:
+        msg_error(p,"Arrow like Operators not supported")
 
 def p_arrowExpr(p):
-    '''arrowExpr : assignExpr interTwo'''
+    '''arrowExpr : assignExpr
+                | assignExpr OP1 assignExpr'''
+    if len(p)==2:
+        p[0] = p[1]
+    else:
+        p[0] = {
+        'place': 'undef',
+        'type': 'ERROR_TYPE'
+        }
+        if p[1]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+            msg_error(p,'Unsupported type')
+        elif p[1]['type']!=p[3]['type']:
+            msg_error(p,'Type mismatch')
+        else:
+            TAC.emit(p[2][0],p[1]['place'],p[1]['place'],p[3]['place'])
+        # p[0] = {
+        # 'type:' ("OP1" if len(p) > 2 else None),
+        # 'value': p[1],
+        # 'place'
+        # }
 
-def p_interTwo(p):
-    '''interTwo : OP1 assignExpr interTwo
-                | empty '''
+# def p_interTwo(p):
+#     '''interTwo : OP1 assignExpr interTwo
+#                 | empty '''
 
 def p_assignExpr(p):
     '''assignExpr : orExpr interThree'''
+    if p[2]['type']==None:
+        p[0]=p[1]
 
 def p_interThree(p):
     '''interThree : OP2 orExpr interThree
                 | empty '''
+    p[0] = {
+    'type:' ("OP2" if len(p) > 2 else None),
+    'value': p[1],
+    }
+    if len(p) > 2:
+        msg_error(p,p[1]+" operators not supported")
 
-def p_orExpr(p):
+def p_orExpr(p): # Assuming Bitwise integer operations
     '''orExpr : andExpr interFour'''
+    if p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
+        msg_error(p,'Unsupported type')
+    elif p[1]['type']!=p[2]['type']:
+        msg_error(p,'Type mismatch')
+    else:
+        temp = TAC.createTemp()
+        TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
+        p[0] = {
+        'type': p[1]['type'],
+        'place': temp
+        }
 
 def p_interFour(p):
     '''interFour : OR andExpr interFour
                 | XOR andExpr interFour
                 | empty '''
+    if len(p)==2:
+        p[0] = {
+        'type': None,
+        'place': None
+        }
+    elif p[3]['place']==None:
+        p[0] = {
+        'type': p[2]['type']
+        'value': p[1],
+        'place': p[2]['place']
+        }
+    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+        msg_error(p,'Unsupported type')
+    elif p[2]['type']!=p[3]['type']:
+        msg_error(p,'Type mismatch')
+    else:
+        temp = TAC.createTemp()
+        TAC.emit(p[3]['value'],temp,p[2]['place'],p[3]['place'])
+        p[0] = {
+        'type': p[2]['type'],
+        'place': temp
+        }
+
 
 def p_andExpr(p):
     '''andExpr : cmpExpr interFive'''
+    if p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
+        msg_error(p,'Unsupported type')
+    elif p[1]['type']!=p[2]['type']:
+        msg_error(p,'Type mismatch')
+    else:
+        temp = TAC.createTemp()
+        TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
+        p[0] = {
+        'type': p[1]['type'],
+        'place': temp
+        }
 
 def p_interFive(p):
     '''interFive : AND cmpExpr interFive
-                | empty '''
+                | empty ''''
+    if len(p)==2:
+        p[0] = {
+        'type': None,
+        'place': None
+        }
+    elif p[3]['place']==None:
+        p[0] = {
+        'type': p[2]['type']
+        'value': p[1],
+        'place': p[2]['place']
+        }
+    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+        msg_error(p,'Unsupported type')
+    elif p[2]['type']!=p[3]['type']:
+        msg_error(p,'Type mismatch')
+    else:
+        temp = TAC.createTemp()
+        TAC.emit(p[3]['value'],temp,p[2]['place'],p[3]['place'])
+        p[0] = {
+        'type': p[2]['type'],
+        'place': temp
+        }
 
 def p_cmpExpr(p):
     '''cmpExpr : sliceExpr interSix'''
