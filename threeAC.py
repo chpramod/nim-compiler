@@ -4,7 +4,7 @@ class threeAC:
 		self.labelCount = -1
 		self.labelPrefix = 'l'
 		self.tempCount = -1
-		self.tempPrefix = 't'
+		self.tempPrefix = '$t'
 	def emit(self,op,dest,src1,src2):
 		self.code.append([op,dest,src1,src2])
 
