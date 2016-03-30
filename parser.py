@@ -260,34 +260,60 @@ def p_finallyInter(p):
     else:
         p[0] = p[1]
 
+def p_markerlabel(p):
+    '''markerlabel : empty'''
+    p[0] = {
+    'label': ST.newLabel()
+    }
+
+def p_markerif(p):
+    '''markerif : empty'''
+    if p[-1]['type']!='BOOLEAN':
+        msg_error(p,'Condition expressions must be boolean type')
+    TAC.emit('ifgoto','==',p[-1]['cond']['place'],'0',p[-1]['truelabel'])
+    TAC.emit('goto',p[-1]['falselabel'])
+    }
+
+def p_markerend(p):
+    '''markerend : empty'''
+    p[0] = {
+    'label': ST.newLabel()
+    }
+
 def p_ifStmt(p):
-    '''ifStmt : IF condStmt elifStmt elseStmt'''
+    '''ifStmt : IF condStmt markerif elifStmt elseStmt markerend'''
     p[0] = {
     'inline': False,
     'type': p[1],
     'cond': p[2]['cond'],
     'then': p[2]['then'],
-    'elif': p[3],
-    'else': p[4]
+    'elif': p[4],
+    'else': p[5]
     }
 
 def p_whenStmt(p):
-    '''whenStmt : WHEN condStmt elifStmt elseStmt'''
+    '''whenStmt : WHEN condStmt markerif elifStmt elseStmt markerend'''
     p[0] = {
     'inline': False,
     'type': p[1],
     'cond': p[2]['cond'],
     'then': p[2]['then'],
-    'elif': p[3],
-    'else': p[4]
+    'elif': p[4],
+    'else': p[5]
     }
+    if p[2]['type']!='BOOLEAN':
+        msg_error(p,'Condition expressions must be boolean type')
+    TAC.emit('ifgoto','==',p[2]['cond']['place'],'0',p[2]['truelabel'])
+    TAC.emit('goto',p[2]['falselabel'])
 
 def p_condStmt(p):
-    '''condStmt : expr COLON suite'''
+    '''condStmt : expr COLON markerlabel suite markerlabel'''
     p[0] = {
     'inline': False,
     'cond': p[1],
-    'then': p[2]
+    'then': p[4],
+    'truelabel': p[3]['label'],
+    'falselabel': p[5]['label']
     }
 
 def p_elseStmt(p):
@@ -303,7 +329,7 @@ def p_elseStmt(p):
         p[0] = p[1]
 
 def p_elifStmt(p):
-    '''elifStmt : ELIF condStmt elifStmt
+    '''elifStmt : ELIF condStmt markerif elifStmt
                     | empty'''
     if len(p) > 2:
         p[0] = {
@@ -311,7 +337,7 @@ def p_elifStmt(p):
         'type': p[1],
         'cond': p[2]['cond'],
         'then': p[2]['then'],
-        'next': p[3]
+        'next': p[4]
         }
     else:
         p[0] = p[1]
