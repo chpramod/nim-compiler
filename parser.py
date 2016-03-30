@@ -151,13 +151,14 @@ def p_exprStmt(p):
     # '''exprStmt : simpleExpr
     #             | lhs exprStmtInter
     #             | IDENTIFIER exprStmtInter'''
-        '''exprStmt : simpleExpr
-                    | lhs EQUALS expr
-                    | IDENTIFIER EQUALS expr'''
+    '''exprStmt : simpleExpr
+                | lhs EQUALS expr
+                | IDENTIFIER EQUALS expr'''
 
+    print "exprStmt has %d len"%(len(p))
     if len(p)==2:
         p[0]=p[1]
-        return
+    return
     p[0] = {
 	      'place' : 'undef',
 	      'type' : 'ERROR_TYPE'
@@ -171,6 +172,7 @@ def p_exprStmt(p):
     if lhsType!=p[3]['type']:
         msg_error('Type mismatch in assignment with variable (%s)!'%lhsIdentifier)
     else:
+        print "=, %s, %s" %(p[1]['place'],p[3]['place'])
 
 #
 # def p_exprStmtInter(p):
