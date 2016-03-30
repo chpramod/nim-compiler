@@ -151,10 +151,10 @@ def p_exprStmt(p):
     # '''exprStmt : simpleExpr
     #             | lhs exprStmtInter
     #             | IDENTIFIER exprStmtInter'''
-    # '''exprStmt : simpleExpr
-    #             | lhs EQUALS expr
-    #             | IDENTIFIER EQUALS expr'''
-    '''exprStmt : simpleExpr exprStmtInter'''
+    '''exprStmt : simpleExpr
+                | lhs EQUALS expr
+                | IDENTIFIER EQUALS expr'''
+
     print "exprStmt has %d len"%(len(p))
     if len(p)==2:
         p[0]=p[1]
@@ -175,14 +175,14 @@ def p_exprStmt(p):
         print "=, %s, %s" %(p[1]['place'],p[3]['place'])
 
 #
-def p_exprStmtInter(p):
-    ''' exprStmtInter : EQUALS expr
-                      | expr exprStmtInter2 doBlocks
-                      | empty '''
+# def p_exprStmtInter(p):
+#     ''' exprStmtInter : EQUALS expr
+#                       | expr exprStmtInter2 doBlocks'''
+
 #
-def p_exprStmtInter2(p):
-    ''' exprStmtInter2 : COMMA expr exprStmtInter2
-                       | empty '''
+# def p_exprStmtInter2(p):
+#     ''' exprStmtInter2 : COMMA expr exprStmtInter2
+#                        | empty '''
 
 def p_whileStmt(p):
     '''whileStmt : WHILE condStmt'''
@@ -605,8 +605,8 @@ def p_interOne(p):
     '''interOne : OP0 arrowExpr interOne
                 | empty '''
     p[0] = {
-    'type': ("OP0" if len(p) > 2 else None),
-    'value': p[1]
+    'type:' ("OP0" if len(p) > 2 else None),
+    'value': p[1],
     }
     if len(p) > 2:
         msg_error(p,"Arrow like Operators not supported")
@@ -614,25 +614,25 @@ def p_interOne(p):
 def p_arrowExpr(p):
     '''arrowExpr : assignExpr
                 | assignExpr OP1 assignExpr'''
-    # if len(p)==2:
-    #     p[0] = p[1]
-    # else:
-    #     p[0] = {
-    #     'place': 'undef',
-    #     'type': 'ERROR_TYPE'
-    #     }
-    #     if p[1]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
-    #         msg_error(p,'Unsupported type')
-    #     elif p[1]['type']!=p[3]['type']:
-    #         msg_error(p,'Type mismatch')
-    #     else:
-    #         TAC.emit(p[2][0],p[1]['place'],p[1]['place'],p[3]['place'])
-    #         p[0] = p[1]
-    #     # p[0] = {
-    #     # 'type:' ("OP1" if len(p) > 2 else None),
-    #     # 'value': p[1],
-    #     # 'place'
-    #     # }
+    if len(p)==2:
+        p[0] = p[1]
+    else:
+        p[0] = {
+        'place': 'undef',
+        'type': 'ERROR_TYPE'
+        }
+        if p[1]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+            msg_error(p,'Unsupported type')
+        elif p[1]['type']!=p[3]['type']:
+            msg_error(p,'Type mismatch')
+        else:
+            TAC.emit(p[2][0],p[1]['place'],p[1]['place'],p[3]['place'])
+            p[0] = p[1]
+        # p[0] = {
+        # 'type:' ("OP1" if len(p) > 2 else None),
+        # 'value': p[1],
+        # 'place'
+        # }
 
 # def p_interTwo(p):
 #     '''interTwo : OP1 assignExpr interTwo
@@ -647,8 +647,8 @@ def p_interThree(p):
     '''interThree : OP2 orExpr interThree
                 | empty '''
     p[0] = {
-    'type': ("OP2" if len(p) > 2 else None),
-    'value': p[1]
+    'type:' ("OP2" if len(p) > 2 else None),
+    'value': p[1],
     }
     if len(p) > 2:
         msg_error(p,p[1]+" operators not supported")
@@ -683,7 +683,7 @@ def p_interFour(p):
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
-        'type': p[2]['type'],
+        'type': p[2]['type']
         'value': p[1],
         'place': p[2]['place']
         }
@@ -728,7 +728,7 @@ def p_interFive(p):
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
-        'type': p[2]['type'],
+        'type': p[2]['type']
         'value': p[1],
         'place': p[2]['place']
         }
@@ -773,15 +773,14 @@ def p_cmpExpr(p):
 def p_interSix(p):
     '''interSix : OP5 sliceExpr interSix
                 | empty '''
-    if len(p)>2:
-        p[0]=p[2]
-    else:
+
+    if len(p)==2:
         p[0] = {
         'type': None,
         'value': None,
         'place': None
         }
-    if p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
@@ -793,32 +792,117 @@ def p_interSix(p):
         msg_error(p,'Type mismatch')
     else:
         temp = TAC.createTemp()
-        TAC.emit('ifgoto',p[2]['value'],p[1]['place'],p[2]['place'],label1['name'])
+        TAC.emit('ifgoto',p[3]['value'],p[2]['place'],p[3]['place'],label1['name'])
         TAC.emit('=', temp, 0)
         TAC.emit("goto", label2['name'])
         TAC.emit("label", label1['name'])
         TAC.emit('=' temp, 1)
         TAC.emit("label", label2['name'])
         p[0] = {
-        'type': p[2]['type'],
+        'type': 'BOOLEAN',
         'value': p[1],
         'place': temp
         }
 
-def p_sliceExpr(p):
+def p_sliceExpr(p):           # ignored right now just like arrow
     '''sliceExpr : ampExpr interSeven'''
+
+    if p[2]['place']==None:
+        p[0] = p[1]
+    elif p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
+        msg_error(p,'Unsupported type')
+    elif p[1]['type']!=p[2]['type']:
+        msg_error(p,'Type mismatch')
+    else:
+        temp = TAC.createTemp()
+        TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
+        p[0] = {
+        'type': p[1]['type'],
+        'place': temp
+        }
+
+
 
 def p_interSeven(p):
     '''interSeven : DOTDOT ampExpr interSeven
                 | empty '''
 
-def p_ampExpr(p):
+    if len(p)>2:
+        msg_error(p,'DOT DOT not implemented right now')
+    elif len(p)==2:
+        p[0] = {
+        'type': None,
+        'value': None,
+        'place': None
+        }
+    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+        msg_error(p,'Unsupported type')
+    elif p[3]['place']==None:
+        p[0] = {
+        'type': p[2]['type']
+        'value': p[1],
+        'place': p[2]['place']
+        }
+    elif p[2]['type']!=p[3]['type']:
+        msg_error(p,'Type mismatch')
+    else:
+        temp = TAC.createTemp()
+        TAC.emit(p[3]['value'],temp,p[2]['place'],p[3]['place'])
+        p[0] = {
+        'type': p[2]['type'],
+        'value': p[1],
+        'place': temp
+        }
+
+def p_ampExpr(p):                           # ignored right now just like arrow
     '''ampExpr : plusExpr interEight'''
+
+    if p[2]['place']==None:
+        p[0] = p[1]
+    elif p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
+        msg_error(p,'Unsupported type')
+    elif p[1]['type']!=p[2]['type']:
+        msg_error(p,'Type mismatch')
+    else:
+        temp = TAC.createTemp()
+        TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
+        p[0] = {
+        'type': p[1]['type'],
+        'place': temp
+        }
+
+
 
 def p_interEight(p):
     '''interEight : OP7 plusExpr interEight
                 | empty '''
 
+    if len(p)>2:
+        msg_error(p,'& not implemented right now')
+    elif len(p)==2:
+        p[0] = {
+        'type': None,
+        'value': None,
+        'place': None
+        }
+    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+        msg_error(p,'Unsupported type')
+    elif p[3]['place']==None:
+        p[0] = {
+        'type': p[2]['type']
+        'value': p[1],
+        'place': p[2]['place']
+        }
+    elif p[2]['type']!=p[3]['type']:
+        msg_error(p,'Type mismatch')
+    else:
+        temp = TAC.createTemp()
+        TAC.emit(p[3]['value'],temp,p[2]['place'],p[3]['place'])
+        p[0] = {
+        'type': p[2]['type'],
+        'value': p[1],
+        'place': temp
+        }
 def p_plusExpr(p):
     '''plusExpr : mulExpr interNine'''
 
@@ -863,15 +947,15 @@ def p_identOrLiteral(p):
     #                   | literal
     #                   | par
     #                   | IDENTIFIER'''
-    '''identOrLiteral :  literal
-                        | castExpr
-                        | arrayConstr
-                        | tupleConstr
-                        | symbol '''
     # '''identOrLiteral :  literal
     #                     | castExpr
-    #                     | symbol
-    #                     | lhs'''
+    #                     | arrayConstr
+    #                     | tupleConstr
+    #                     | symbol '''
+    '''identOrLiteral :  literal
+                        | castExpr
+                        | symbol
+                        | lhs'''
     p[0] = p[1]
 
 def p_lhs(p):
