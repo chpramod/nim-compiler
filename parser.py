@@ -151,9 +151,10 @@ def p_exprStmt(p):
     # '''exprStmt : simpleExpr
     #             | lhs exprStmtInter
     #             | IDENTIFIER exprStmtInter'''
-    '''exprStmt : simpleExpr
-                | lhs EQUALS expr
-                | IDENTIFIER EQUALS expr'''
+    # '''exprStmt : simpleExpr
+    #             | lhs EQUALS expr
+    #             | IDENTIFIER EQUALS expr'''
+    '''exprStmt : simpleExpr exprStmtInter'''
 
     print "exprStmt has %d len"%(len(p))
     if len(p)==2:
@@ -174,15 +175,16 @@ def p_exprStmt(p):
     else:
         print "=, %s, %s" %(p[1]['place'],p[3]['place'])
 
-#
-# def p_exprStmtInter(p):
-#     ''' exprStmtInter : EQUALS expr
-#                       | expr exprStmtInter2 doBlocks'''
 
-#
-# def p_exprStmtInter2(p):
-#     ''' exprStmtInter2 : COMMA expr exprStmtInter2
-#                        | empty '''
+def p_exprStmtInter(p):
+    ''' exprStmtInter : EQUALS expr
+                      | expr exprStmtInter2 doBlocks
+                      | empty'''
+
+
+def p_exprStmtInter2(p):
+    ''' exprStmtInter2 : COMMA expr exprStmtInter2
+                       | empty '''
 
 def p_whileStmt(p):
     '''whileStmt : WHILE condStmt'''
@@ -947,15 +949,15 @@ def p_identOrLiteral(p):
     #                   | literal
     #                   | par
     #                   | IDENTIFIER'''
-    # '''identOrLiteral :  literal
-    #                     | castExpr
-    #                     | arrayConstr
-    #                     | tupleConstr
-    #                     | symbol '''
     '''identOrLiteral :  literal
                         | castExpr
-                        | symbol
-                        | lhs'''
+                        | arrayConstr
+                        | tupleConstr
+                        | symbol '''
+    # '''identOrLiteral :  literal
+    #                     | castExpr
+    #                     | symbol
+    #                     | lhs'''
     p[0] = p[1]
 
 def p_lhs(p):
