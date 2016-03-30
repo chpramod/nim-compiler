@@ -906,17 +906,97 @@ def p_interEight(p):
 def p_plusExpr(p):
     '''plusExpr : mulExpr interNine'''
 
+    if p[2]['place']==None:
+        p[0] = p[1]
+    elif p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
+        msg_error(p,'Unsupported type')
+    elif p[1]['type']!=p[2]['type']:
+        msg_error(p,'Type mismatch')
+    else:
+        temp = TAC.createTemp()
+        TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
+        p[0] = {
+        'type': p[1]['type'],
+        'place': temp
+        }
+
+
 def p_interNine(p):
     '''interNine : OP8 mulExpr interNine
                 | empty '''
 
+    if len(p)==2:
+        p[0] = {
+        'type': None,
+        'value': None,
+        'place': None
+        }
+    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+        msg_error(p,'Unsupported type')
+    elif p[3]['place']==None:
+        p[0] = {
+        'type': p[2]['type']
+        'value': p[1],
+        'place': p[2]['place']
+        }
+    elif p[2]['type']!=p[3]['type']:
+        msg_error(p,'Type mismatch')
+    else:
+        temp = TAC.createTemp()
+        TAC.emit(p[3]['value'],temp,p[2]['place'],p[3]['place'])
+        p[0] = {
+        'type': p[2]['type'],
+        'value': p[1],
+        'place': temp
+        }
+
 def p_mulExpr(p):
     '''mulExpr : dollarExpr interTen'''
+
+    if p[2]['place']==None:
+        p[0] = p[1]
+    elif p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
+        msg_error(p,'Unsupported type')
+    elif p[1]['type']!=p[2]['type']:
+        msg_error(p,'Type mismatch')
+    else:
+        temp = TAC.createTemp()
+        TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
+        p[0] = {
+        'type': p[1]['type'],
+        'place': temp
+        }
 
 def p_interTen(p):
     '''interTen : OP9 dollarExpr interTen
                 | empty '''
 
+    if len(p)==2:
+        p[0] = {
+        'type': None,
+        'value': None,
+        'place': None
+        }
+    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+        msg_error(p,'Unsupported type')
+    elif p[3]['place']==None:
+        p[0] = {
+        'type': p[2]['type']
+        'value': p[1],
+        'place': p[2]['place']
+        }
+    elif p[2]['type']!=p[3]['type']:
+        msg_error(p,'Type mismatch')
+    else:
+        temp = TAC.createTemp()
+        TAC.emit(p[3]['value'],temp,p[2]['place'],p[3]['place'])
+        p[0] = {
+        'type': p[2]['type'],
+        'value': p[1],
+        'place': temp
+        }
+
+        
 def p_dollarExpr(p):
     '''dollarExpr : primary interElev'''
 
