@@ -607,8 +607,8 @@ def p_interOne(p):
     '''interOne : OP0 arrowExpr interOne
                 | empty '''
     p[0] = {
-    'type:' ("OP0" if len(p) > 2 else None),
-    'value': p[1],
+    'type': ("OP0" if len(p) > 2 else None),
+    'value': p[1]
     }
     if len(p) > 2:
         msg_error(p,"Arrow like Operators not supported")
@@ -649,8 +649,8 @@ def p_interThree(p):
     '''interThree : OP2 orExpr interThree
                 | empty '''
     p[0] = {
-    'type:' ("OP2" if len(p) > 2 else None),
-    'value': p[1],
+    'type': ("OP2" if len(p) > 2 else None),
+    'value': p[1]
     }
     if len(p) > 2:
         msg_error(p,p[1]+" operators not supported")
@@ -998,7 +998,7 @@ def p_interTen(p):
         'place': temp
         }
 
-        
+
 def p_dollarExpr(p):
     '''dollarExpr : primary interElev'''
 
