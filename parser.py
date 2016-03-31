@@ -274,7 +274,7 @@ def p_markerif(p):
         msg_error(p,'Condition expressions must be boolean type')
     TAC.emit('ifgoto','==',p[-1]['cond']['place'],'0',p[-1]['truelabel'])
     TAC.emit('goto',p[-1]['falselabel'])
-    }
+    
 
 def p_markerend(p):
     '''markerend : empty'''
@@ -711,7 +711,7 @@ def p_interFour(p):
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
-        'type': p[2]['type']
+        'type': p[2]['type'],
         'value': p[1],
         'place': p[2]['place']
         }
@@ -756,7 +756,7 @@ def p_interFive(p):
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
-        'type': p[2]['type']
+        'type': p[2]['type'],
         'value': p[1],
         'place': p[2]['place']
         }
@@ -779,8 +779,7 @@ def p_cmpExpr(p):
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
-    elif:
-        p[1]['type']=='BOOLEAN':
+    elif p[1]['type']=='BOOLEAN':        
         msg_error(p,"Boolean not allowed in comparision statements")
     else:
         temp = TAC.createTemp()
@@ -790,7 +789,7 @@ def p_cmpExpr(p):
         TAC.emit('=', temp, 0)
         TAC.emit("goto", label2['name'])
         TAC.emit("label", label1['name'])
-        TAC.emit('=' temp, 1)
+        TAC.emit('=', temp, 1)
         TAC.emit("label", label2['name'])
         p[0] = {
         'type': 'BOOLEAN',
@@ -812,7 +811,7 @@ def p_interSix(p):
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
-        'type': p[2]['type']
+        'type': p[2]['type'],
         'value': p[1],
         'place': p[2]['place']
         }
@@ -824,7 +823,7 @@ def p_interSix(p):
         TAC.emit('=', temp, 0)
         TAC.emit("goto", label2['name'])
         TAC.emit("label", label1['name'])
-        TAC.emit('=' temp, 1)
+        TAC.emit('=', temp, 1)
         TAC.emit("label", label2['name'])
         p[0] = {
         'type': 'BOOLEAN',
@@ -867,7 +866,7 @@ def p_interSeven(p):
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
-        'type': p[2]['type']
+        'type': p[2]['type'],
         'value': p[1],
         'place': p[2]['place']
         }
@@ -917,7 +916,7 @@ def p_interEight(p):
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
-        'type': p[2]['type']
+        'type': p[2]['type'],
         'value': p[1],
         'place': p[2]['place']
         }
@@ -963,7 +962,7 @@ def p_interNine(p):
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
-        'type': p[2]['type']
+        'type': p[2]['type'],
         'value': p[1],
         'place': p[2]['place']
         }
@@ -1009,7 +1008,7 @@ def p_interTen(p):
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
-        'type': p[2]['type']
+        'type': p[2]['type'],
         'value': p[1],
         'place': p[2]['place']
         }
@@ -1058,7 +1057,7 @@ def p_interElev(p):
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
-        'type': p[2]['type']
+        'type': p[2]['type'],
         'value': p[1],
         'place': p[2]['place']
         }
@@ -1131,11 +1130,11 @@ def p_identOrLiteral(p):
 
     p[0] = p[1]
     temp = TAC.createTemp()
-        TAC.emit('=',temp,p[1])
-        p[0] = {
-        'type': p[1]['type'],
-        'value': p[1],
-        'place': temp
+    TAC.emit('=',temp,p[1],'','')
+    p[0] = {
+    'type': p[1]['type'],
+    'value': p[1],
+    'place': temp
         }
 
 def p_lhs(p):
@@ -1244,12 +1243,12 @@ def p_literal(p):# was INTLIT in place of INT
 def p_int(p):
     ''' int : INTLIT '''
     temp = TAC.createTemp()
-        TAC.emit('=',temp,p[1])
-        p[0] = {
-        'type': 'int',
-        'value': p[1],
-        'place': temp
-        }
+    TAC.emit('=',temp,p[1],'','')
+    p[0] = {
+    'type': 'int',
+    'value': p[1],
+    'place': temp
+    }
 
 def p_doBlocks(p):
     '''doBlocks : doBlock NEWLINE doBlocks
