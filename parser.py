@@ -12,7 +12,7 @@ import lexer
 tokens = lexer.tokens
 import threeAC
 
-TAC = threeAC.threeAC()
+TAC = threeAC.ThreeAC()
 identifier = {}
 identifierList = []
 
@@ -279,37 +279,25 @@ def p_markerlabel(p):
     p[0] = {
     'label': TAC.newLabel()
     }
-    TAC.emit('label',p[0]['label'],'','')
+    # TAC.emit('label'  ,p[0]['label'],'','')
 
 def p_markerif(p):
     '''markerif : empty'''
     if p[-1]['cond']['type']!='BOOLEAN':
         msg_error(p,'Condition expressions must be boolean type')
 
-    TAC.emit('ifgoto','==',p[-1]['cond']['place'],'0',p[-1]['truelabel'])
-    TAC.emit('goto',p[-1]['falselabel'],'','')
+    # TAC.emit('ifgoto','==',p[-1]['cond']['place'],'0',p[-1]['truelabel'])
+    # TAC.emit('goto',p[-1]['falselabel'],'','')
 
 def p_markerjump(p):
     '''markerjump : empty'''
-    TAC.emit('goto',p[-1]['endlabel'],'','')
+    # TAC.emit('goto',p[-1]['endlabel'],'','')
 
 def p_markerend(p):
     '''markerend : empty'''
     p[0] = {
     'label': TAC.newLabel()
     }
-
-def p_ifStmt(p):
-    '''ifStmt : IF markerend condStmt markerif elifStmt elseStmt'''
-    p[0] = {
-    'inline': False,
-    'type': p[1],
-    'cond': p[3]['cond'],
-    'then': p[3]['then'],
-    'elif': p[5],
-    'else': p[6]
-    }
-    TAC.emit('label',p[1]['label'],'','')
 
 def p_whenStmt(p):
     '''whenStmt : WHEN condStmt markerif elifStmt elseStmt'''
@@ -321,10 +309,22 @@ def p_whenStmt(p):
     'elif': p[4],
     'else': p[5]
     }
-    if p[2]['type']!='BOOLEAN':
-        msg_error(p,'Condition expressions must be boolean type')
-    TAC.emit('ifgoto','==',p[2]['cond']['place'],'0',p[2]['truelabel'])
-    TAC.emit('goto',p[2]['falselabel'])
+    # if p[2]['type']!='BOOLEAN':
+    #     msg_error(p,'Condition expressions must be boolean type')
+    #     TAC.emit('ifgoto','==',p[2]['cond']['place'],'0',p[2]['truelabel'])
+    #     TAC.emit('goto',p[2]['falselabel'])
+
+def p_ifStmt(p):
+    '''ifStmt : IF markerend condStmt markerif elifStmt elseStmt'''
+    p[0] = {
+    'inline': False,
+    'type': p[1],
+    'cond': p[3]['cond'],
+    'then': p[3]['then'],
+    'elif': p[5],
+    'else': p[6]
+    }
+    # TAC.emit('label',p[1]['label'],'','')
 
 def p_condStmt(p):
     '''condStmt : expr COLON markerlabel suite markerjump markerlabel'''
@@ -334,7 +334,7 @@ def p_condStmt(p):
     'then': p[4],
     'falselabel': p[6]['label'],
     'truelabel': p[3]['label'],
-    'endlabel': p[-1]['label']
+    # 'endlabel': p[-1]['label']
     }
 
 def p_elseStmt(p):
