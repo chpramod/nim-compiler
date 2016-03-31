@@ -1,4 +1,4 @@
-class threeAC:
+class ThreeAC:
 	def __init__(self):
 		self.code = []
 		self.labelCount = -1
@@ -9,8 +9,8 @@ class threeAC:
 	def emit(self,op,dest,src1,src2):
 		self.code.append([op,dest,src1,src2])
 
-	def emitif(self,ifgoto,op,src1,src2,destlabel):
-		self.code.append([ifgoto,op,src1,src2,destlabel])
+	def emit(self,ifgoto,op,src1,src2,destLabel):
+		self.code.append([ifgoto,op,src1,src2,destLabel])
 
 	def newLabel(self):
 		self.labelCount += 1
