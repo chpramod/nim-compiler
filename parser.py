@@ -16,15 +16,6 @@ TAC = threeAC.ThreeAC()
 identifier = {}
 identifierList = []
 
-
-# initialising TAC GLOBALLY
-
-TAC = threeAC.ThreeAC()
-
-
-
-
-
 def p_start(p):
 #ignored extra
 #module = stmt ^* (';' / IND{=})
