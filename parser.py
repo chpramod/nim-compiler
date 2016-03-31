@@ -279,14 +279,19 @@ def p_markerlabel(p):
     p[0] = {
     'label': TAC.newLabel()
     }
+    TAC.emit('label',p[0]['label'],'','')
 
 def p_markerif(p):
     '''markerif : empty'''
     if p[-1]['cond']['type']!='BOOLEAN':
         msg_error(p,'Condition expressions must be boolean type')
-    TAC.emit('==',p[-1]['cond']['place'],'0',p[-1]['truelabel'])
+
+    TAC.emit('ifgoto','==',p[-1]['cond']['place'],'0',p[-1]['truelabel'])
     TAC.emit('goto',p[-1]['falselabel'],'','')
 
+def p_markerjump(p):
+    '''markerjump : empty'''
+    TAC.emit('goto',p[-1]['endlabel'],'','')
 
 def p_markerend(p):
     '''markerend : empty'''
@@ -295,15 +300,16 @@ def p_markerend(p):
     }
 
 def p_ifStmt(p):
-    '''ifStmt : IF condStmt markerif elifStmt elseStmt'''
+    '''ifStmt : IF markerend condStmt markerif elifStmt elseStmt'''
     p[0] = {
     'inline': False,
     'type': p[1],
-    'cond': p[2]['cond'],
-    'then': p[2]['then'],
-    'elif': p[4],
-    'else': p[5]
+    'cond': p[3]['cond'],
+    'then': p[3]['then'],
+    'elif': p[5],
+    'else': p[6]
     }
+    TAC.emit('label',p[1]['label'],'','')
 
 def p_whenStmt(p):
     '''whenStmt : WHEN condStmt markerif elifStmt elseStmt'''
@@ -321,13 +327,14 @@ def p_whenStmt(p):
     TAC.emit('goto',p[2]['falselabel'])
 
 def p_condStmt(p):
-    '''condStmt : expr COLON markerlabel suite markerlabel'''
+    '''condStmt : expr COLON markerlabel suite markerjump markerlabel'''
     p[0] = {
     'inline': False,
     'cond': p[1],
     'then': p[4],
+    'falselabel': p[6]['label'],
     'truelabel': p[3]['label'],
-    'falselabel': p[5]['label']
+    'endlabel': p[-1]['label']
     }
 
 def p_elseStmt(p):
