@@ -159,30 +159,64 @@ def p_exprStmt(p):
     #             | IDENTIFIER EQUALS expr'''
     '''exprStmt : simpleExpr exprStmtInter'''
 
-    print "exprStmt has %d len"%(len(p))
-    if len(p)==2:
-        p[0]=p[1]
-    return
     p[0] = {
-	      'place' : 'undef',
-	      'type' : 'ERROR_TYPE'
-    }
-    if p[3]['type'] == 'ERROR_TYPE':
-        return
-    #identifier will have attri. name, type and place
-    lhsIdentifier=p[1]['name']
-    lhsType=p[1]['type']
-    lhsPlace=p[1]['place']
-    if lhsType!=p[3]['type']:
-        msg_error('Type mismatch in assignment with variable (%s)!'%lhsIdentifier)
-    else:
-        print "=, %s, %s" %(p[1]['place'],p[3]['place'])
+        'type': p[2]['type'],
+        'value': None,
+        'place': None
+        }
+
+    # print "exprStmt has %d len"%(len(p))
+    # if len(p)==2:
+    #     p[0]=p[1]
+    # return
+    # p[0] = {
+	   #    'place' : 'undef',
+	   #    'type' : 'ERROR_TYPE'
+    # }
+    # if p[3]['type'] == 'ERROR_TYPE':
+    #     return
+    # #identifier will have attri. name, type and place
+    # lhsIdentifier=p[1]['name']
+    # lhsType=p[1]['type']
+    # lhsPlace=p[1]['place']
+    # if lhsType!=p[3]['type']:
+    #     msg_error('Type mismatch in assignment with variable (%s)!'%lhsIdentifier)
+    # else:
+    #     print "=, %s, %s" %(p[1]['place'],p[3]['place'])
 
 
 def p_exprStmtInter(p):
     ''' exprStmtInter : EQUALS expr
                       | expr exprStmtInter2 doBlocks
                       | empty'''
+
+    if len(p)==2:
+        p[0] = {
+        'type': None,
+        'value': None,
+        'place': None
+        }
+    elif(len(p) == 3):
+        if p[2]['type']=='ERROR_TYPE' :
+            msg_error(p,'Unsupported type')
+        elif p[2]['place']==None:
+            p[0] = {
+            'type': p[2]['type'],
+            'value': p[1],
+            'place': p[2]['place']
+            }
+        # elif p[2]['type']!=p[-1]['type']:            ##p[-1] can be identifier and p[2] can be literal as in a = 4
+        #     msg_error(p,'Type mismatch')
+        else:
+            # temp = TAC.createTemp()
+            TAC.emit('=',p[-1]['place'],p[2]['place'],'')
+            p[0] = {
+            'type': p[2]['type'],
+            'value': None,
+            'place': None
+            }
+    else :
+        msg_error(p,'not implemented right now')
 
 
 def p_exprStmtInter2(p):
@@ -1146,7 +1180,10 @@ def p_identOrLiteral(p):
 
     p[0] = p[1]
     temp = TAC.createTemp()
-    TAC.emit('=',temp,p[1],'')
+
+    print "identorliteral", temp
+
+    TAC.emit('=',temp,p[1]['place'],'')
     p[0] = {
     'type': (p[1]['type'] if p[1]!=None else None),
     'value': p[1],
@@ -1237,6 +1274,7 @@ def p_symbol(p):
                 | TYPE
                 | BOOLEAN'''
     temp = TAC.createTemp()
+    print "symbol fdfdfd", temp
     TAC.emit('=',temp,p[1],'')
     p[0] = {
     'type': p.slice[1].type,
@@ -1257,7 +1295,9 @@ def p_literal(p):# was INTLIT in place of INT
                 | NIL'''
 
     temp = TAC.createTemp()
-    TAC.emit('=',temp,p.slice[1].type,'')
+    # print "^^^&&&^^^",temp,p[1], "^^^&&&^^^"
+    TAC.emit('=',temp,p[1],'')
+    
     p[0] = {
     'type': 'int',
     'value': p[1],
@@ -1573,8 +1613,8 @@ if __name__ == "__main__":
     filename, inputFile = argv
     testYacc(inputFile)
 
-    # to print TAC code
-    TAC.printCode()
+    # # to print TAC code
+    # TAC.printCode()
 
 
     #code to get reduced rules as an output file
