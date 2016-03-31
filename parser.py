@@ -4,6 +4,7 @@ import logging
 import sys, re
 from collections import defaultdict
 from pprint import pprint
+import threeAC
 #get tokens
 #import lexer #as ourLexer# our lexer
 # tokens = lexer.tok_data
@@ -12,6 +13,15 @@ tokens = lexer.tokens
 
 identifier = {}
 identifierList = []
+
+
+# initialising TAC GLOBALLY
+
+TAC = threeAC.ThreeAC()
+
+
+
+
 
 def p_start(p):
 #ignored extra
@@ -1545,6 +1555,11 @@ if __name__ == "__main__":
     from sys import argv
     filename, inputFile = argv
     testYacc(inputFile)
+
+    # to print TAC code
+    TAC.printCode()
+
+
     #code to get reduced rules as an output file
     actionfile = open("actionfile.txt", 'w')
     with open("parselog.txt") as f:
