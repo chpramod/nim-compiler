@@ -1160,6 +1160,8 @@ def p_identOrLiteral(p):
     #                     | lhs'''
 
     p[0] = p[1]
+
+    print p[1], "^^&&&&^^"
     temp = TAC.createTemp()
     TAC.emit('=',temp,p[1],'','')
     p[0] = {
