@@ -9,7 +9,9 @@ from pprint import pprint
 # tokens = lexer.tok_data
 import lexer
 tokens = lexer.tokens
+import threeAC
 
+TAC = threeAC.threeAC()
 identifier = {}
 identifierList = []
 
@@ -265,25 +267,25 @@ def p_finallyInter(p):
 def p_markerlabel(p):
     '''markerlabel : empty'''
     p[0] = {
-    'label': ST.newLabel()
+    'label': TAC.newLabel()
     }
 
 def p_markerif(p):
     '''markerif : empty'''
-    if p[-1]['type']!='BOOLEAN':
+    if p[-1]['cond']['type']!='BOOLEAN':
         msg_error(p,'Condition expressions must be boolean type')
-    TAC.emit('ifgoto','==',p[-1]['cond']['place'],'0',p[-1]['truelabel'])
-    TAC.emit('goto',p[-1]['falselabel'])
-    
+    TAC.emit('==',p[-1]['cond']['place'],'0',p[-1]['truelabel'])
+    TAC.emit('goto',p[-1]['falselabel'],'','')
+
 
 def p_markerend(p):
     '''markerend : empty'''
     p[0] = {
-    'label': ST.newLabel()
+    'label': TAC.newLabel()
     }
 
 def p_ifStmt(p):
-    '''ifStmt : IF condStmt markerif elifStmt elseStmt markerend'''
+    '''ifStmt : IF condStmt markerif elifStmt elseStmt'''
     p[0] = {
     'inline': False,
     'type': p[1],
@@ -294,7 +296,7 @@ def p_ifStmt(p):
     }
 
 def p_whenStmt(p):
-    '''whenStmt : WHEN condStmt markerif elifStmt elseStmt markerend'''
+    '''whenStmt : WHEN condStmt markerif elifStmt elseStmt'''
     p[0] = {
     'inline': False,
     'type': p[1],
@@ -545,7 +547,12 @@ def p_strings(p):
     '''strings : STRLIT
                 | RSTRLIT
                 | TRIPLESTRLIT'''
-    p[0] = p[1]
+    temp = TAC.createTemp()
+    TAC.emit('=',temp,p[1],'')
+    p[0]={
+    'type': 'STRING',
+    'place': temp
+    }
 
 def p_expr(p):
     '''expr : ifExpr
@@ -779,18 +786,19 @@ def p_cmpExpr(p):
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
-    elif p[1]['type']=='BOOLEAN':        
+    elif p[1]['type']=='BOOLEAN':
         msg_error(p,"Boolean not allowed in comparision statements")
     else:
         temp = TAC.createTemp()
         label1 = TAC.newLabel()
         label2 = TAC.newLabel()
-        TAC.emit('ifgoto',p[2]['value'],p[1]['place'],p[2]['place'],label1['name'])
-        TAC.emit('=', temp, 0)
-        TAC.emit("goto", label2['name'])
-        TAC.emit("label", label1['name'])
-        TAC.emit('=', temp, 1)
-        TAC.emit("label", label2['name'])
+        # print p[1],p[2],"hi"
+        TAC.emitif('ifgoto',p[2]['value'],p[1]['place'],p[2]['place'],label1)
+        TAC.emit('=', temp, 0,'')
+        TAC.emit("goto", label2,'','')
+        TAC.emit("label", label1,'','')
+        TAC.emit('=', temp, 1,'')
+        TAC.emit("label", label2,'','')
         p[0] = {
         'type': 'BOOLEAN',
         'place': temp
@@ -1100,7 +1108,7 @@ def p_interPrefixOperator(p):
         }
     else :
         msg_error(p,'currently interPrefixOperator -> empty')
-        
+
 def p_interPrimarySuffix(p):
     '''interPrimarySuffix : primarySuffix interPrimarySuffix
                             | empty '''
@@ -1130,9 +1138,9 @@ def p_identOrLiteral(p):
 
     p[0] = p[1]
     temp = TAC.createTemp()
-    TAC.emit('=',temp,p[1],'','')
+    TAC.emit('=',temp,p[1],'')
     p[0] = {
-    'type': p[1]['type'],
+    'type': (p[1]['type'] if p[1]!=None else None),
     'value': p[1],
     'place': temp
         }
@@ -1220,10 +1228,15 @@ def p_symbol(p):
                 | ADDR
                 | TYPE
                 | BOOLEAN'''
-    p[0] = p[1]
+    temp = TAC.createTemp()
+    TAC.emit('=',temp,p[1],'')
+    p[0] = {
+    'type': p.slice[1].type,
+    'place': temp
+    }
 
 def p_literal(p):# was INTLIT in place of INT
-    '''literal : int             
+    '''literal : INTLIT
                 | INT8LIT
                 | INT16LIT
                 | INT32LIT
@@ -1234,10 +1247,15 @@ def p_literal(p):# was INTLIT in place of INT
                 | CHARLIT
                 | strings
                 | NIL'''
-    
-    p[0] = p[1]
 
-    
+    temp = TAC.createTemp()
+    TAC.emit('=',temp,p.slice[1].type,'')
+    p[0] = {
+    'type': 'int',
+    'value': p[1],
+    'place': temp
+    }
+
 # def p_par(p):
 
 def p_int(p):
@@ -1539,6 +1557,7 @@ def testYacc(inputFile):
     customLexer = lexer.customLexer()
     result=parser.parse(data, lexer=customLexer, debug=log)
     pprint(result)
+    TAC.printCode()
     # parser.parse(program, lexer=lexer, debug=1)
 
 if __name__ == "__main__":
