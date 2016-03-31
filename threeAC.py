@@ -11,7 +11,7 @@ class ThreeAC:
 	def emit(self,ifgoto,op,src1,src2,destLabel):
 		self.code.append([ifgoto,op,src1,src2,destLabel])
 
-	def createLabel(self):
+	def newLabel(self):
 		self.labelCount += 1
 		return self.labelPrefix+str(self.labelCount)
 	def printCode(self):
