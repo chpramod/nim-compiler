@@ -215,6 +215,7 @@ def p_exprStmtInter(p):
             'value': None,
             'place': None
             }
+            p[-1] = p[2]
     else :
         msg_error(p,'not implemented right now')
 
@@ -340,27 +341,42 @@ def p_whenStmt(p):
     #     TAC.emit('goto',p[2]['falselabel'])
 
 def p_ifStmt(p):
-    '''ifStmt : IF markerend condStmt markerif elifStmt elseStmt'''
-    p[0] = {
-    'inline': False,
-    'type': p[1],
-    'cond': p[3]['cond'],
-    'then': p[3]['then'],
-    'elif': p[5],
-    'else': p[6]
-    }
-    # TAC.emit('label',p[1]['label'],'','')
+    '''ifStmt : IF  condStmt  elifStmt elseStmt ifEndLabel'''
+
+
+
 
 def p_condStmt(p):
-    '''condStmt : expr COLON markerlabel suite markerjump markerlabel'''
-    p[0] = {
-    'inline': False,
-    'cond': p[1],
-    'then': p[4],
-    'falselabel': p[6]['label'],
-    'truelabel': p[3]['label'],
-    # 'endlabel': p[-1]['label']
-    }
+    '''condStmt : expr COLON makeCondLabels1 suite endCondLabel'''
+    # p[0] = {
+    # 'inline': False,
+    # 'cond': p[1],
+    # 'then': p[4],
+    # 'truelabel': p[3]['label'],
+    # 'falselabel': p[5]['label']
+    # }
+    p[0] = p[3]
+
+def p_makeCondLabels1(p):
+    ''' makeCondLabels1 :  '''
+    label1 = TAC.makeLabel()
+    label2 = TAC.makeLabel()
+    label3 = TAC.makeLabel()
+    p[0]=[label1,label2,label3]
+    TAC.emit('ifgoto', 'eq', p[-2]['place'], 1, 'goto', label1)
+    TAC.emit('goto', label2, '', '')
+    TAC.emit('label', label1, '', '')
+
+def p_endCondLabel(p):
+    ''' endCondLabel :  '''
+    TAC.emit('goto', p[-2][2], '', '')
+    TAC.emit('label', p[-2][1], '', '')
+
+
+def p_ifEndLabel(p):
+    ''' ifEndLabel : '''
+    TAC.emit('label', p[-3][1], '', '')
+
 
 def p_elseStmt(p):
     '''elseStmt : ELSE COLON suite
