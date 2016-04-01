@@ -159,11 +159,15 @@ def p_exprStmt(p):
     #             | IDENTIFIER EQUALS expr'''
     '''exprStmt : simpleExpr exprStmtInter'''
 
+    p[1] = p[2]
+    print "for checking type and value in exprstmt \n", p[1]
+
     p[0] = {
         'type': p[2]['type'],
         'value': None,
         'place': None
         }
+
 
     # print "exprStmt has %d len"%(len(p))
     # if len(p)==2:
@@ -190,6 +194,8 @@ def p_exprStmtInter(p):
                       | expr exprStmtInter2 doBlocks
                       | empty'''
 
+
+    print "exprstmt debug", "p[2] =", p[2]
     if len(p)==2:
         p[0] = {
         'type': None,
@@ -210,12 +216,13 @@ def p_exprStmtInter(p):
         else:
             # temp = TAC.createTemp()
             TAC.emit('=',p[-1]['place'],p[2]['place'],'')
-            p[0] = {
-            'type': p[2]['type'],
-            'value': None,
-            'place': None
-            }
-            p[-1] = p[2]
+            p[0] = p[2]
+            # p[0] = {
+            # 'type': p[2]['type'],
+            # 'value': None,
+            # 'place': None
+            # }
+            
     else :
         msg_error(p,'not implemented right now')
 
@@ -1197,14 +1204,14 @@ def p_identOrLiteral(p):
     p[0] = p[1]
     temp = TAC.createTemp()
 
-    print "identorliteral", temp
+    print "identorliteral", temp, p[1]['place']
 
     TAC.emit('=',temp,p[1]['place'],'')
-    p[0] = {
-    'type': (p[1]['type'] if p[1]!=None else None),
-    'value': p[1],
-    'place': temp
-        }
+    # p[0] = {
+    # 'type': (p[1]['type'] if p[1]!=None else None),
+    # 'value': p[1],
+    # 'place': temp
+    #     }
 
 def p_lhs(p):
     '''lhs : arrayConstr
@@ -1290,11 +1297,12 @@ def p_symbol(p):
                 | TYPE
                 | BOOLEAN'''
     temp = TAC.createTemp()
-    print "symbol fdfdfd", temp
+    print "symbol fdfdfd", temp, p[1]
     TAC.emit('=',temp,p[1],'')
     p[0] = {
     'type': p.slice[1].type,
-    'place': temp
+    'place': temp,
+    'value' : p[1]
     }
 
 def p_literal(p):# was INTLIT in place of INT
@@ -1311,26 +1319,26 @@ def p_literal(p):# was INTLIT in place of INT
                 | NIL'''
 
     temp = TAC.createTemp()
-    # print "^^^&&&^^^",temp,p[1], "^^^&&&^^^"
+    print "literal ---",temp,p[1]
     TAC.emit('=',temp,p[1],'')
     
     p[0] = {
-    'type': 'int',
+    'type': p.slice[1].type,
     'value': p[1],
     'place': temp
     }
 
 # def p_par(p):
 
-def p_int(p):
-    ''' int : INTLIT '''
-    temp = TAC.createTemp()
-    TAC.emit('=',temp,p[1],'','')
-    p[0] = {
-    'type': 'int',
-    'value': p[1],
-    'place': temp
-    }
+# def p_int(p):
+#     ''' int : INTLIT '''
+#     temp = TAC.createTemp()
+#     TAC.emit('=',temp,p[1],'','')
+#     p[0] = {
+#     'type': 'int',
+#     'value': p[1],
+#     'place': temp
+#     }
 
 def p_doBlocks(p):
     '''doBlocks : doBlock NEWLINE doBlocks
@@ -1621,6 +1629,7 @@ def testYacc(inputFile):
     customLexer = lexer.customLexer()
     result=parser.parse(data, lexer=customLexer, debug=log)
     pprint(result)
+    print "now printing TAC code"
     TAC.printCode()
     # parser.parse(program, lexer=lexer, debug=1)
 
