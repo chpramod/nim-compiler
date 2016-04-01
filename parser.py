@@ -159,8 +159,9 @@ def p_exprStmt(p):
     #             | IDENTIFIER EQUALS expr'''
     '''exprStmt : simpleExpr exprStmtInter'''
 
-    p[1] = p[2]
-    print "for checking type and value in exprstmt \n", p[1]
+    p[1] = p[2]                                                     ## MUST BE DEALT using Symbol table
+    print "for checking type and value in exprstmt \n"
+    print "p[1] =", p[1], "p[2] = ", p[2]
 
     p[0] = {
         'type': p[2]['type'],
@@ -195,7 +196,7 @@ def p_exprStmtInter(p):
                       | empty'''
 
 
-    print "exprstmt debug", "p[2] =", p[2]
+    print "exprstmtinter debug", "p[2] =", p[2]
     if len(p)==2:
         p[0] = {
         'type': None,
@@ -203,16 +204,12 @@ def p_exprStmtInter(p):
         'place': None
         }
     elif(len(p) == 3):
+
+        p[0] = p[2]
+
         if p[2]['type']=='ERROR_TYPE' :
             msg_error(p,'Unsupported type')
-        elif p[2]['place']==None:
-            p[0] = {
-            'type': p[2]['type'],
-            'value': p[1],
-            'place': p[2]['place']
-            }
-        # elif p[2]['type']!=p[-1]['type']:            ##p[-1] can be identifier and p[2] can be literal as in a = 4
-        #     msg_error(p,'Type mismatch')
+        
         else:
             # temp = TAC.createTemp()
             TAC.emit('=',p[-1]['place'],p[2]['place'],'')
@@ -366,11 +363,13 @@ def p_condStmt(p):
 
 def p_makeCondLabels1(p):
     ''' makeCondLabels1 :  '''
-    label1 = TAC.makeLabel()
-    label2 = TAC.makeLabel()
-    label3 = TAC.makeLabel()
+    label1 = TAC.newLabel()
+    label2 = TAC.newLabel()
+    label3 = TAC.newLabel()
     p[0]=[label1,label2,label3]
-    TAC.emit('ifgoto', 'eq', p[-2]['place'], 1, 'goto', label1)
+    print "in p_makeCondLabels1 p[-2] = ", p[-2] 
+    # TAC.emitif('ifgoto', 'eq', p[-2], 1, label1)
+    TAC.emitif('ifgoto', 'eq', p[-2]['place'], 1, label1)
     TAC.emit('goto', label2, '', '')
     TAC.emit('label', label1, '', '')
 
@@ -382,7 +381,7 @@ def p_endCondLabel(p):
 
 def p_ifEndLabel(p):
     ''' ifEndLabel : '''
-    TAC.emit('label', p[-3][1], '', '')
+    TAC.emit('label', p[-3][2], '', '')
 
 
 def p_elseStmt(p):
@@ -398,18 +397,14 @@ def p_elseStmt(p):
         p[0] = p[1]
 
 def p_elifStmt(p):
-    '''elifStmt : ELIF condStmt markerif elifStmt
+    '''elifStmt : ELIF condStmt elifStmt elifEndLabel
                     | empty'''
-    if len(p) > 2:
-        p[0] = {
-        'inline': False,
-        'type': p[1],
-        'cond': p[2]['cond'],
-        'then': p[2]['then'],
-        'next': p[4]
-        }
-    else:
-        p[0] = p[1]
+    p[0] = p[-1]
+
+def p_elifEndLabel(p):
+    ''' elifEndLabel : '''
+    TAC.emit('label', p[-2][2], '', '')
+
 
 def p_exprList(p):
     '''exprList : expr COMMA exprList
@@ -1319,7 +1314,7 @@ def p_literal(p):# was INTLIT in place of INT
                 | NIL'''
 
     temp = TAC.createTemp()
-    print "literal ---",temp,p[1]
+    print "literal ---",temp,p[1], p.slice[1].type
     TAC.emit('=',temp,p[1],'')
     
     p[0] = {
