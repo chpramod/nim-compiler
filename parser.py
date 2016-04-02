@@ -424,30 +424,60 @@ def p_exprList(p):
     else:
         p[0] = [p[1]]
 
+def p_MarkerCase(p):
+    '''MarkerCase : '''
+    p[0] = {
+    'expr': p[-4],
+    'endlabel':TAC.newLabel()
+    }
+
+def p_MarkerCaseEnd(p):
+    '''MarkerCaseEnd : '''
+    TAC.emit('label',p[-5]['endlabel'],'','')
+
+def p_MarkerExpr(p):
+    '''MarkerExpr : '''
+    p[0] ={
+    'endlabel': p[-4]['endlabel'],
+    'nextlabel': TAC.newLabel()
+    }
+    temp = TAC.newLabel()
+    for expr in p[-2]:
+        TAC.emitif('ifgoto','!=',expr['place'],p[-4]['expr'],p[0]['nextlabel'])
+
+def p_OfMarkerEnd(p):
+    '''OfMarkerEnd : '''
+    TAC.emit('goto',p[-2]['endlabel'],'','')
+    TAC.emit('label',p[-2]['nextlabel'],'','')
+
 def p_ofBranch(p):
-    '''ofBranch : OF exprList COLON suite'''
+    '''ofBranch : OF exprList COLON MarkerExpr suite OfMarkerEnd'''
     p[0] = {
     'cond': p[2],
-    'then': p[4]
+    'then': p[4],
+    'expr': p[-1]['expr'],
+    'endlabel' : p[-1]['endlabel']
     }
 
 def p_ofBranches(p):
     '''ofBranches : ofBranch ofBranches
                     | ofBranch'''
+    expr = p[-1]
+
     if len(p) > 2:
         p[0] = [p[1]] + p[2]
     else:
         p[0] = [p[1]]
 
 def p_caseStmt(p):
-    '''caseStmt : CASE expr COLON NEWLINE INDGR ofBranches elifStmt elseStmt INDLE'''
+    '''caseStmt : CASE expr COLON NEWLINE INDGR MarkerCase ofBranches elifStmt elseStmt INDLE MarkerCaseEnd'''
     p[0] = {
     'inline': False,
     'type': p[1],
     'case': p[2],
-    'branches': [p[5]] + p[6],
-    'elif': p[7],
-    'else': p[8]
+    'branches': p[7],
+    'elif': p[8],
+    'else': p[9]
     }
 
 def p_echoStmt(p):
@@ -456,7 +486,8 @@ def p_echoStmt(p):
     'type': p[1],
     'echo': p[2]
     }
-    TAC.emit('print',p[1]['place','',''])
+    for expr in p[2]:
+        TAC.emit('print',expr['place'],'','')
 
 def p_importStmt(p):
     '''importStmt : IMPORT exprList
@@ -503,9 +534,9 @@ def p_returnStmt(p):
         'return': None
         }
     if len(p) > 2:
-        TAC.emit('ret',(p[1]['place'],'','')
+        TAC.emit('ret',p[1]['place'],'','')
     else:
-        TAC.enit('ret','','','')
+        TAC.emit('ret','','','')
 
 def p_raiseStmt(p):
     '''raiseStmt : RAISE expr
@@ -1641,6 +1672,7 @@ def p_error(p):
     global msg
 	# global haltExecution
 	# haltExecution = True
+    print p
     try:
 		print "Syntax Error near '"+str(p.stack[-1].value)+ "' in line "+str(p.stack[-1].lineno) + str(msg)
     except:
