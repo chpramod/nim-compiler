@@ -251,10 +251,6 @@ def p_endWhileLabel(p):
     ''' endWhileLabel :  '''
     TAC.emit('label', p[-1][2], '', '')
 
-def p_endWhileLabel(p):
-    ''' endWhileLabel :  '''
-    TAC.emit('label', p[-1][2], '', '')
-
 def p_identWithPragmaInter(p):
     '''identWithPragmaInter : COMMA identWithPragma identWithPragmaInter
                             | empty'''
