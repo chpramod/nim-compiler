@@ -250,8 +250,8 @@ def p_whileStmt(p):
     p[0] = {
     'inline': False,
     'type': p[1],
-    'cond': p[3]['cond'],
-    'then': p[3]['then']
+    'cond': p[3],
+    'then': p[6]
     }
 
 def p_whileStartLabel(p):
@@ -264,8 +264,8 @@ def p_whileStartLabel(p):
 
 def p_whileEndLabel(p):
     '''whileEndLabel : '''
-    TAC.emit('goto',p[-2]['start'],'','')
-    TAC.emit('label',p[-2]['end'],'','')
+    TAC.emit('goto',p[-5]['start'],'','')
+    TAC.emit('label',p[-5]['end'],'','')
 
 def p_identWithPragmaInter(p):
     '''identWithPragmaInter : COMMA identWithPragma identWithPragmaInter
