@@ -328,6 +328,18 @@ def generateIndentation(lexer):
             temp = tok_data[-1]
             if temp.type=="NEWLINE":
                 del tok_data[-1]
+        elif tok.value=='>':
+            tok.value = 'gr'
+        elif tok.value=='<':
+            tok.value = 'le'
+        elif tok.value=='<=':
+            tok.value = 'leq'
+        elif tok.value=='>=':
+            tok.value = 'geq'
+        elif tok.value=='==':
+            tok.value = 'eq'
+        elif tok.value=='!=':
+            tok.value = 'neq'
             # elif temp.type!="INDGR":
             #     t_error(tok)
         tok.lineno = lineno

@@ -20,7 +20,7 @@ class St:
             'parent':self.curScope,
             'identifiers':{}
         }
-        self,curScope=nameBlock
+        self.curScope=nameBlock
 
     def endBlock(self):
         self.curScope=self.St[self.curScope]['parent']
@@ -31,15 +31,15 @@ class St:
 
     def addIden(self, idenName, place, idenType):
         self.St[self.curScope]['identifiers'][idenName]={
-            'place'=place,
-            'type'=idenType
+            'place':place,
+            'type':idenType
         }
 
     def getIden(self, idenName):
         idenScope = self.getIdenScope(idenName)
         if idenScope!=None:
             #returns all attributes of identifier
-            return self.St.[idenScope]['identifiers'][idenName].get(idenName)
+            return self.St[idenScope]['identifiers'][idenName].get(idenName)
 
         else:
             return None
@@ -56,11 +56,11 @@ class St:
     def getIdenAttr(self, idenName, attrName):
         idenScope = self.getIdenScope(idenName)
         if idenScope!=None:
-            return self.St.[idenScope]['identifier'][idenName].get(attrName)
+            return self.St[idenScope]['identifier'][idenName].get(attrName)
         else:
             return None
 
     def setidenAttr(self, idenName, attrName, attrVal):
         idenScope = self.getIdenScope(idenName)
         if idenScope!=None:
-            self.St.[idenScope]['identifiers'][idenName][attrName]=attrVal
+            self.St[idenScope]['identifiers'][idenName][attrName]=attrVal

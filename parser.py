@@ -5,6 +5,7 @@ import sys, re
 from collections import defaultdict
 from pprint import pprint
 import threeAC
+import st
 #get tokens
 #import lexer #as ourLexer# our lexer
 # tokens = lexer.tok_data
@@ -13,6 +14,7 @@ tokens = lexer.tokens
 import threeAC
 
 TAC = threeAC.ThreeAC()
+ST = st.St()
 identifier = {}
 identifierList = []
 
@@ -47,11 +49,19 @@ def p_stmtStar(p):                      # changed a bit
 
 def p_suite(p):                         # changed it too
     '''suite : simpleStmt
-                  | NEWLINE INDGR stmtStar INDLE'''
+                  | NEWLINE INDGR markerSuite stmtStar INDLE'''
+
+    ST.endBlock()
+    #print ST.curScope
     if len(p) > 2:
         p[0] = p[3]
     else:
         p[0] = [p[1]]
+
+def p_markerSuite(p):
+    '''markerSuite : empty'''
+    ST.addBlock()
+    #print ST.curScope
 
 def p_typeDefSuite(p):                         # changed it too
     '''typeDefSuite : typeDef
@@ -209,7 +219,7 @@ def p_exprStmtInter(p):
 
         if p[2]['type']=='ERROR_TYPE' :
             msg_error(p,'Unsupported type')
-        
+
         else:
             # temp = TAC.createTemp()
             TAC.emit('=',p[-1]['place'],p[2]['place'],'')
@@ -219,7 +229,7 @@ def p_exprStmtInter(p):
             # 'value': None,
             # 'place': None
             # }
-            
+
     else :
         msg_error(p,'not implemented right now')
 
@@ -367,7 +377,7 @@ def p_makeCondLabels1(p):
     label2 = TAC.newLabel()
     label3 = TAC.newLabel()
     p[0]=[label1,label2,label3]
-    print "in p_makeCondLabels1 p[-2] = ", p[-2] 
+    print "in p_makeCondLabels1 p[-2] = ", p[-2]
     # TAC.emitif('ifgoto', 'eq', p[-2], 1, label1)
     TAC.emitif('ifgoto', 'eq', p[-2]['place'], 1, label1)
     TAC.emit('goto', label2, '', '')
@@ -1316,7 +1326,7 @@ def p_literal(p):# was INTLIT in place of INT
     temp = TAC.createTemp()
     print "literal ---",temp,p[1], p.slice[1].type
     TAC.emit('=',temp,p[1],'')
-    
+
     p[0] = {
     'type': p.slice[1].type,
     'value': p[1],
