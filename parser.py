@@ -240,6 +240,9 @@ def p_exprStmtInter2(p):
 
 def p_makeCondLabelsLoop(p):
     ''' makeCondLabelsLoop :  '''
+    if p[-2]==None:
+        msg_error(p,"Error in Case Expression")
+        return
     TAC.emitif('ifgoto', 'neq', p[-2]['place'], 1, p[-3]['end'])
 
 def p_whileStmt(p):
