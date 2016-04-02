@@ -239,13 +239,17 @@ def p_exprStmtInter2(p):
                        | empty '''
 
 def p_whileStmt(p):
-    '''whileStmt : WHILE condStmt'''
+    '''whileStmt : WHILE condStmt endWhileLabel'''
     p[0] = {
     'inline': False,
     'type': p[1],
     'cond': p[2]['cond'],
     'then': p[2]['then']
     }
+
+def p_endWhileLabel(p):
+    ''' endWhileLabel :  '''
+    TAC.emit('label', p[-1][2], '', '')
 
 def p_identWithPragmaInter(p):
     '''identWithPragmaInter : COMMA identWithPragma identWithPragmaInter
