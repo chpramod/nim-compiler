@@ -1407,10 +1407,13 @@ def p_typeKeyww(p):
     p[0] = {
         'type': None
     }
-    if p[1]=='INT':
+    if p[1]=='int':
         p[0]['type']='INTLIT'
-    elif p[1]=='BOOL':
+    elif p[1]=='bool':
         p[0]['type']='BOOLEAN'
+
+    print 'hi'
+    print p[0]['type']
 
 def p_paramListColon(p):
     ''' paramListColon : paramListInter
@@ -1547,7 +1550,7 @@ def p_varTupleInter(p) :
 def p_identColonEquals(p) :
     ''' identColonEquals : identColonEqualsInter1 identColonEqualsInter2 identColonEqualsInter3 identColonEqualsInter4  '''
     p[0] = { # Not sure what identColonEqualsInter2 does
-    'varlist': p[2]['varlist']
+    'varlist': p[2]['varlist'],
      'type': None,
      'value': None
     }
@@ -1566,14 +1569,17 @@ def p_identColonEquals(p) :
         for i in p[0]['varlist']:
             ST.setidenAttr(i,'place',p[4]['place'])
             ST.setidenAttr(i,'type',p[4]['type'])
+
+
+    print ST.St[ST.curScope]['identifiers']
     # print p[2]['varlist']
-    print p[0]['varlist']
-    for i in p[2]['varlist']:
-        if i in identifierList:
-            msg_error(p,"Redeclaring Variable \"" + str(i) + "\"")
-        else:
-            # identifier[i] = {'type': p[3], 'value': p[4]}
-            identifierList.append(i)
+    # print p[0]['varlist']
+    # for i in p[2]['varlist']:
+    #     if i in identifierList:
+    #         msg_error(p,"Redeclaring Variable \"" + str(i) + "\"")
+    #     else:
+    #         # identifier[i] = {'type': p[3], 'value': p[4]}
+    #         identifierList.append(i)
 
 def p_identColonEqualsInter1(p) :
     ''' identColonEqualsInter1 : identOrLiteral'''
@@ -1603,8 +1609,10 @@ def p_identColonEqualsInter3(p) :
         p[0] = p[2]
     else:
         p[0]={
-            'type'= None
+            'type':None
         }
+
+    print p[0]['type']
 
 def p_identColonEqualsInter4(p) :
     ''' identColonEqualsInter4 : empty
@@ -1613,7 +1621,7 @@ def p_identColonEqualsInter4(p) :
         p[0] = p[2]
     else:
         p[0]={
-            'type'= None
+            'type': None
         }
 msg = ''
 
