@@ -169,8 +169,10 @@ def p_exprStmt(p):
     #             | IDENTIFIER EQUALS expr'''
     '''exprStmt : simpleExpr exprStmtInter'''
 
-    p[1] = p[2]                                                     ## MUST BE DEALT using Symbol table
-    print "for checking type and value in exprstmt \n"
+    p[1] = p[2]
+
+                                                         ## MUST BE DEALT using Symbol table
+    print "for checking type and value in exprstmt \n"              ## Assuming it computes only identifier = expr type only
     print "p[1] =", p[1], "p[2] = ", p[2]
 
     p[0] = {
@@ -180,24 +182,7 @@ def p_exprStmt(p):
         }
 
 
-    # print "exprStmt has %d len"%(len(p))
-    # if len(p)==2:
-    #     p[0]=p[1]
-    # return
-    # p[0] = {
-	   #    'place' : 'undef',
-	   #    'type' : 'ERROR_TYPE'
-    # }
-    # if p[3]['type'] == 'ERROR_TYPE':
-    #     return
-    # #identifier will have attri. name, type and place
-    # lhsIdentifier=p[1]['name']
-    # lhsType=p[1]['type']
-    # lhsPlace=p[1]['place']
-    # if lhsType!=p[3]['type']:
-    #     msg_error('Type mismatch in assignment with variable (%s)!'%lhsIdentifier)
-    # else:
-    #     print "=, %s, %s" %(p[1]['place'],p[3]['place'])
+
 
 
 def p_exprStmtInter(p):
@@ -1358,15 +1343,29 @@ def p_symbol(p):
 #                | ADDR'''
 #                | BOOLEAN'''
     #           | TYPE
-    temp = TAC.createTemp()
-    #print "symbol fdfdfd", temp, p[1]
-    #TAC.emit('=',temp,p[1],'')
-    p[0] = {
-    'type': None,
-    'place': temp ,
-    'value' : p[1]
-    }
-    ST.addIden(p[0]['value'],p[0]['place'],p[0]['type'])
+
+    print "$$$$$$ \n"
+    print p[1]
+    print "$$$$$$ \n"
+
+    if(ST.getIden(p[1]) == None):
+        temp = TAC.createTemp()
+        #print "symbol fdfdfd", temp, p[1]
+        #TAC.emit('=',temp,p[1],'')
+        p[0] = {
+        'type': None,
+        'place': temp ,
+        'value' : p[1]
+        }
+        ST.addIden(p[0]['value'],p[0]['place'],p[0]['type'])
+    else :
+        iplace = ST.getIdenAttr(p[1], 'place')
+        itype = ST.getIdenAttr(p[1], 'type')
+        p[0] = {
+        'type': itype,
+        'place': iplace,
+        'value' : p[1]
+        }
 
 def p_literal(p):# was INTLIT in place of INT
     '''literal : int'''
@@ -1632,7 +1631,7 @@ def p_identColonEquals(p) :
 
     print "debug in identColonEquals"
     print ST.St[ST.curScope]['identifiers']
-    print "\n"
+    print " ^^\n"
     # print p[2]['varlist']
     # print p[0]['varlist']
     # for i in p[2]['varlist']:
