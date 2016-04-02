@@ -433,21 +433,21 @@ def p_ofBranch(p):
 
 def p_ofBranches(p):
     '''ofBranches : ofBranch ofBranches
-                    | empty'''
+                    | ofBranch'''
     if len(p) > 2:
         p[0] = [p[1]] + p[2]
     else:
         p[0] = [p[1]]
 
 def p_caseStmt(p):
-    '''caseStmt : CASE expr COLON NEWLINE INDGR ofBranch ofBranches elifStmt elseStmt INDLE'''
+    '''caseStmt : CASE expr COLON NEWLINE INDGR ofBranches elifStmt elseStmt INDLE'''
     p[0] = {
     'inline': False,
     'type': p[1],
     'case': p[2],
-    'branches': [p[6]] + p[7],
-    'elif': p[8],
-    'else': p[9]
+    'branches': [p[5]] + p[6],
+    'elif': p[7],
+    'else': p[8]
     }
 
 def p_echoStmt(p):
@@ -456,6 +456,7 @@ def p_echoStmt(p):
     'type': p[1],
     'echo': p[2]
     }
+    TAC.emit('print',p[1]['place','',''])
 
 def p_importStmt(p):
     '''importStmt : IMPORT exprList
@@ -501,6 +502,10 @@ def p_returnStmt(p):
         'type': p[1],
         'return': None
         }
+    if len(p) > 2:
+        TAC.emit('ret',(p[1]['place'],'','')
+    else:
+        TAC.enit('ret','','','')
 
 def p_raiseStmt(p):
     '''raiseStmt : RAISE expr
@@ -578,6 +583,7 @@ def p_incStmt(p):
     'type': p[1],
     'increment': p[2]
     }
+    TAC.emit('incr',p[1]['place'],'','')
 
 def p_blockStmt(p):
     '''blockStmt : BLOCK symbol COLON suite
@@ -633,7 +639,7 @@ def p_expr(p):
 # Ensure that expr type is INTLIT or BOOLEAN or NONE
 # and expr place is temporary variable or none
 def p_ifExpr(p):
-    '''ifExpr : IF condExpr elifExpr elseExpr'''
+    '''ifExpr : IF condExpr elifExpr elseExpr ifEndLabel'''
     p[0] = {
     'inline': True,
     'type': p[1],
@@ -644,7 +650,7 @@ def p_ifExpr(p):
     }
 
 def p_whenExpr(p):
-    '''whenExpr : WHEN condExpr elifExpr elseExpr'''
+    '''whenExpr : WHEN condExpr elifExpr elseExpr ifEndLabel'''
     p[0] = {
     'inline': True,
     'type': p[1],
@@ -655,7 +661,7 @@ def p_whenExpr(p):
     }
 
 def p_condExpr(p):
-    '''condExpr : expr COLON expr'''
+    '''condExpr : expr makeCondLabels1 COLON expr endCondLabel'''
     p[0] = {
     'inline': True,
     'cond': p[1],
@@ -663,15 +669,15 @@ def p_condExpr(p):
     }
 
 def p_elifExpr(p):
-    '''elifExpr : ELIF expr COLON expr elifExpr
+    '''elifExpr : ELIF condExpr elifExpr elifEndLabel
         | empty'''
     if len(p) > 2:
         p[0] = {
         'inline': True,
         'type': p[1],
-        'cond': p[2],
-        'then': p[4],
-        'next': p[5],
+        'cond': p[2]['cond'],
+        'then': p[2]['then'],
+        'next': p[3],
         }
     else:
         p[0] = p[1]
