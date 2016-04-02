@@ -206,7 +206,7 @@ def p_exprStmtInter(p):
                       | empty'''
 
 
-    print "exprstmtinter debug", "p[2] =", p[2]
+    #print "exprstmtinter debug", "p[2] =%", %(p[2])
     if len(p)==2:
         p[0] = {
         'type': None,
@@ -630,7 +630,8 @@ def p_expr(p):
             | caseExpr
             | simpleExpr'''
     p[0] = p[1]
-
+# Ensure that expr type is INTLIT or BOOLEAN or NONE
+# and expr place is temporary variable or none
 def p_ifExpr(p):
     '''ifExpr : IF condExpr elifExpr elseExpr'''
     p[0] = {
@@ -1207,11 +1208,10 @@ def p_identOrLiteral(p):
     #                     | lhs'''
 
     p[0] = p[1]
-    temp = TAC.createTemp()
+    # temp = TAC.createTemp()
+    # print "identorliteral", temp, p[1]['place']
 
-    print "identorliteral", temp, p[1]['place']
-
-    TAC.emit('=',temp,p[1]['place'],'')
+    # TAC.emit('=',temp,p[1]['place'],'')
     # p[0] = {
     # 'type': (p[1]['type'] if p[1]!=None else None),
     # 'value': p[1],
@@ -1297,34 +1297,41 @@ def p_prefixOperator(p):
     '''prefixOperator : operator'''
 
 def p_symbol(p):
-    '''symbol : IDENTIFIER
-                | ADDR
-                | TYPE
-                | BOOLEAN'''
-    temp = TAC.createTemp()
-    print "symbol fdfdfd", temp, p[1]
-    TAC.emit('=',temp,p[1],'')
+    '''symbol : IDENTIFIER'''
+#                | ADDR'''
+#                | BOOLEAN'''
+    #           | TYPE
+    #temp = TAC.createTemp()
+    #print "symbol fdfdfd", temp, p[1]
+    #TAC.emit('=',temp,p[1],'')
     p[0] = {
-    'type': p.slice[1].type,
-    'place': temp,
+    'type': None,
+    'place': None,
     'value' : p[1]
     }
+    ST.addIden(p[0]['value'],p[0]['place'],p[0]['type'])
 
 def p_literal(p):# was INTLIT in place of INT
-    '''literal : INTLIT
-                | INT8LIT
-                | INT16LIT
-                | INT32LIT
-                | INT64LIT
-                | FLOATLIT
-                | FLOAT32LIT
-                | FLOAT64LIT
-                | CHARLIT
-                | strings
-                | NIL'''
+    '''literal : int'''
+                # | INT8LIT
+                # | INT32LIT
+                # | INT16LIT
+                # | INT64LIT
+                # | FLOATLIT
+                # | FLOAT32LIT
+                # | FLOAT64LIT
+                # | CHARLIT
+                # | strings
+
+                # | NIL'''
+ #boolean also added
+    p[0]=p[1]
+def p_int(p):
+    '''int : INTLIT
+            | BOOLEAN'''
 
     temp = TAC.createTemp()
-    print "literal ---",temp,p[1], p.slice[1].type
+    # print "literal ---",temp,p[1], p.slice[1].type
     TAC.emit('=',temp,p[1],'')
 
     p[0] = {
@@ -1332,7 +1339,6 @@ def p_literal(p):# was INTLIT in place of INT
     'value': p[1],
     'place': temp
     }
-
 # def p_par(p):
 
 # def p_int(p):
@@ -1396,8 +1402,15 @@ def p_typeKeyww(p):
     ''' typeKeyww : INT
                     | FLOAT
                     | CHAR
+                    | BOOL
                     | STRING '''
-    p[0] = p[1]
+    p[0] = {
+        'type': None
+    }
+    if p[1]=='INT':
+        p[0]['type']='INTLIT'
+    elif p[1]=='BOOL':
+        p[0]['type']='BOOLEAN'
 
 def p_paramListColon(p):
     ''' paramListColon : paramListInter
@@ -1534,28 +1547,54 @@ def p_varTupleInter(p) :
 def p_identColonEquals(p) :
     ''' identColonEquals : identColonEqualsInter1 identColonEqualsInter2 identColonEqualsInter3 identColonEqualsInter4  '''
     p[0] = { # Not sure what identColonEqualsInter2 does
-    'vars': p[1],
-    'type': p[3],
-    'value': p[4]
+    'varlist': p[2]['varlist']
+     'type': None,
+     'value': None
     }
-    for i in p[0]['vars']:
+    p[0]['varlist'].append(p[1]['value'])
+    if p[3]['type']!=None and p[4]['type']!=None:
+        if p[3]['type'] != p[4]['type']:
+            msg_error(p,'Type mismatch')
+            return
+        for i in p[0]['varlist']:
+            ST.setidenAttr(i,'place',p[4]['place'])
+            ST.setidenAttr(i,'type',p[4]['type'])
+    elif p[3]['type']!=None:
+        for i in p[0]['varlist']:
+            ST.setidenAttr(i,'type',p[3]['type'])
+    elif p[4]['type']!=None:
+        for i in p[0]['varlist']:
+            ST.setidenAttr(i,'place',p[4]['place'])
+            ST.setidenAttr(i,'type',p[4]['type'])
+    # print p[2]['varlist']
+    print p[0]['varlist']
+    for i in p[2]['varlist']:
         if i in identifierList:
             msg_error(p,"Redeclaring Variable \"" + str(i) + "\"")
         else:
-            identifier[i] = {'type': p[3], 'value': p[4]}
+            # identifier[i] = {'type': p[3], 'value': p[4]}
             identifierList.append(i)
 
 def p_identColonEqualsInter1(p) :
-    ''' identColonEqualsInter1 : identOrLiteral
-                               | COMMA identOrLiteral identColonEqualsInter1'''
-    if len(p) > 2:
-        p[0] = [p[2]] + p[3]
-    else:
-        p[0] = [p[1]]
+    ''' identColonEqualsInter1 : identOrLiteral'''
+                              # | COMMA identOrLiteral identColonEqualsInter1'''
+    # if len(p) > 2:
+    #     p[0] = [p[2]] + p[3]
+    # else:
+    p[0] = p[1]
 
 def p_identColonEqualsInter2(p) :
     ''' identColonEqualsInter2 : empty
-                               | COMMA'''
+                               | COMMA identOrLiteral identColonEqualsInter2'''
+    if len(p)==2:
+        p[0]={
+        'varlist': []
+        }
+    else:
+        p[0]={
+        'varlist': p[3]['varlist']
+        }
+        p[0]['varlist'].append(p[2]['value'])
 
 def p_identColonEqualsInter3(p) :
     ''' identColonEqualsInter3 : empty
@@ -1563,7 +1602,9 @@ def p_identColonEqualsInter3(p) :
     if len(p) > 2:
         p[0] = p[2]
     else:
-        p[0] = None
+        p[0]={
+            'type'= None
+        }
 
 def p_identColonEqualsInter4(p) :
     ''' identColonEqualsInter4 : empty
@@ -1571,8 +1612,9 @@ def p_identColonEqualsInter4(p) :
     if len(p) > 2:
         p[0] = p[2]
     else:
-        p[0] = None
-
+        p[0]={
+            'type'= None
+        }
 msg = ''
 
 def msg_error(p,_msg=''):

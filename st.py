@@ -64,3 +64,4 @@ class St:
         idenScope = self.getIdenScope(idenName)
         if idenScope!=None:
             self.St[idenScope]['identifiers'][idenName][attrName]=attrVal
+        

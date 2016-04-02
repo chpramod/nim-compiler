@@ -340,6 +340,11 @@ def generateIndentation(lexer):
             tok.value = 'eq'
         elif tok.value=='!=':
             tok.value = 'neq'
+        elif tok.type=='BOOLEAN':
+            if tok.value=='true':
+                tok.value = 1
+            else:
+                tok.value = 0
             # elif temp.type!="INDGR":
             #     t_error(tok)
         tok.lineno = lineno
