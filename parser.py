@@ -323,19 +323,19 @@ def p_markerlabel(p):
     p[0] = {
     'label': TAC.newLabel()
     }
-    # TAC.emit('label'  ,p[0]['label'],'','')
+    TAC.emit('label'  ,p[0]['label'],'','')
 
 def p_markerif(p):
     '''markerif : empty'''
     if p[-1]['cond']['type']!='BOOLEAN':
         msg_error(p,'Condition expressions must be boolean type')
 
-    # TAC.emit('ifgoto','==',p[-1]['cond']['place'],'0',p[-1]['truelabel'])
-    # TAC.emit('goto',p[-1]['falselabel'],'','')
+    TAC.emit('ifgoto','==',p[-1]['cond']['place'],'0',p[-1]['truelabel'])
+    TAC.emit('goto',p[-1]['falselabel'],'','')
 
 def p_markerjump(p):
     '''markerjump : empty'''
-    # TAC.emit('goto',p[-1]['endlabel'],'','')
+    TAC.emit('goto',p[-1]['endlabel'],'','')
 
 def p_markerend(p):
     '''markerend : empty'''
@@ -360,9 +360,6 @@ def p_whenStmt(p):
 
 def p_ifStmt(p):
     '''ifStmt : IF  condStmt  elifStmt elseStmt ifEndLabel'''
-
-
-
 
 def p_condStmt(p):
     '''condStmt : expr COLON makeCondLabels1 suite endCondLabel'''
@@ -428,7 +425,16 @@ def p_exprList(p):
     else:
         p[0] = [p[1]]
 
+def p_MarkerCase(p):
+    '''MarkerCase : '''
+    p[0] = {
+    'expr': p[-4],
+    'endlabel':TAC.newLabel()
+    }
 
+def p_MarkerCaseEnd(p):
+    '''MarkerCaseEnd : '''
+    TAC.emit('label',p[-5]['endlabel'],'','')
 
 def p_MarkerExpr(p):
     '''MarkerExpr : '''
@@ -445,22 +451,9 @@ def p_OfMarkerEnd(p):
     TAC.emit('goto',p[-2]['endlabel'],'','')
     TAC.emit('label',p[-2]['nextlabel'],'','')
 
-
-
-def p_caseStmt(p):
-    '''caseStmt : CASE expr COLON NEWLINE INDGR MarkerCase ofBranches elifStmt elseStmt INDLE MarkerCaseEnd'''
-    p[0] = {
-    'inline': False,
-    'type': p[1],
-    'case': p[2],
-    'branches': p[7],
-    'elif': p[8],
-    'else': p[9]
-    }
-
 def p_ofBranch(p):
-    '''ofBranch : OF exprList markerOfbranch COLON MarkerExpr suite OfMarkerEnd'''         # works if exprlist contains 1 expr only
-    p[0] = {                                                                # does not work for range
+    '''ofBranch : OF exprList COLON MarkerExpr suite OfMarkerEnd'''
+    p[0] = {
     'cond': p[2],
     'then': p[4],
     'expr': p[-1]['expr'],
@@ -477,25 +470,16 @@ def p_ofBranches(p):
     else:
         p[0] = [p[1]]
 
-def p_MarkerCase(p):
-    '''MarkerCase : '''
-    label1 = TAC.newLabel()
-    label2 = TAC.newLabel()
-    label3 = TAC.newLabel()
-    p[0]=[label1,label2,label3]
-    print "in p_MarkerCase p[-4] = ", p[-4]
-    # TAC.emitif('ifgoto', 'eq', p[-2], 1, label1)
-    TAC.emitif('ifgoto', 'eq', p[-4]['place'], 1, label1)
-    TAC.emit('goto', label2, '', '')
-    TAC.emit('label', label1, '', '')
-
-
-
-
-
-def p_MarkerCaseEnd(p):
-    '''MarkerCaseEnd : '''
-    TAC.emit('label',p[-5]['endlabel'],'','')
+def p_caseStmt(p):
+    '''caseStmt : CASE expr COLON NEWLINE INDGR MarkerCase ofBranches elifStmt elseStmt INDLE MarkerCaseEnd'''
+    p[0] = {
+    'inline': False,
+    'type': p[1],
+    'case': p[2],
+    'branches': p[7],
+    'elif': p[8],
+    'else': p[9]
+    }
 
 def p_echoStmt(p):
     '''echoStmt : ECHO exprList'''
