@@ -56,12 +56,12 @@ class St:
     def getIdenAttr(self, idenName, attrName):
         idenScope = self.getIdenScope(idenName)
         if idenScope!=None:
-            return self.St[idenScope]['identifier'][idenName].get(attrName)
+            return self.St[idenScope]['identifiers'][idenName].get(attrName)
         else:
+            print "attribute not set"
             return None
 
     def setidenAttr(self, idenName, attrName, attrVal):
         idenScope = self.getIdenScope(idenName)
         if idenScope!=None:
             self.St[idenScope]['identifiers'][idenName][attrName]=attrVal
-        
