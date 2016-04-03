@@ -38,7 +38,7 @@ def p_stmt(p):
     '''stmt : complexOrSimpleStmt '''
     p[0] = p[1]
 
-    print "printing stmt in stmt", p[0]
+    # print "printing stmt in stmt", p[0]
 
     if p[0]['type'] != None :
         msg_error(p,"syntax error : stmt can not be of any type other than None")
@@ -311,13 +311,32 @@ def p_whileEndLabel(p):
 def p_identWithPragmaInter(p):
     '''identWithPragmaInter : COMMA identWithPragma identWithPragmaInter
                             | empty'''
+    if len(p)==2:
+        p[0]={
+        'varlist': []
+        }
+    else:
+        p[0]={
+        'varlist': p[3]['varlist']
+        }
+        p[0]['varlist'].append(p[2]['value'])
+
 
 def p_identWithPragma(p):
     '''identWithPragma : identVis pragmaInter'''
 
-def p_pragmaInter(p):
+    p[0] = p[1]         # identVis -> symbol
+
+def p_pragmaInter(p):                               ## assuming pragma -> empty
     '''pragmaInter : pragma
                     | empty'''
+    if len(p) == 2 :
+        p[0] ={
+        'type' : None,
+        'value' : None,
+        }
+
+
 
 def p_pragma(p):
     '''pragma : CURLYDOTLE pragmaInterInter optPar CURLYDOTRI
@@ -428,7 +447,7 @@ def p_ifStmt(p):
 def p_condStmt(p):
     '''condStmt : expr COLON makeCondLabels1 suite endCondLabel'''
 
-    print "scope of suite = ", p[4]['value']
+    # print "scope of suite = ", p[4]['value']
     if p[1]['type'] != 'BOOLEAN' :
         msg_error(p,"expression should be a boolean")
 
@@ -1642,6 +1661,25 @@ def p_operator(p):
 def p_routine(p):
     ''' routine : identVis paramListColon EQUALS suite '''
 
+    p[0] = {
+    'varlist' : p[2]['varlist'], #p[2]['varlist'] has 2 attributes name and type
+    'type' : None,
+    'value':None,
+    'returnType' : p[2]['returnType']
+    }
+
+    newScope = p[4]
+
+    print "p[0] in routine = ", p[0]
+    print "p[0]['varlist']", p[0]['varlist']
+    for i in p[0]['varlist'] :
+        temp = TAC.createTemp()
+        ST.addIdenInScope(newScope,p[0]['varlist'][i]['varName'],temp,p[0]['varlist'][i]['varType'],0)
+        if p[0]['varlist'][i]['varValue'] != None :
+            TAC.emit('=',temp,varValue,'')
+## need to update hasValue
+
+
 def p_typeKeyww(p):
     ''' typeKeyww : INT
                     | FLOAT
@@ -1661,35 +1699,93 @@ def p_typeKeyww(p):
 
 def p_paramListColon(p):
     ''' paramListColon : paramListInter
-                        | paramListInter COLON typeDescK'''
+                        | paramListInter COLON typeKeyw'''  # changed from paramListInter COLON typeDescK
     p[0] = {
-    'vars': p[1],
-    'type': (p[3] if len(p)>2 else None)
+    'varlist': (p[1]['varlist'] if p[1]['type'] != None else None ),
+    'returnType': (p[3] if len(p)>2 else None),
+    'type' : 'paramListColon'
     }
+
+
 
 def p_paramListInter(p):
     ''' paramListInter : PARLE declColonEqualsInter2 PARRI'''
-    p[0] = p[2]
+
+    if p[2]['type'] == None :
+        p[0]={
+        'type' : None
+        }
+
+    else :
+        p[0] = {
+        'varlist' : p[2]['varlist'],
+        'type' : p[2]['type']
+        }
+    print "p[0] after paramListInter = ", p[0]
 
 def p_declColonEqualsInter2(p):
     ''' declColonEqualsInter2 : empty
                               | declColonEqualsInter '''
-    p[0] = p[1]
+    if p[1]['type'] == None :
+        p[0]={
+        'type' : None
+        }
+    else :
+        p[0] ={
+        'varlist' : p[1]['varlist'],
+        'type' : 'notNone'
+        }
+    print "p[0] after declColonEqualsInter2 = ", p[0]
 
 def p_declColonEqualsInter(p):
     ''' declColonEqualsInter : declColonEquals COMMA declColonEqualsInter
                             |  declColonEquals SEMICOLON declColonEqualsInter
                             |  declColonEquals  '''
-    if len(p) > 2:
-        p[0] = [p[1]] + p[3]
+    if len(p) == 2:
+        p[0]={
+        'varlist' : p[1]['varlist'],
+        'type' : 'notnone'
+        }
     else:
-        p[0] = [p[1]]
+        p[0] ={
+        'varlist' : p[3]['varlist'].extend(p[1]['varlist']),
+        'type' : 'notnone'
+        }
+
+    print "p[0] after declColonEqualsInter = ", p[0]
 
     ## original rule : routine = optInd identVis pattern? genericParamList? paramListColon pragma? ('=' COMMENT? stmt)? indAndComment
     ## pattern is used in template hence not implemented
 
 def p_declColonEquals(p) :
     ''' declColonEquals : commaIdentWithPragmaInter commaInter colonTypeDescKInter equalExprInter'''
+
+    print "p[1] in descolonequals =", p[1]
+
+    varNameList = p[1]['varlist']
+    varType = p[3]['type']
+    eqExpr = p[4]['type']
+
+    print "p[4]= in deccolonequals", p[4]
+
+
+    l={}
+    for i in varNameList :
+        l[i]={
+        'varName' : i,
+        'varType' : varType,
+        'varValue' : eqExpr              ## will be none if p[4] = none
+        }
+    print " printing list in declColonEquals", l
+    p[0]={
+    'varlist':l,
+    'type' : varType
+    }
+    print "p[0]= after deccolonequals", p[0]
+
+
+
+
     # p[0] = { # Not sure what identColonEqualsInter2 does
     # 'vars': p[1],
     # 'type': p[3],
@@ -1702,25 +1798,39 @@ def p_declColonEquals(p) :
     #         identifier[i] = {'type': p[3], 'value': p[4]}
     #         identifierList.append(i)
 
-def p_commaIdentWithPragmaInter(p) :
+def p_commaIdentWithPragmaInter(p) :                            #currently identWithPragma = symbol
     '''commaIdentWithPragmaInter : identWithPragma
                                   | COMMA identWithPragma commaIdentWithPragmaInter '''
-    if len(p) > 2:
-        p[0] = [p[2]] + p[3]
-    else:
-        p[0] = [p[1]]
+
+    if len(p) == 2 :
+        p[0]={
+        'varlist': []
+        }
+        p[0]['varlist'].append(p[1]['value'])
+    else :
+        p[0]={
+        'varlist': p[3]['varlist']
+        }
+        p[0]['varlist'].append(p[2]['value'])
+
+    # if len(p) > 2:
+    #     p[0] = [p[2]] + p[3]
+    # else:
+    #     p[0] = [p[1]]
 
 def p_commaInter(p): # Not sure what this does
     ''' commaInter : COMMA
                    | empty'''
 
 def p_colonTypeDescKInter(p):
-    ''' colonTypeDescKInter : COLON typeDescK
-                            | empty '''
+    ''' colonTypeDescKInter : COLON typeKeyw
+                            | empty '''       # changed from COLON typeDescK
     if len(p) > 2:
-        p[0] = p[2]
+        p[0] = {
+        'type' : p[2]
+        }
     else:
-        p[0] = p[1]
+        p[0]['type'] = None
 
 def p_equalExprInter(p):
     ''' equalExprInter : EQUALS expr
@@ -1728,7 +1838,9 @@ def p_equalExprInter(p):
     if len(p) > 2:
         p[0] = p[2]
     else:
-        p[0] = p[1]
+        p[0]={
+        'type' : None
+        }
 
 def p_typeDef(p) :
     ''' typeDef : identWithPragma genericParamListInter EQUALS typeDefAux '''
@@ -1920,7 +2032,9 @@ def p_error(p):
 def p_empty(p):
     'empty :'
 
-    p[0] = {}
+    p[0] = {
+    'type' : None
+    }
 
 # Error rule for syntax errors
 # def p_error(p):
