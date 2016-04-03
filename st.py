@@ -29,10 +29,11 @@ class St:
         self.curBlockNo+=1
         return 'b'+str(self.curBlockNo)
 
-    def addIden(self, idenName, place, idenType):
+    def addIden(self, idenName, place, idenType,idenhasVal):
         self.St[self.curScope]['identifiers'][idenName]={
             'place':place,
-            'type':idenType
+            'type':idenType,
+            'hasVal': idenhasVal
         }
 
     def getIden(self, idenName):

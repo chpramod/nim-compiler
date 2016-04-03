@@ -38,6 +38,9 @@ def p_stmt(p):
     '''stmt : complexOrSimpleStmt '''
     p[0] = p[1]
 
+    if p[0]['type'] != None :
+        msg_error(p,"syntax error : stmt can not be of any type other than None")
+
 def p_stmtStar(p):                      # changed a bit
     '''stmtStar : stmt NEWLINE stmtStar
                  | stmt SEMICOLON stmtStar
@@ -103,7 +106,9 @@ def p_variableSuite(p):                         # changed it too
     if len(p) > 2:
         p[0] = [p[1]] + p[3]
     else:
-        p[0] = [p[1]]
+        p[0] = p[1]
+
+
 
 def p_variableStar(p):                      # changed a bit
     '''variableStar : variable NEWLINE variableStar
@@ -135,7 +140,7 @@ def p_complexOrSimpleStmt(p):
                             | LET variableSuite
                             | VAR variableSuite '''
     if len(p) > 2:
-        p[0] = {'type': p[1]}
+        p[0] = p[2]
     else:
         p[0] = p[1]
                             ## bind and mixin are also not implemented
@@ -175,7 +180,11 @@ def p_exprStmt(p):
         'place': None
         }
 
+    if p[2]['type'] == None :     ## for the case when exprstmt goes to simple_expr
+        p[0]=p[1]
+        return
 
+## whren a = something type thing happens
     if p[2]['type']!= None :
         if ST.getIdenScope(p[1]['value']) == None :
             msg_error(p,'should be a variable')
@@ -186,9 +195,13 @@ def p_exprStmt(p):
         msg_error(p,'type mismatch')
         return
 
+    if p[2]['hasVal'] == 0:
+        msg_error(p,'rhs has garbage value')
+        return
 
+    p[1]['hasVal'] = 1
+    ST.setidenAttr(p[1]['value'], 'hasVal', 1)
 
-    
     TAC.emit('=',p[1]['place'],p[2]['place'],'')
 
                                                          ## MUST BE DEALT using Symbol table
@@ -220,14 +233,15 @@ def p_exprStmtInter(p):
         }
     elif(len(p) == 3):
 
-        
+
+        print "p[2] in exprstmtinter =", p[2]
 
         if p[2]['type']=='ERROR_TYPE' :
             msg_error(p,'Unsupported type')
 
         else:
             # temp = TAC.createTemp()
-            
+
             p[0] = p[2]
             # p[0] = {
             # 'type': p[2]['type'],
@@ -252,6 +266,13 @@ def p_makeCondLabelsLoop(p):
 
 def p_whileStmt(p):
     '''whileStmt : WHILE whileStartLabel expr COLON makeCondLabelsLoop suite whileEndLabel'''
+
+    # print "expr type in whilestmt = ", p[3]['type']
+    if p[3]['type'] != 'BOOLEAN' :
+        msg_error(p,"expression should be a boolean")
+
+
+
     p[0] = {
     'inline': False,
     'type': p[1],
@@ -387,6 +408,11 @@ def p_ifStmt(p):
 
 def p_condStmt(p):
     '''condStmt : expr COLON makeCondLabels1 suite endCondLabel'''
+
+    # print "expr type in condstmt = ", p[1]['type']
+    if p[1]['type'] != 'BOOLEAN' :
+        msg_error(p,"expression should be a boolean")
+
     # p[0] = {
     # 'inline': False,
     # 'cond': p[1],
@@ -718,6 +744,11 @@ def p_whenExpr(p):
 
 def p_condExpr(p):
     '''condExpr : expr makeCondLabels1 COLON expr endCondLabel'''
+
+    if p[1]['type'] != 'BOOLEAN' :
+        msg_error(p,"expression should be a boolean")
+
+
     p[0] = {
     'inline': True,
     'cond': p[1],
@@ -793,6 +824,11 @@ def p_arrowExpr(p):
             msg_error(p,'Unsupported type')
         elif p[1]['type']!=p[3]['type']:
             msg_error(p,'Type mismatch')
+
+        elif p[1]['hasVal'] == 0 or p[2]['hasVal'] == 0 :
+            msg_error(p,'rhs has garbage value')
+            return
+
         else:
             TAC.emit(p[2][0],p[1]['place'],p[1]['place'],p[3]['place'])
             p[0] = p[1]
@@ -829,6 +865,10 @@ def p_orExpr(p): # Assuming Bitwise integer operations
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
+
+    elif p[1]['hasVal'] == 0 or p[2]['hasVal'] == 0 :
+        msg_error(p,'rhs has garbage value')
+
     else:
         temp = TAC.createTemp()
         TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
@@ -857,6 +897,10 @@ def p_interFour(p):
         }
     elif p[2]['type']!=p[3]['type']:
         msg_error(p,'Type mismatch')
+
+    elif p[2]['hasVal'] == 0 or p[3]['hasVal'] == 0 :
+        msg_error(p,'rhs has garbage value')
+
     else:
         temp = TAC.createTemp()
         TAC.emit(p[3]['value'],temp,p[2]['place'],p[3]['place'])
@@ -875,6 +919,10 @@ def p_andExpr(p):
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
+
+    elif p[1]['hasVal'] == 0 or p[2]['hasVal'] == 0 :
+        msg_error(p,'rhs has garbage value')
+
     else:
         temp = TAC.createTemp()
         TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
@@ -902,6 +950,9 @@ def p_interFive(p):
         }
     elif p[2]['type']!=p[3]['type']:
         msg_error(p,'Type mismatch')
+
+    elif p[2]['hasVal'] == 0 or p[3]['hasVal'] == 0 :
+        msg_error(p,'rhs has garbage value')
     else:
         temp = TAC.createTemp()
         TAC.emit(p[3]['value'],temp,p[2]['place'],p[3]['place'])
@@ -919,6 +970,10 @@ def p_cmpExpr(p):
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
+
+    elif p[1]['hasVal'] == 0 or p[2]['hasVal'] == 0 :
+        msg_error(p,'rhs has garbage value')
+
     elif p[1]['type']=='BOOLEAN':
         msg_error(p,"Boolean not allowed in comparision statements")
     else:
@@ -958,6 +1013,10 @@ def p_interSix(p):
         }
     elif p[2]['type']!=p[3]['type']:
         msg_error(p,'Type mismatch')
+
+    elif p[2]['hasVal'] == 0 or p[3]['hasVal'] == 0 :
+        msg_error(p,'rhs has garbage value')
+
     else:
         temp = TAC.createTemp()
         TAC.emit('ifgoto',p[3]['value'],p[2]['place'],p[3]['place'],label1['name'])
@@ -981,6 +1040,10 @@ def p_sliceExpr(p):           # ignored right now just like arrow
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
+
+    elif p[1]['hasVal'] == 0 or p[2]['hasVal'] == 0 :
+        msg_error(p,'rhs has garbage value')
+
     else:
         temp = TAC.createTemp()
         TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
@@ -1013,6 +1076,10 @@ def p_interSeven(p):
         }
     elif p[2]['type']!=p[3]['type']:
         msg_error(p,'Type mismatch')
+
+    elif p[2]['hasVal'] == 0 or p[3]['hasVal'] == 0 :
+        msg_error(p,'rhs has garbage value')
+
     else:
         temp = TAC.createTemp()
         TAC.emit(p[3]['value'],temp,p[2]['place'],p[3]['place'])
@@ -1031,6 +1098,10 @@ def p_ampExpr(p):                           # ignored right now just like arrow
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
+
+    elif p[1]['hasVal'] == 0 or p[2]['hasVal'] == 0 :
+        msg_error(p,'rhs has garbage value')
+
     else:
         temp = TAC.createTemp()
         TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
@@ -1063,6 +1134,11 @@ def p_interEight(p):
         }
     elif p[2]['type']!=p[3]['type']:
         msg_error(p,'Type mismatch')
+
+    elif p[2]['hasVal'] == 0 or p[3]['hasVal'] == 0 :
+        msg_error(p,'rhs has garbage value')
+
+
     else:
         temp = TAC.createTemp()
         TAC.emit(p[3]['value'],temp,p[2]['place'],p[3]['place'])
@@ -1080,6 +1156,11 @@ def p_plusExpr(p):
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
+
+    elif p[1]['hasVal'] == 0 or p[2]['hasVal'] == 0 :
+        msg_error(p,'rhs has garbage value')
+
+
     else:
         temp = TAC.createTemp()
         TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
@@ -1109,6 +1190,11 @@ def p_interNine(p):
         }
     elif p[2]['type']!=p[3]['type']:
         msg_error(p,'Type mismatch')
+
+    elif p[2]['hasVal'] == 0 or p[3]['hasVal'] == 0 :
+        msg_error(p,'rhs has garbage value')
+
+
     else:
         temp = TAC.createTemp()
         TAC.emit(p[3]['value'],temp,p[2]['place'],p[3]['place'])
@@ -1127,6 +1213,11 @@ def p_mulExpr(p):
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
+
+    elif p[1]['hasVal'] == 0 or p[2]['hasVal'] == 0 :
+        msg_error(p,'rhs has garbage value')
+
+
     else:
         temp = TAC.createTemp()
         TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
@@ -1155,6 +1246,10 @@ def p_interTen(p):
         }
     elif p[2]['type']!=p[3]['type']:
         msg_error(p,'Type mismatch')
+
+    elif p[2]['hasVal'] == 0 or p[3]['hasVal'] == 0 :
+        msg_error(p,'rhs has garbage value')
+
     else:
         temp = TAC.createTemp()
         TAC.emit(p[3]['value'],temp,p[2]['place'],p[3]['place'])
@@ -1174,6 +1269,10 @@ def p_dollarExpr(p):
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
+
+    elif p[1]['hasVal'] == 0 or p[2]['hasVal'] == 0 :
+        msg_error(p,'rhs has garbage value')
+
     else:
         temp = TAC.createTemp()
         TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
@@ -1204,6 +1303,11 @@ def p_interElev(p):
         }
     elif p[2]['type']!=p[3]['type']:
         msg_error(p,'Type mismatch')
+
+    elif p[2]['hasVal'] == 0 or p[3]['hasVal'] == 0 :
+        msg_error(p,'rhs has garbage value')
+
+
     else:
         temp = TAC.createTemp()
         TAC.emit(p[3]['value'],temp,p[2]['place'],p[3]['place'])
@@ -1375,16 +1479,19 @@ def p_symbol(p):
         p[0] = {
         'type': None,
         'place': None ,
-        'value' : p[1]
+        'value' : p[1],
+        'hasVal' : 0
         }
         # ST.addIden(p[0]['value'],p[0]['place'],p[0]['type'])
     else :
         iplace = ST.getIdenAttr(p[1], 'place')
         itype = ST.getIdenAttr(p[1], 'type')
+        ihasVal = ST.getIdenAttr(p[1], 'hasVal')
         p[0] = {
         'type': itype,
         'place': iplace,
-        'value' : p[1]
+        'value' : p[1],
+        'hasVal' : ihasVal
         }
 
 def p_literal(p):# was INTLIT in place of INT
@@ -1413,7 +1520,8 @@ def p_int(p):
     p[0] = {
     'type': p.slice[1].type,
     'value': p[1],
-    'place': temp
+    'place': temp,
+    'hasVal': 1
     }
 # def p_par(p):
 
@@ -1633,23 +1741,32 @@ def p_identColonEquals(p) :
     p[0]['varlist'].append(p[1]['value'])
     for i in p[0]['varlist']:
         temp = TAC.createTemp()
-        ST.addIden(i,temp,None)
+        ST.addIden(i,temp,None,0)
     if p[3]['type']!=None and p[4]['type']!=None:
         if p[3]['type'] != p[4]['type']:
             msg_error(p,'Type mismatch')
             return
+
+        elif p[3]['hasVal'] == 0 or p[4]['hasVal'] == 0 :
+            msg_error(p,'rhs has garbage value')
+            return
+
         for i in p[0]['varlist']:
             # ST.setidenAttr(i,'place',p[4]['place'])
             place = ST.getIdenAttr(i,'place')
             TAC.emit('=', place, p[4]['place'], '' )
             ST.setidenAttr(i,'type',p[4]['type'])
+            ST.setidenAttr(i,'hasVal',1)
     elif p[3]['type']!=None:
         for i in p[0]['varlist']:
             ST.setidenAttr(i,'type',p[3]['type'])
+
     elif p[4]['type']!=None:
         for i in p[0]['varlist']:
-            ST.setidenAttr(i,'place',p[4]['place'])
+            place = ST.getIdenAttr(i,'place')
+            TAC.emit('=', place, p[4]['place'], '' )
             ST.setidenAttr(i,'type',p[4]['type'])
+            ST.setidenAttr(i,'hasVal',1)
 
 
     print "debug in identColonEquals"
