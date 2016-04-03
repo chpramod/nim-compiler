@@ -29,6 +29,16 @@ class St:
         self.curBlockNo+=1
         return 'b'+str(self.curBlockNo)
 
+    def getCurrentScope(self):
+        return self.curScope
+
+    def addIdenInScope(self, scope,idenName, place, idenType,idenhasVal):
+        self.St[scope]['identifiers'][idenName]={
+            'place':place,
+            'type':idenType,
+            'hasVal': idenhasVal
+        }
+
     def addIden(self, idenName, place, idenType,idenhasVal):
         self.St[self.curScope]['identifiers'][idenName]={
             'place':place,

@@ -38,6 +38,8 @@ def p_stmt(p):
     '''stmt : complexOrSimpleStmt '''
     p[0] = p[1]
 
+    print "printing stmt in stmt", p[0]
+
     if p[0]['type'] != None :
         msg_error(p,"syntax error : stmt can not be of any type other than None")
 
@@ -54,16 +56,29 @@ def p_suite(p):                         # changed it too
     '''suite : simpleStmt
                   | NEWLINE INDGR markerSuite stmtStar INDLE'''
 
-    ST.endBlock()
+
     #print ST.curScope
     if len(p) > 2:
         p[0] = p[3]
     else:
-        p[0] = [p[1]]
+        p[0] = p[1]
+
+    # print "printing suite attributes", p[0]
+
+    p[0]['value'] = ST.getCurrentScope()
+
+    ST.endBlock()
 
 def p_markerSuite(p):
     '''markerSuite : empty'''
+    p[0]={
+    'type' : None,
+    'value': None,
+    'place': None
+
+    }
     ST.addBlock()
+
     #print ST.curScope
 
 def p_typeDefSuite(p):                         # changed it too
@@ -402,14 +417,18 @@ def p_whenStmt(p):
 
 def p_ifStmt(p):
     '''ifStmt : IF  condStmt  elifStmt elseStmt ifEndLabel'''
-
+    p[0] = {
+    'type' : None,
+    'value' : None,
+    'place' : None
+    }
 
 
 
 def p_condStmt(p):
     '''condStmt : expr COLON makeCondLabels1 suite endCondLabel'''
 
-    # print "expr type in condstmt = ", p[1]['type']
+    print "scope of suite = ", p[4]['value']
     if p[1]['type'] != 'BOOLEAN' :
         msg_error(p,"expression should be a boolean")
 
@@ -847,6 +866,7 @@ def p_assignExpr(p):
     if p[2]['type']==None:
         p[0]=p[1]
 
+
 def p_interThree(p):
     '''interThree : OP2 orExpr interThree
                 | empty '''
@@ -874,7 +894,9 @@ def p_orExpr(p): # Assuming Bitwise integer operations
         TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
         p[0] = {
         'type': p[1]['type'],
-        'place': temp
+        'place': temp,
+        'hasVal':1,
+        'val':None
         }
 
 def p_interFour(p):
@@ -885,7 +907,8 @@ def p_interFour(p):
         p[0] = {
         'type': None,
         'value': None,
-        'place': None
+        'place': None,
+        'hasVal': 0
         }
     elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
         msg_error(p,'Unsupported type')
@@ -893,7 +916,8 @@ def p_interFour(p):
         p[0] = {
         'type': p[2]['type'],
         'value': p[1],
-        'place': p[2]['place']
+        'place': p[2]['place'],
+        'hasVal' : 1
         }
     elif p[2]['type']!=p[3]['type']:
         msg_error(p,'Type mismatch')
@@ -907,7 +931,8 @@ def p_interFour(p):
         p[0] = {
         'type': p[2]['type'],
         'value': p[1],
-        'place': temp
+        'place': temp,
+        'hasVal': 1
         }
 
 
@@ -928,7 +953,9 @@ def p_andExpr(p):
         TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
         p[0] = {
         'type': p[1]['type'],
-        'place': temp
+        'place': temp,
+        'value':None,
+        'hasVal': 1
         }
 
 def p_interFive(p):
@@ -938,7 +965,8 @@ def p_interFive(p):
         p[0] = {
         'type': None,
         'value': None,
-        'place': None
+        'place': None,
+        'hasVal': 0
         }
     elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
         msg_error(p,'Unsupported type')
@@ -946,7 +974,8 @@ def p_interFive(p):
         p[0] = {
         'type': p[2]['type'],
         'value': p[1],
-        'place': p[2]['place']
+        'place': p[2]['place'],
+        'hasVal' : 1
         }
     elif p[2]['type']!=p[3]['type']:
         msg_error(p,'Type mismatch')
@@ -959,7 +988,8 @@ def p_interFive(p):
         p[0] = {
         'type': p[2]['type'],
         'value': p[1],
-        'place': temp
+        'place': temp,
+        'hasVal': 1
         }
 
 def p_cmpExpr(p):
@@ -989,7 +1019,9 @@ def p_cmpExpr(p):
         TAC.emit("label", label2,'','')
         p[0] = {
         'type': 'BOOLEAN',
-        'place': temp
+        'place': temp,
+        'value' : None,
+        'hasVal': 1
         }
 
 
@@ -1001,7 +1033,8 @@ def p_interSix(p):
         p[0] = {
         'type': None,
         'value': None,
-        'place': None
+        'place': None,
+        'hasVal': 0
         }
     elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
         msg_error(p,'Unsupported type')
@@ -1009,7 +1042,8 @@ def p_interSix(p):
         p[0] = {
         'type': p[2]['type'],
         'value': p[1],
-        'place': p[2]['place']
+        'place': p[2]['place'],
+        'hasVal' : 1
         }
     elif p[2]['type']!=p[3]['type']:
         msg_error(p,'Type mismatch')
@@ -1028,7 +1062,8 @@ def p_interSix(p):
         p[0] = {
         'type': 'BOOLEAN',
         'value': p[1],
-        'place': temp
+        'place': temp,
+        'hasVal': 1
         }
 
 def p_sliceExpr(p):           # ignored right now just like arrow
@@ -1049,7 +1084,9 @@ def p_sliceExpr(p):           # ignored right now just like arrow
         TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
         p[0] = {
         'type': p[1]['type'],
-        'place': temp
+        'place': temp,
+        'val' : None,
+        'hasVal': 1
         }
 
 
@@ -1064,7 +1101,8 @@ def p_interSeven(p):
         p[0] = {
         'type': None,
         'value': None,
-        'place': None
+        'place': None,
+        'hasVal': 0
         }
     elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
         msg_error(p,'Unsupported type')
@@ -1072,7 +1110,8 @@ def p_interSeven(p):
         p[0] = {
         'type': p[2]['type'],
         'value': p[1],
-        'place': p[2]['place']
+        'place': p[2]['place'],
+        'hasVal' : 1
         }
     elif p[2]['type']!=p[3]['type']:
         msg_error(p,'Type mismatch')
@@ -1086,7 +1125,8 @@ def p_interSeven(p):
         p[0] = {
         'type': p[2]['type'],
         'value': p[1],
-        'place': temp
+        'place': temp,
+        'hasVal' : 1
         }
 
 def p_ampExpr(p):                           # ignored right now just like arrow
@@ -1107,7 +1147,9 @@ def p_ampExpr(p):                           # ignored right now just like arrow
         TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
         p[0] = {
         'type': p[1]['type'],
-        'place': temp
+        'place': temp,
+        'value' : None,
+        'hasVal' : 1
         }
 
 
@@ -1122,7 +1164,8 @@ def p_interEight(p):
         p[0] = {
         'type': None,
         'value': None,
-        'place': None
+        'place': None,
+        'hasVal' : 0
         }
     elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
         msg_error(p,'Unsupported type')
@@ -1130,7 +1173,8 @@ def p_interEight(p):
         p[0] = {
         'type': p[2]['type'],
         'value': p[1],
-        'place': p[2]['place']
+        'place': p[2]['place'],
+        'hasVal' : 1
         }
     elif p[2]['type']!=p[3]['type']:
         msg_error(p,'Type mismatch')
@@ -1145,7 +1189,8 @@ def p_interEight(p):
         p[0] = {
         'type': p[2]['type'],
         'value': p[1],
-        'place': temp
+        'place': temp,
+        'hasVal' : 1
         }
 def p_plusExpr(p):
     '''plusExpr : mulExpr interNine'''
@@ -1166,7 +1211,9 @@ def p_plusExpr(p):
         TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
         p[0] = {
         'type': p[1]['type'],
-        'place': temp
+        'place': temp,
+        'value' : None,
+        'hasVal' : 1
         }
 
 
@@ -1178,7 +1225,8 @@ def p_interNine(p):
         p[0] = {
         'type': None,
         'value': None,
-        'place': None
+        'place': None,
+        'hasVal' : 0
         }
     elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
         msg_error(p,'Unsupported type')
@@ -1186,7 +1234,8 @@ def p_interNine(p):
         p[0] = {
         'type': p[2]['type'],
         'value': p[1],
-        'place': p[2]['place']
+        'place': p[2]['place'],
+        'hasVal' : 1
         }
     elif p[2]['type']!=p[3]['type']:
         msg_error(p,'Type mismatch')
@@ -1201,7 +1250,8 @@ def p_interNine(p):
         p[0] = {
         'type': p[2]['type'],
         'value': p[1],
-        'place': temp
+        'place': temp,
+        'hasVal' : 1
         }
 
 def p_mulExpr(p):
@@ -1223,7 +1273,9 @@ def p_mulExpr(p):
         TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
         p[0] = {
         'type': p[1]['type'],
-        'place': temp
+        'place': temp,
+        'hasVal' : 0,
+        'value' : None
         }
 
 def p_interTen(p):
@@ -1234,7 +1286,8 @@ def p_interTen(p):
         p[0] = {
         'type': None,
         'value': None,
-        'place': None
+        'place': None,
+        'hasVal' : 0
         }
     elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
         msg_error(p,'Unsupported type')
@@ -1242,7 +1295,8 @@ def p_interTen(p):
         p[0] = {
         'type': p[2]['type'],
         'value': p[1],
-        'place': p[2]['place']
+        'place': p[2]['place'],
+        'hasVal' : 1
         }
     elif p[2]['type']!=p[3]['type']:
         msg_error(p,'Type mismatch')
@@ -1256,7 +1310,8 @@ def p_interTen(p):
         p[0] = {
         'type': p[2]['type'],
         'value': p[1],
-        'place': temp
+        'place': temp,
+        'hasVal' : 1
         }
 
 
@@ -1278,7 +1333,9 @@ def p_dollarExpr(p):
         TAC.emit(p[2]['value'],temp,p[1]['place'],p[2]['place'])
         p[0] = {
         'type': p[1]['type'],
-        'place': temp
+        'place': temp,
+        'hasVal' : 1,
+        'value' : None
         }
 
 def p_interElev(p):
@@ -1291,7 +1348,8 @@ def p_interElev(p):
         p[0] = {
         'type': None,
         'value': None,
-        'place': None
+        'place': None,
+        'hasVal' : 0
         }
     elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
         msg_error(p,'Unsupported type')
@@ -1299,7 +1357,8 @@ def p_interElev(p):
         p[0] = {
         'type': p[2]['type'],
         'value': p[1],
-        'place': p[2]['place']
+        'place': p[2]['place'],
+        'hasVal' : 1
         }
     elif p[2]['type']!=p[3]['type']:
         msg_error(p,'Type mismatch')
@@ -1314,7 +1373,8 @@ def p_interElev(p):
         p[0] = {
         'type': p[2]['type'],
         'value': p[1],
-        'place': temp
+        'place': temp,
+        'hasVal' : 1
         }
 
 def p_castExpr(p):
