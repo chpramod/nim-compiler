@@ -1369,15 +1369,15 @@ def p_symbol(p):
     # print "$$$$$$ \n"
 
     if(ST.getIdenScope(p[1]) == None):
-        temp = TAC.createTemp()
+        # temp = TAC.createTemp()
         #print "symbol fdfdfd", temp, p[1]
         #TAC.emit('=',temp,p[1],'')
         p[0] = {
         'type': None,
-        'place': temp ,
+        'place': None ,
         'value' : p[1]
         }
-        ST.addIden(p[0]['value'],p[0]['place'],p[0]['type'])
+        # ST.addIden(p[0]['value'],p[0]['place'],p[0]['type'])
     else :
         iplace = ST.getIdenAttr(p[1], 'place')
         itype = ST.getIdenAttr(p[1], 'type')
@@ -1631,6 +1631,9 @@ def p_identColonEquals(p) :
      'value': None
     }
     p[0]['varlist'].append(p[1]['value'])
+    for i in p[0]['varlist']:
+        temp = TAC.createTemp()
+        ST.addIden(i,temp,None)
     if p[3]['type']!=None and p[4]['type']!=None:
         if p[3]['type'] != p[4]['type']:
             msg_error(p,'Type mismatch')
