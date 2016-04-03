@@ -6,7 +6,7 @@ class St:
             'name':'global',
             #currently only considered for blocks
             #'type'='block'
-            'parent':'none',
+            'parent':None,
             'identifiers':{}
         }
         }

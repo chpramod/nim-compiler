@@ -135,7 +135,7 @@ def p_complexOrSimpleStmt(p):
                             | LET variableSuite
                             | VAR variableSuite '''
     if len(p) > 2:
-        p[0] = {'type': p[1], 'content': p[2]}
+        p[0] = {'type': p[1]}
     else:
         p[0] = p[1]
                             ## bind and mixin are also not implemented
@@ -169,14 +169,34 @@ def p_exprStmt(p):
     #             | IDENTIFIER EQUALS expr'''
     '''exprStmt : simpleExpr exprStmtInter'''
 
-    p[1] = p[2]
+    p[0] = {
+        'type': None,
+        'value': None,
+        'place': None
+        }
+
+
+    if p[2]['type']!= None :
+        if ST.getIdenScope(p[1]['value']) == None :
+            msg_error(p,'should be a variable')
+            return
+
+
+    if p[1]['type'] != p[2]['type']:
+        msg_error(p,'type mismatch')
+        return
+
+
+
+    
+    TAC.emit('=',p[1]['place'],p[2]['place'],'')
 
                                                          ## MUST BE DEALT using Symbol table
     print "for checking type and value in exprstmt \n"              ## Assuming it computes only identifier = expr type only
     print "p[1] =", p[1], "p[2] = ", p[2]
 
     p[0] = {
-        'type': p[2]['type'],
+        'type': None,
         'value': None,
         'place': None
         }
@@ -200,14 +220,14 @@ def p_exprStmtInter(p):
         }
     elif(len(p) == 3):
 
-        p[0] = p[2]
+        
 
         if p[2]['type']=='ERROR_TYPE' :
             msg_error(p,'Unsupported type')
 
         else:
             # temp = TAC.createTemp()
-            TAC.emit('=',p[-1]['place'],p[2]['place'],'')
+            
             p[0] = p[2]
             # p[0] = {
             # 'type': p[2]['type'],
@@ -1344,11 +1364,11 @@ def p_symbol(p):
 #                | BOOLEAN'''
     #           | TYPE
 
-    print "$$$$$$ \n"
-    print p[1]
-    print "$$$$$$ \n"
+    # print "$$$$$$ \n"
+    # print p[1]
+    # print "$$$$$$ \n"
 
-    if(ST.getIden(p[1]) == None):
+    if(ST.getIdenScope(p[1]) == None):
         temp = TAC.createTemp()
         #print "symbol fdfdfd", temp, p[1]
         #TAC.emit('=',temp,p[1],'')
