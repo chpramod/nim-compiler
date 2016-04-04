@@ -199,7 +199,7 @@ def p_exprStmt(p):
     #             | lhs EQUALS expr
     #             | IDENTIFIER EQUALS expr'''
     '''exprStmt : simpleExpr exprStmtInter'''
-
+    print p[1],p[2],'hi'
     p[0] = {
         'type': None,
         'value': None,
@@ -212,9 +212,16 @@ def p_exprStmt(p):
 
 ## whren a = something type thing happens
 
+    if 'array' in p[1]:
+        print "hello",p[1]['value']
+    if ST.getIdenScope(p[1]['value']) != None:
+        print "olleh"
     if p[2]['type']!= None :
-        if ST.getIdenScope(p[1]['value']) == None and 'array' not in p[2]:
+        if ST.getIdenScope(p[1]['value']) == None and 'array' not in p[1]:
             msg_error(p,'should be a variable')
+            return
+        elif 'array' in p[1] and ST.getIdenScope(p[1]['value']) != None:
+            TAC.emit('=',p[1]['array'],p[2]['place'],'')
             return
 
 
@@ -1440,7 +1447,7 @@ def p_primary(p):
             p[0] = {
             'type': functionDict[p[2]['value']],
             'place': temp,
-            'value': None,
+            'value': functionDict[p[2]['value']],
             'hasVal': 1
             }
     elif p[3]['type']=='ARRAY':
@@ -1458,8 +1465,9 @@ def p_primary(p):
             p[0] = {
             'type': ST.getIdenAttr(p[2]['value'],'type'),
             'place': temp,
-            'value': None,
-            'hasVal': 1
+            'value': p[2]['value'],
+            'hasVal': 1,
+            'array': ST.getIdenAttr(p[2]['value'],'place')+'['+p[3]['place']+']'
             }
 
 #shd be interPrefixOperator identOrLiteral interPrimarySuffix
@@ -2095,6 +2103,7 @@ def p_identColonEquals(p) :
     elif p[3]['type']!=None:
         if p[3]['size']!=None:
             for i in p[0]['varlist']:
+                TAC.emit('array',ST.getIdenAttr(i,'place'),p[3]['size'],p[3]['type'])
                 ST.setidenAttr(i,'type',p[3]['type'])
                 ST.setidenAttr(i,'size',p[3]['size'])
         else:
