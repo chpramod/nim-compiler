@@ -1,6 +1,6 @@
-proc items(range: int) =
-  var i:bool=false
-  while i :
-    i+=1
-    echo i
-items(3)
+var a,b = 5
+if true :
+  var a = 3
+  echo a
+  echo b
+echo a
