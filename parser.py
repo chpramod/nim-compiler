@@ -1757,7 +1757,8 @@ def p_typeKeyww(p):
                     | BOOL
                     | STRING '''
     p[0] = {
-        'type': None
+        'type': None,
+        'size':None
     }
     if p[1]=='int':
         p[0]['type']='INTLIT'
@@ -2001,34 +2002,35 @@ def p_identColonEquals(p) :
     p[0]['varlist'].append(p[1]['value'])
     for i in p[0]['varlist']:
         temp = TAC.createTemp()
-        ST.addIden(i,temp,None,0)
+        ST.addIden(i,temp,None,0,None)
     if p[3]['type']!=None and p[4]['type']!=None:
         if p[3]['type'] != p[4]['type']:
             msg_error(p,'Type mismatch')
             return
-
         elif p[4]['hasVal'] == 0 :
             msg_error(p,'rhs has garbage value')
             return
-
         for i in p[0]['varlist']:
             # ST.setidenAttr(i,'place',p[4]['place'])
             place = ST.getIdenAttr(i,'place')
             TAC.emit('=', place, p[4]['place'], '' )
             ST.setidenAttr(i,'type',p[4]['type'])
             ST.setidenAttr(i,'hasVal',1)
-    elif p[3]['type']!=None:
-        for i in p[0]['varlist']:
-            ST.setidenAttr(i,'type',p[3]['type'])
 
+    elif p[3]['type']!=None:
+        if p[3]['size']!=None:
+            for i in p[0]['varlist']:
+                ST.setidenAttr(i,'type',p[3]['type'])
+                ST.setidenAttr(i,'size',p[3]['size'])
+        else:
+            for i in p[0]['varlist']:
+                ST.setidenAttr(i,'type',p[3]['type'])
     elif p[4]['type']!=None:
         for i in p[0]['varlist']:
             place = ST.getIdenAttr(i,'place')
             TAC.emit('=', place, p[4]['place'], '' )
             ST.setidenAttr(i,'type',p[4]['type'])
             ST.setidenAttr(i,'hasVal',1)
-
-
     print "debug in identColonEquals"
     print ST.St[ST.curScope]['identifiers']
     print " ^^\n"
@@ -2064,15 +2066,20 @@ def p_identColonEqualsInter2(p) :
 
 def p_identColonEqualsInter3(p) :
     ''' identColonEqualsInter3 : empty
-                               | COLON typeKeyww'''
-    if len(p) > 2:
+                               | COLON typeKeyww
+                               | COLON ARRAY BRACKETLE int COMMA typeKeyww BRACKETRI'''
+    if len(p) == 3:
         p[0] = p[2]
-    else:
+    elif len(p) ==2:
         p[0]={
-            'type':None
+            'type':None,
+            'size':None
         }
-
-    print p[0]['type']
+    else:
+        p[0] = {
+        'type': p[6]['type'],
+        'size': p[4]['value']
+        }
 
 def p_identColonEqualsInter4(p) :
     ''' identColonEqualsInter4 : empty
