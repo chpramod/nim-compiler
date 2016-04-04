@@ -146,7 +146,7 @@ def p_complexOrSimpleStmt(p):
                             | staticStmt
                             | deferStmt
                             | asmStmt
-                            | PROC routine
+                            | PROC  routine
                             | MACRO routine
                             | ITERATOR routine
                             | METHOD routine
@@ -154,12 +154,24 @@ def p_complexOrSimpleStmt(p):
                             | CONST constantSuite
                             | LET variableSuite
                             | VAR variableSuite '''
+
+
     if len(p) > 2:
         p[0] = p[2]
+
+        if p[1] == 'proc' :
+            TAC.emit('label', p[2]['value'],'','')
+
+
     else:
         p[0] = p[1]
                             ## bind and mixin are also not implemented
                             ## we are not implementing 'template' routine , 'converter'
+
+def p_markerFuncLabel(p) :
+    ''' markerFuncLabel : empty '''
+
+    TAC.emit('label', p[3]['value'],'','')
 
 def p_simpleStmt(p):
     '''simpleStmt : returnStmt
@@ -1659,8 +1671,13 @@ def p_operator(p):
     p[0] = p[1]
 
 def p_routine(p):
-    ''' routine : identVis paramListColon EQUALS suite '''
-
+    ''' routine :  identVis paramListColon markerRoutine EQUALS suite  '''
+    #  Uncomment it after pulling from rajni
+    # if p[1]['value'] in functionDict:
+    #     msg_error(p,'Two functions with same name')
+    # functionDict[p[1]['value']] = p[2]['returnType']
+    # TAC.emit('label', p[1]['value'],'','')
+    ST.endBlock()
     p[0] = {
     'varlist' : p[2]['varlist'], #p[2]['varlist'] has 2 attributes name and type
     'type' : None,
@@ -1669,14 +1686,29 @@ def p_routine(p):
     }
     print "value of routine" , p[0]['value']
 
-    if p[2]['varlist'] != None :
 
-        newScope = p[4]['value']
-        print "new scope of suite  = ", p[4]['value']
 
-        print "\n"
-        print "p[0] in routine = ", p[0]
-        print "\n"
+
+## need to update hasValue
+
+
+def p_markerRoutine(p) :
+    ''' markerRoutine : empty '''
+
+    p[0]={
+    'type' : None,
+    'value': None,
+    'place': None,
+    'varlist': p[-1]['varlist']
+
+    }
+    ST.addBlock()
+
+
+    if p[0]['varlist'] != None :
+
+        newScope = ST.getCurrentScope()
+        print "now new scope = ", newScope
 
         # print "p[0]['varlist']", p[0]['varlist']
         for i in p[0]['varlist'] :
@@ -1686,7 +1718,12 @@ def p_routine(p):
             print "printing scope in routine" ,ST.getIdenScope(p[0]['varlist'][i]['varName'])
             if p[0]['varlist'][i]['varValue'] != None :
                 TAC.emit('=',temp,p[0]['varlist'][i]['varValue'],'')
-## need to update hasValue
+
+
+def p_markerFuncLabelRet(p) :
+    ''' markerFuncLabelRet : empty '''
+
+    TAC.emit('ret', '','','')
 
 
 def p_typeKeyww(p):
