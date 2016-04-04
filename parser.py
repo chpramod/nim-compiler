@@ -1671,14 +1671,18 @@ def p_routine(p):
     if p[2]['varlist'] != None :
 
         newScope = p[4]['value']
-        # print "new scope of suite  = ", p[4]['value']
+        print "new scope of suite  = ", p[4]['value']
 
+        print "\n"
         print "p[0] in routine = ", p[0]
+        print "\n"
+
         # print "p[0]['varlist']", p[0]['varlist']
         for i in p[0]['varlist'] :
             temp = TAC.createTemp()
             # print "var name and var type = ",p[0]['varlist'][i]['varName'],p[0]['varlist'][i]['varType']
-            ST.addIdenInScope(newScope,p[0]['varlist'][i]['varName'],temp,p[0]['varlist'][i]['varType'],0)
+            ST.addIdenInScope(newScope,p[0]['varlist'][i]['varName'],temp,p[0]['varlist'][i]['varType'],1)
+            print "printing scope in routine" ,ST.getIdenScope(p[0]['varlist'][i]['varName'])
             if p[0]['varlist'][i]['varValue'] != None :
                 TAC.emit('=',temp,p[0]['varlist'][i]['varValue'],'')
 ## need to update hasValue
@@ -1860,7 +1864,8 @@ def p_equalExprInter(p):
         p[0] = p[2]
     else:
         p[0]={
-        'type' : None
+        'type' : None,
+        'place' : None
         }
 
 def p_typeDef(p) :
