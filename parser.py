@@ -199,7 +199,7 @@ def p_exprStmt(p):
     #             | lhs EQUALS expr
     #             | IDENTIFIER EQUALS expr'''
     '''exprStmt : simpleExpr exprStmtInter'''
-    print p[1],p[2],'hi'
+    # print p[1],p[2],'hi'
     p[0] = {
         'type': None,
         'value': None,
@@ -212,10 +212,6 @@ def p_exprStmt(p):
 
 ## whren a = something type thing happens
 
-    if 'array' in p[1]:
-        print "hello",p[1]['value']
-    if ST.getIdenScope(p[1]['value']) != None:
-        print "olleh"
     if p[2]['type']!= None :
         if ST.getIdenScope(p[1]['value']) == None and 'array' not in p[1]:
             msg_error(p,'should be a variable')
@@ -239,8 +235,8 @@ def p_exprStmt(p):
     TAC.emit('=',p[1]['place'],p[2]['place'],'')
 
                                                          ## MUST BE DEALT using Symbol table
-    print "for checking type and value in exprstmt \n"              ## Assuming it computes only identifier = expr type only
-    print "p[1] =", p[1], "p[2] = ", p[2]
+    # print "for checking type and value in exprstmt \n"              ## Assuming it computes only identifier = expr type only
+    # print "p[1] =", p[1], "p[2] = ", p[2]
 
     p[0] = {
         'type': None,
@@ -268,7 +264,7 @@ def p_exprStmtInter(p):
     elif(len(p) == 3):
 
 
-        print "p[2] in exprstmtinter =", p[2]
+        # print "p[2] in exprstmtinter =", p[2]
 
         if p[2]['type']=='ERROR_TYPE' :
             msg_error(p,'Unsupported type')
@@ -485,7 +481,7 @@ def p_makeCondLabels1(p):
     label2 = TAC.newLabel()
     label3 = TAC.newLabel()
     p[0]=[label1,label2,label3]
-    print "in p_makeCondLabels1 p[-2] = ", p[-2]
+    # print "in p_makeCondLabels1 p[-2] = ", p[-2]
     # TAC.emitif('ifgoto', 'eq', p[-2], 1, label1)
     TAC.emitif('ifgoto', 'eq', p[-2]['place'], 1, label1)
     TAC.emit('goto', label2, '', '')
@@ -641,8 +637,9 @@ def p_returnStmt(p):
         'type': p[1],
         'return': None
         }
+    print p[1]
     if len(p) > 2:
-        TAC.emit('ret',p[1]['place'],'','')
+        TAC.emit('ret',p[2]['place'],'','')
     else:
         TAC.emit('ret','','','')
 
@@ -673,6 +670,10 @@ def p_yieldStmt(p):
         'type': p[1],
         'yield': None
         }
+    if len(p) > 2:
+        TAC.emit('yield',p[2]['place'],'','')
+    else:
+        TAC.emit('yield','','','')
 
 def p_discardStmt(p):
     '''discardStmt : DISCARD expr
@@ -1459,7 +1460,7 @@ def p_primary(p):
             msg_error(p,'Array not declared')
         else:
             temp = TAC.createTemp()
-            print p[3],'hi'
+            # print p[3],'hi'
             TAC.emit('=',temp,ST.getIdenAttr(p[2]['value'],'place')+'['+p[3]['place']+']','')
             p[0] = p[2]
             p[0] = {
@@ -1617,7 +1618,6 @@ def p_primarySuffix(p):
             for i in p[2]:
                 if i!=None:
                     if i['type']!=None:
-                        print i
                         params.append(i['place'])
         p[0]['params'] = params
     elif p[1]=='.':
@@ -1771,10 +1771,7 @@ def p_operator(p):
 def p_routine(p):
     ''' routine :  identVis markerFuncLabel paramListColon markerRoutine EQUALS suite  '''
     #  Uncomment it after pulling from rajni
-    if p[1]['value'] in functionDict:
-        msg_error(p,'Two functions with same name')
     functionDict[p[1]['value']] = p[3]['returnType']
-
     # print "printing dict =", functionDict
 
     ST.endBlock()
@@ -1791,6 +1788,9 @@ def p_routine(p):
 def p_markerFuncLabel(p) :
     ''' markerFuncLabel : empty '''
     p[0] = p[-1]
+    if p[0]['value'] in functionDict:
+        msg_error(p,'Two functions with same name')
+    functionDict[p[0]['value']] = "DUMMY"
     TAC.emit('label', p[0]['value'],'','')
 
 
@@ -1814,7 +1814,7 @@ def p_markerRoutine(p) :
     if p[0]['varlist'] != None :
 
         newScope = ST.getCurrentScope()
-        print "now new scope = ", newScope
+        # print "now new scope = ", newScope
 
 
         # print "p[0]['varlist']", p[0]['varlist']
@@ -1931,7 +1931,7 @@ def p_declColonEquals(p) :
     varType = p[3]['type']
     eqExpr = p[4]['place']
 
-    print "varType = p[3]['type'] in declColonEquals ",varType, "and p[3] =", p[3]
+    # print "varType = p[3]['type'] in declColonEquals ",varType, "and p[3] =", p[3]
 
 
     # print "p[4]= in deccolonequals", p[4]
@@ -2115,9 +2115,9 @@ def p_identColonEquals(p) :
             TAC.emit('=', place, p[4]['place'], '' )
             ST.setidenAttr(i,'type',p[4]['type'])
             ST.setidenAttr(i,'hasVal',1)
-    print "debug in identColonEquals"
-    print ST.St[ST.curScope]['identifiers']
-    print " ^^\n"
+    # print "debug in identColonEquals"
+    # print ST.St[ST.curScope]['identifiers']
+    # print " ^^\n"
     # print p[2]['varlist']
     # print p[0]['varlist']
     # for i in p[2]['varlist']:
@@ -2237,7 +2237,7 @@ def testYacc(inputFile):
     customLexer = lexer.customLexer()
     result=parser.parse(data, lexer=customLexer, debug=log)
     pprint(result)
-    print "now printing TAC code"
+    # print "now printing TAC code"
     TAC.printCode()
     # parser.parse(program, lexer=lexer, debug=1)
 
