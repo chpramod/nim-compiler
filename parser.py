@@ -1747,7 +1747,7 @@ def p_routine(p):
     p[0] = {
     'varlist' : p[2]['varlist'], #p[2]['varlist'] has 2 attributes name and type
     'type' : None,
-    'value':None,
+    'value': p[1]['value'],
     'returnType' : p[2]['returnType']
     }
 
@@ -1969,7 +1969,8 @@ def p_equalExprInter(p):
         p[0] = p[2]
     else:
         p[0]={
-        'type' : None
+        'type' : None,
+        'place' :None
         }
 
 def p_typeDef(p) :
