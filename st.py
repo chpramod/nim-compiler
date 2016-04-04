@@ -39,11 +39,12 @@ class St:
             'hasVal': idenhasVal
         }
 
-    def addIden(self, idenName, place, idenType,idenhasVal):
+    def addIden(self, idenName, place, idenType,idenhasVal,size):
         self.St[self.curScope]['identifiers'][idenName]={
             'place':place,
             'type':idenType,
-            'hasVal': idenhasVal
+            'hasVal': idenhasVal,
+            'size':size
         }
 
     def getIden(self, idenName):
