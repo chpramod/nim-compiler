@@ -147,7 +147,7 @@ def p_complexOrSimpleStmt(p):
                             | staticStmt
                             | deferStmt
                             | asmStmt
-                            | PROC  routine
+                            | PROC routine
                             | MACRO routine
                             | ITERATOR routine
                             | METHOD routine
@@ -160,8 +160,7 @@ def p_complexOrSimpleStmt(p):
     if len(p) > 2:
         p[0] = p[2]
 
-        if p[1] == 'proc' :
-            TAC.emit('label', p[2]['value'],'','')
+
 
 
     else:
@@ -169,10 +168,9 @@ def p_complexOrSimpleStmt(p):
                             ## bind and mixin are also not implemented
                             ## we are not implementing 'template' routine , 'converter'
 
-def p_markerFuncLabel(p) :
-    ''' markerFuncLabel : empty '''
 
-    TAC.emit('label', p[3]['value'],'','')
+
+
 
 def p_simpleStmt(p):
     '''simpleStmt : returnStmt
@@ -1763,21 +1761,29 @@ def p_operator(p):
     p[0] = p[1]
 
 def p_routine(p):
-    ''' routine :  identVis paramListColon markerRoutine EQUALS suite  '''
+    ''' routine :  identVis markerFuncLabel paramListColon markerRoutine EQUALS suite  '''
     #  Uncomment it after pulling from rajni
-    # if p[1]['value'] in functionDict:
-    #     msg_error(p,'Two functions with same name')
-    # functionDict[p[1]['value']] = p[2]['returnType']
-    # TAC.emit('label', p[1]['value'],'','')
+    if p[1]['value'] in functionDict:
+        msg_error(p,'Two functions with same name')
+    functionDict[p[1]['value']] = p[3]['returnType']
+
+    # print "printing dict =", functionDict
+
     ST.endBlock()
     p[0] = {
-    'varlist' : p[2]['varlist'], #p[2]['varlist'] has 2 attributes name and type
+    'varlist' : p[3]['varlist'], #p[2]['varlist'] has 2 attributes name and type
     'type' : None,
     'value': p[1]['value'],
-    'returnType' : p[2]['returnType']
+    'returnType' : p[3]['returnType']
     }
 
+    TAC.emit('ret','','','')
+    # print "p[1] in routine" , p[1]
 
+def p_markerFuncLabel(p) :
+    ''' markerFuncLabel : empty '''
+    p[0] = p[-1]
+    TAC.emit('label', p[0]['value'],'','')
 
 
 
