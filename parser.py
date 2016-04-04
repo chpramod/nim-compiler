@@ -17,6 +17,7 @@ TAC = threeAC.ThreeAC()
 ST = st.St()
 identifier = {}
 identifierList = []
+functionDict = {}
 
 def p_start(p):
 #ignored extra
@@ -1405,11 +1406,32 @@ def p_primary(p):
                 | STATIC primary
                 | BIND primary'''
 
+    # if len(p)!=4:
+    #     msg_error(p,'currently primary can go to only identOrLiteral')
+    # else :
+    #     p[0] = p[2]
     if len(p)!=4:
-        msg_error(p,'currently primary can go to only identOrLiteral')
-    else :
         p[0] = p[2]
-
+        msg_error(p,'Operation not supported')
+    elif p[3]['type']==None:
+        p[0] = p[2]
+    elif p[3]['type']=='CALL':
+        if p[2]['type']!=None:
+            p[0] = p[2]
+            msg_error(p,'Improper function name')
+        elif p[2]['value'] not in functionDict:
+            p[0] = p[2]
+            msg_error(p,'Function not declared')
+        else:
+            temp = TAC.newLabel()
+            TAC.emit('call',p[2]['value'],p[3]['params'],'')
+            p[0] = p[2]
+            p[0] = {
+            'type': functionDict[p[2]['value']],
+            'place': temp,
+            'value': None,
+            'hasVal': 1
+            }
 
 #shd be interPrefixOperator identOrLiteral interPrimarySuffix
 
@@ -1434,8 +1456,11 @@ def p_interPrimarySuffix(p):
         'value': None,
         'place': None
         }
-    else :
-        msg_error(p,'currently interPrimarySuffix -> empty')
+    elif p[2]['type']==None:
+        p[0] = p[1]
+        msg_error(p,'Multidimentional arrays not allowed')
+    else:
+        p[0]=p[1]
 
 def p_identOrLiteral(p):
     # '''identOrLiteral : symbol
@@ -1449,7 +1474,7 @@ def p_identOrLiteral(p):
                         | symbol '''
     # '''identOrLiteral :  literal
     #                     | castExpr
-    #                     | symbol
+    #                     | symbo-l
     #                     | lhs'''
 
     p[0] = p[1]
@@ -1490,7 +1515,24 @@ def p_exprColonEqExpr(p) :
     ''' exprColonEqExpr : expr
                         | expr COLON expr
                         | expr EQUALS expr '''
-
+    if len(p)==2:
+        p[0] = p[1]
+    elif p[2]==':':
+        msg_error(p,'Ranges not supported')
+    elif p[1]==None or p[3]==None:
+        msg_error(p,'Empty expression')
+    elif p[1]['type']!=p[3]['type']:
+        p[0]=p[1]
+        msg_error(p,'Type mismatch')
+    else:
+        temp = TAC.newLabel()
+        TAC.emit('=',p[1]['place'],p[2]['place'],'')
+        p[0] = {
+        'type': p[1]['type'],
+        'hasVal': 1,
+        'place': temp,
+        'value': None
+        }
 
 def p_typeKeyw(p):
     '''typeKeyw : VAR
@@ -1530,6 +1572,26 @@ def p_primarySuffix(p):
                      | DOT symbol
                      | BRACKETLE exprList BRACKETRI
                      | CURLYLE exprList CURLYRI'''
+    p[0] = {}
+    if p[1]=='(':
+        p[0]['type'] = 'CALL'
+        params = []
+        if p[2]!=None:
+            for i in p[2]:
+                if i!=None:
+                    if i['type']!=None:
+                        print i
+                        params.append(i['place'])
+        p[0]['params'] = params
+    elif p[1]=='.':
+        p[0]['type'] = 'ERROR_TYPE'
+        msg_error(p,'Objects not allowed')
+    elif p[1]=='[':
+        p[0]['type'] = 'ARRAY'
+    elif p[1]=='{':
+        p[0]['type'] = 'SET'
+    else:
+        p[0]['type'] = 'DO'
 
 ## we are not implementing generalised lit etc  ## Last rule is also not implemented
 
@@ -1537,6 +1599,10 @@ def p_primarySuffixInter(p):
     ''' primarySuffixInter : exprColonEqExpr COMMA primarySuffixInter
                            | exprColonEqExpr  primarySuffixInter
                            | empty'''
+    if len(p)==2:
+        p[0] = [p[1]]
+    else:
+        p[0] = [p[1]] + p[2]
 
 def p_prefixOperator(p):
     '''prefixOperator : operator'''
@@ -1931,6 +1997,7 @@ def p_identColonEquals(p) :
      'type': None,
      'value': None
     }
+
     p[0]['varlist'].append(p[1]['value'])
     for i in p[0]['varlist']:
         temp = TAC.createTemp()
@@ -1940,7 +2007,7 @@ def p_identColonEquals(p) :
             msg_error(p,'Type mismatch')
             return
 
-        elif p[3]['hasVal'] == 0 or p[4]['hasVal'] == 0 :
+        elif p[4]['hasVal'] == 0 :
             msg_error(p,'rhs has garbage value')
             return
 
