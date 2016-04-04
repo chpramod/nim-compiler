@@ -1,0 +1,8 @@
+var low,high:int
+proc items(range: int): int =
+  var i = range
+  while i <= range:
+    i+=1
+    echo i
+
+items(3)
