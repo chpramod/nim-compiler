@@ -2144,7 +2144,6 @@ def p_error(p):
     global msg
 	# global haltExecution
 	# haltExecution = True
-    print p
     try:
 		print "Syntax Error near '"+str(p.stack[-1].value)+ "' in line "+str(p.stack[-1].lineno) + str(msg)
     except:
