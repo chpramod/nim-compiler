@@ -41,8 +41,8 @@ def p_stmt(p):
 
     # print "printing stmt in stmt", p[0]
 
-    if p[0]['type'] != None :
-        msg_error(p,"syntax error : stmt can not be of any type other than None")
+    # if p[0]['type'] != None :
+    #     msg_error(p,"syntax error : stmt can not be of any type other than None")
 
 def p_stmtStar(p):                      # changed a bit
     '''stmtStar : stmt NEWLINE stmtStar
@@ -199,7 +199,7 @@ def p_exprStmt(p):
     #             | lhs EQUALS expr
     #             | IDENTIFIER EQUALS expr'''
     '''exprStmt : simpleExpr exprStmtInter'''
-
+    print p[1],p[2],'hi'
     p[0] = {
         'type': None,
         'value': None,
@@ -211,9 +211,17 @@ def p_exprStmt(p):
         return
 
 ## whren a = something type thing happens
+
+    if 'array' in p[1]:
+        print "hello",p[1]['value']
+    if ST.getIdenScope(p[1]['value']) != None:
+        print "olleh"
     if p[2]['type']!= None :
-        if ST.getIdenScope(p[1]['value']) == None :
+        if ST.getIdenScope(p[1]['value']) == None and 'array' not in p[1]:
             msg_error(p,'should be a variable')
+            return
+        elif 'array' in p[1] and ST.getIdenScope(p[1]['value']) != None:
+            TAC.emit('=',p[1]['array'],p[2]['place'],'')
             return
 
 
@@ -541,7 +549,7 @@ def p_MarkerExpr(p):
     'endlabel': p[-4]['endlabel'],
     'nextlabel': TAC.newLabel()
     }
-    temp = TAC.newLabel()
+    temp = TAC.createTemp()
     for expr in p[-2]:
         TAC.emitif('ifgoto','!=',expr['place'],p[-4]['expr'],p[0]['nextlabel'])
 
@@ -1433,14 +1441,33 @@ def p_primary(p):
             p[0] = p[2]
             msg_error(p,'Function not declared')
         else:
-            temp = TAC.newLabel()
+            temp = TAC.createTemp()
             TAC.emit('call',p[2]['value'],p[3]['params'],'')
             p[0] = p[2]
             p[0] = {
             'type': functionDict[p[2]['value']],
             'place': temp,
-            'value': None,
+            'value': functionDict[p[2]['value']],
             'hasVal': 1
+            }
+    elif p[3]['type']=='ARRAY':
+        if p[2]['type']==None:
+            p[0] = p[2]
+            msg_error(p,'Improper array name')
+        elif ST.getIdenScope(p[2]['value'])==None:
+            p[0] = p[2]
+            msg_error(p,'Array not declared')
+        else:
+            temp = TAC.createTemp()
+            print p[3],'hi'
+            TAC.emit('=',temp,ST.getIdenAttr(p[2]['value'],'place')+'['+p[3]['place']+']','')
+            p[0] = p[2]
+            p[0] = {
+            'type': ST.getIdenAttr(p[2]['value'],'type'),
+            'place': temp,
+            'value': p[2]['value'],
+            'hasVal': 1,
+            'array': ST.getIdenAttr(p[2]['value'],'place')+'['+p[3]['place']+']'
             }
 
 #shd be interPrefixOperator identOrLiteral interPrimarySuffix
@@ -1466,7 +1493,7 @@ def p_interPrimarySuffix(p):
         'value': None,
         'place': None
         }
-    elif p[2]['type']==None:
+    elif p[2]['type']!=None:
         p[0] = p[1]
         msg_error(p,'Multidimentional arrays not allowed')
     else:
@@ -1535,7 +1562,7 @@ def p_exprColonEqExpr(p) :
         p[0]=p[1]
         msg_error(p,'Type mismatch')
     else:
-        temp = TAC.newLabel()
+        temp = TAC.createTemp()
         TAC.emit('=',p[1]['place'],p[2]['place'],'')
         p[0] = {
         'type': p[1]['type'],
@@ -1598,6 +1625,13 @@ def p_primarySuffix(p):
         msg_error(p,'Objects not allowed')
     elif p[1]=='[':
         p[0]['type'] = 'ARRAY'
+        if p[2]!=[] or p[2]!=[{}] or p[2]!= [[]]:
+            if len(p[2])>1:
+                msg_error(p,"Ranges not allowed")
+            elif p[2][0]['type']==None or p[2][0]['type']=='ERROR_TYPE':
+                msg_error(p,'Unsupported Type')
+            else:
+                p[0]['place'] = p[2][0]['place']
     elif p[1]=='{':
         p[0]['type'] = 'SET'
     else:
@@ -2069,6 +2103,7 @@ def p_identColonEquals(p) :
     elif p[3]['type']!=None:
         if p[3]['size']!=None:
             for i in p[0]['varlist']:
+                TAC.emit('array',ST.getIdenAttr(i,'place'),p[3]['size'],p[3]['type'])
                 ST.setidenAttr(i,'type',p[3]['type'])
                 ST.setidenAttr(i,'size',p[3]['size'])
         else:
