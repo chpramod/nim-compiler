@@ -18,6 +18,7 @@ ST = st.St()
 identifier = {}
 identifierList = []
 functionDict = {}
+call_flag=False
 
 def p_start(p):
 #ignored extra
@@ -41,8 +42,8 @@ def p_stmt(p):
 
     # print "printing stmt in stmt", p[0]
 
-    # if p[0]['type'] != None :
-    #     msg_error(p,"syntax error : stmt can not be of any type other than None")
+    if p[0]['type'] != None :
+        msg_error(p,"syntax error : stmt can not be of any type other than None")
 
 def p_stmtStar(p):                      # changed a bit
     '''stmtStar : stmt NEWLINE stmtStar
@@ -187,6 +188,8 @@ def p_simpleStmt(p):
                 | exprStmt
                 | incStmt'''
     p[0] = p[1]
+    # if p[0]['type']!=None:
+    #     msg_error(p,"Statements should not have return type")
 
 ## we are not implementing exportStmt
 
@@ -222,6 +225,7 @@ def p_exprStmt(p):
 
 
     if p[1]['type'] != p[2]['type']:
+        print "##",p[1]['type'] ,"xx", p[2]
         msg_error(p,'type mismatch')
         return
 
@@ -630,15 +634,15 @@ def p_returnStmt(p):
                 | RETURN'''
     if len(p) > 2:
         p[0] = {
-        'type': p[1],
+        'type': None,
         'return': p[2]
         }
     else:
         p[0] = {
-        'type': p[1],
+        'type': None,
         'return': None
         }
-    print p[1]
+    # print p[1]
     if len(p) > 2:
         TAC.emit('ret',p[2]['place'],'','')
     else:
@@ -663,12 +667,12 @@ def p_yieldStmt(p):
                 | YIELD'''
     if len(p) > 2:
         p[0] = {
-        'type': p[1],
+        'type': None,
         'yield': p[2]
         }
     else:
         p[0] = {
-        'type': p[1],
+        'type': None,
         'yield': None
         }
     if len(p) > 2:
@@ -721,7 +725,7 @@ def p_continueStmt(p):
 def p_incStmt(p):
     '''incStmt : INC expr'''
     p[0] = {
-    'type': p[1],
+    'type': None,
     'increment': p[2]
     }
     TAC.emit('incr',p[1]['place'],'','')
@@ -1444,7 +1448,7 @@ def p_primary(p):
             msg_error(p,'Function not declared')
         else:
             temp = TAC.createTemp()
-            TAC.emit('call',p[2]['value'],p[3]['params'],'')
+            TAC.emit('call',temp,p[2]['value'],p[3]['params'])
             p[0] = p[2]
             p[0] = {
             'type': functionDict[p[2]['value']],
@@ -1452,6 +1456,7 @@ def p_primary(p):
             'value': functionDict[p[2]['value']],
             'hasVal': 1
             }
+            print "Hello",p[0]
     elif p[3]['type']=='ARRAY':
         if p[2]['type']==None:
             p[0] = p[2]
@@ -1772,6 +1777,7 @@ def p_operator(p):
 def p_routine(p):
     ''' routine :  identVis markerFuncLabel paramListColon markerRoutine EQUALS suite  '''
     #  Uncomment it after pulling from rajni
+    print "Bye",p[3]
     functionDict[p[1]['value']] = p[3]['returnType']
     # print "printing dict =", functionDict
 
@@ -1784,6 +1790,7 @@ def p_routine(p):
     }
 
     TAC.emit('ret','','','')
+    TAC.emit('label', "end"+p[0]['value'],'','')
     # print "p[1] in routine" , p[1]
 
 def p_markerFuncLabel(p) :
@@ -1792,6 +1799,7 @@ def p_markerFuncLabel(p) :
     if p[0]['value'] in functionDict:
         msg_error(p,'Two functions with same name')
     functionDict[p[0]['value']] = "INTLIT"
+    TAC.emit('goto', "end"+p[0]['value'],'','')
     TAC.emit('label', p[0]['value'],'','')
 
 
@@ -1856,7 +1864,7 @@ def p_paramListColon(p):
                         | paramListInter COLON typeKeyww'''  # changed from paramListInter COLON typeDescK
     p[0] = {
     'varlist': (p[1]['varlist'] if p[1]['type'] != None else None ),
-    'returnType': (p[3] if len(p)>2 else None),
+    'returnType': (p[3]['type'] if len(p)>2 else None),
     'type' : 'paramListColon'
     }
 
@@ -2237,7 +2245,7 @@ def testYacc(inputFile):
     data = program.read()
     customLexer = lexer.customLexer()
     result=parser.parse(data, lexer=customLexer, debug=log)
-    pprint(result)
+    # pprint(result)               # removed as we don't know what it does : Preetansh
     # print "now printing TAC code"
     TAC.printCode()
     # parser.parse(program, lexer=lexer, debug=1)

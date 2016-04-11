@@ -1,2 +1,4 @@
-""" - Triple quotes is a valid sequence in nim (Run string.nim)
-
++= not working
+cannot print strings
+no 'for'
+inc stmt does not work
