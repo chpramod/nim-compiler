@@ -745,7 +745,7 @@ def p_incStmt(p):
     'type': None,
     'increment': p[2]
     }
-    TAC.emit('incr',p[1]['place'],'','')
+    TAC.emit('incr',p[2]['place'],'','')
 
 def p_blockStmt(p):
     '''blockStmt : BLOCK symbol COLON suite
