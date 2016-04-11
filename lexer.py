@@ -28,6 +28,7 @@ reserved = {
     'div' : 'DIV' ,
     'do' : 'DO' ,
     'echo' : 'ECHO',
+    'scan' : 'SCAN' ,                            # manually added
     'elif' : 'ELIF' ,
     'else' : 'ELSE' ,
     'end' : 'END' ,
