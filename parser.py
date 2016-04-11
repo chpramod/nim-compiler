@@ -229,7 +229,7 @@ def p_exprStmt(p):
 
 
     if p[1]['type'] != p[2]['type']:
-        print "##",p[1]['type'] ,"xx", p[2]
+        # print "##",p[1]['type'] ,"xx", p[2]
         msg_error(p,'type mismatch')
         return
 
@@ -622,12 +622,16 @@ def p_scanStmt(p):
     }
     expr = p[2]
 
+    
+    ST.setidenAttr(expr['value'], 'hasVal', 1)
+
     if expr['type'] == 'CHARLIT' :
             TAC.emit('scantchar',expr['place'],'','')
     elif expr['type'] == 'INTLIT' :
         TAC.emit('scan',expr['place'],'','')
     elif expr['type'] == 'STRLIT' :
         TAC.emit('scanstr',expr['place'],'','')
+
 
 
 
