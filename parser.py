@@ -1493,19 +1493,29 @@ def p_primary(p):
             'array': ST.getIdenAttr(p[2]['value'],'place')+'['+p[3]['place']+']'
             }
 
+    # print " p[1] in primary", p[1]
+    if p[1]['value'] == '-' :
+        # print " reached primary where p[1] = - "
+        placeOfIdentOrLiteral = p[0]['place']
+        TAC.emit('-',placeOfIdentOrLiteral,'0',placeOfIdentOrLiteral)
+
 #shd be interPrefixOperator identOrLiteral interPrimarySuffix
 
 def p_interPrefixOperator(p):
-    '''interPrefixOperator : prefixOperator interPrefixOperator
+    # '''interPrefixOperator : prefixOperator interPrefixOperator               # Currently only one operator is allowed
+    #                         | empty '''
+
+    '''interPrefixOperator : prefixOperator
                             | empty '''
-    if len(p) == 2 :
+    if p[1]['type'] == None :
         p[0] = {
         'type': None,
         'value': None,
         'place': None
         }
     else :
-        msg_error(p,'currently interPrefixOperator -> empty')
+        p[0] = p[1]       ## p[1]['type'] = 'operator' and p[1]['value'] = operator symbol
+        # msg_error(p,'currently interPrefixOperator -> empty')  ## now our prefix operator can go to ! and - only
 
 def p_interPrimarySuffix(p):
     '''interPrimarySuffix : primarySuffix interPrimarySuffix
@@ -1673,6 +1683,8 @@ def p_primarySuffixInter(p):
 def p_prefixOperator(p):
     '''prefixOperator : operator'''
 
+    p[0]= p[1]
+
 def p_symbol(p):
     '''symbol : IDENTIFIER'''
 #                | ADDR'''
@@ -1788,7 +1800,11 @@ def p_operator(p):
                 | NOT
                 | STATIC
                 | DOTDOT'''
-    p[0] = p[1]
+    p[0] = {
+    'value' : p[1],
+    'type' : 'operator'
+    }
+
 
 def p_routine(p):
     ''' routine :  identVis markerFuncLabel paramListColon markerRoutine EQUALS suite  '''
