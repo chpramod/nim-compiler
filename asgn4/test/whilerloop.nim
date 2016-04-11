@@ -3,4 +3,4 @@ proc items(range: int): int =
   while i :
     i+=1
     echo i
-items(4)
+items(3)
