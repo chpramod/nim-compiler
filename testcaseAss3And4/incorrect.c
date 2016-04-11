@@ -5,8 +5,17 @@ int main(){
         if (i>=0);{
             printf("yes\n");
         }
-        else 
+        else
             printf("no\n");
     }
     return 0;
 }
+
+
+var i:int=6
+while i<=8 and i 6 and i!=7:
+  if i>=0:
+    echo 1
+  else:
+    echo 0
+  i=i+1
