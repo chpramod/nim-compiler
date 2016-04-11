@@ -603,7 +603,10 @@ def p_echoStmt(p):
     'echo': p[2]
     }
     for expr in p[2]:
-        TAC.emit('print',expr['place'],'','')
+        if expr['type'] == 'CHARLIT' :
+                TAC.emit('printchar',expr['place'],'','')
+        else :
+            TAC.emit('print',expr['place'],'','')
 
 def p_importStmt(p):
     '''importStmt : IMPORT exprList
@@ -745,7 +748,7 @@ def p_incStmt(p):
     'type': None,
     'increment': p[2]
     }
-    TAC.emit('incr',p[1]['place'],'','')
+    TAC.emit('incr',p[2]['place'],'','')
 
 def p_blockStmt(p):
     '''blockStmt : BLOCK symbol COLON suite
@@ -1718,7 +1721,8 @@ def p_symbol(p):
         }
 
 def p_literal(p):# was INTLIT in place of INT
-    '''literal : int'''
+    '''literal : int
+                | char    '''
                 # | INT8LIT
                 # | INT32LIT
                 # | INT16LIT
@@ -1746,6 +1750,29 @@ def p_int(p):
     'place': temp,
     'hasVal': 1
     }
+
+def p_char(p):
+    '''char : CHARLIT '''
+
+    temp = TAC.createTemp()
+    # print "literal ---",temp,p[1], p.slice[1].type
+    # print "type of p[1]= ", type(p[1])
+    # print " using list to get char ", list(p[1]),list(p[1])[0]
+    # print "ASCII of p[1] = ", ord(list(p[1])[0])
+
+    strAscii = str(ord(p[1]))
+
+    TAC.emit('=',temp,strAscii,'')
+
+    p[0] = {
+    'type': p.slice[1].type,
+    'value': ord(p[1]),                 ## ord() gives ASCII
+    'place': temp,
+    'hasVal': 1
+    }
+
+    print "p[0] in char", p[0]
+
 # def p_par(p):
 
 # def p_int(p):
@@ -1886,6 +1913,8 @@ def p_typeKeyww(p):
         p[0]['type']='INTLIT'
     elif p[1]=='bool':
         p[0]['type']='BOOLEAN'
+    elif p[1]=='char':
+        p[0]['type']='CHARLIT'
 
     # print 'hi'
     # print p[0]['type']
