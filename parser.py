@@ -18,7 +18,8 @@ ST = st.St()
 identifier = {}
 identifierList = []
 functionDict = {}
-call_flag=False
+break_label=None
+continue_label=None
 
 def p_start(p):
 #ignored extra
@@ -42,8 +43,8 @@ def p_stmt(p):
 
     # print "printing stmt in stmt", p[0]
 
-    if p[0]['type'] != None :
-        msg_error(p,"syntax error : stmt can not be of any type other than None")
+    # if p[0]['type'] != None :
+    #     msg_error(p,"syntax error : stmt can not be of any type other than None")
 
 def p_stmtStar(p):                      # changed a bit
     '''stmtStar : stmt NEWLINE stmtStar
@@ -316,16 +317,22 @@ def p_whileStmt(p):
 
 def p_whileStartLabel(p):
     '''whileStartLabel : '''
+    global break_label,continue_label
     p[0] = {
     'start': TAC.newLabel(),
     'end': TAC.newLabel()
     }
     TAC.emit('label',p[0]['start'],'','')
+    break_label=p[0]['end']
+    continue_labe=p[0]['end']
 
 def p_whileEndLabel(p):
     '''whileEndLabel : '''
+    global break_label,continue_labe
     TAC.emit('goto',p[-5]['start'],'','')
     TAC.emit('label',p[-5]['end'],'','')
+    break_label=None
+    continue_labe=None
 
 def p_identWithPragmaInter(p):
     '''identWithPragmaInter : COMMA identWithPragma identWithPragmaInter
@@ -552,7 +559,7 @@ def p_MarkerExpr(p):
     }
     temp = TAC.createTemp()
     for expr in p[-2]:
-        TAC.emitif('ifgoto','!=',expr['place'],p[-4]['expr'],p[0]['nextlabel'])
+        TAC.emitif('ifgoto','!=',expr['place'],p[-4]['expr']['place'],p[0]['nextlabel'])
 
 def p_OfMarkerEnd(p):
     '''OfMarkerEnd : '''
@@ -582,7 +589,7 @@ def p_caseStmt(p):
     '''caseStmt : CASE expr COLON NEWLINE INDGR MarkerCase ofBranches elifStmt elseStmt INDLE MarkerCaseEnd'''
     p[0] = {
     'inline': False,
-    'type': p[1],
+    'type': None,
     'case': p[2],
     'branches': p[7],
     'elif': p[8],
@@ -592,7 +599,7 @@ def p_caseStmt(p):
 def p_echoStmt(p):
     '''echoStmt : ECHO exprList'''
     p[0] = {
-    'type': p[1],
+    'type': None,
     'echo': p[2]
     }
     for expr in p[2]:
@@ -697,30 +704,40 @@ def p_discardStmt(p):
 def p_breakStmt(p):
     '''breakStmt : BREAK expr
                 | BREAK'''
+    global break_label
     if len(p) > 2:
         p[0] = {
-        'type': p[1],
+        'type': None,
         'break': p[2]
         }
     else:
         p[0] = {
-        'type': p[1],
+        'type': None,
         'break': None
         }
+    if break_label==None:
+        msg_error(p,'Break outside loop')
+    else:
+        TAC.emit('goto',break_label,'','')
 
 def p_continueStmt(p):
     '''continueStmt : CONTINUE expr
                 | CONTINUE'''
+    global continue_label
     if len(p) > 2:
         p[0] = {
-        'type': p[1],
+        'type': None,
         'continue': p[2]
         }
     else:
         p[0] = {
-        'type': p[1],
+        'type': None,
         'continue': None
         }
+    if continue_label==None:
+        msg_error(p,'Continue outside loop')
+    else:
+        TAC.emit('goto',continue_label,'','')
 
 def p_incStmt(p):
     '''incStmt : INC expr'''
@@ -888,7 +905,7 @@ def p_arrowExpr(p):
         elif p[1]['type']!=p[3]['type']:
             msg_error(p,'Type mismatch')
 
-        elif p[1]['hasVal'] == 0 or p[2]['hasVal'] == 0 :
+        elif p[1]['hasVal'] == 0 or p[3]['hasVal'] == 0 :
             msg_error(p,'rhs has garbage value')
             return
 
@@ -1456,7 +1473,6 @@ def p_primary(p):
             'value': functionDict[p[2]['value']],
             'hasVal': 1
             }
-            print "Hello",p[0]
     elif p[3]['type']=='ARRAY':
         if p[2]['type']==None:
             p[0] = p[2]
@@ -1777,7 +1793,6 @@ def p_operator(p):
 def p_routine(p):
     ''' routine :  identVis markerFuncLabel paramListColon markerRoutine EQUALS suite  '''
     #  Uncomment it after pulling from rajni
-    print "Bye",p[3]
     functionDict[p[1]['value']] = p[3]['returnType']
     # print "printing dict =", functionDict
 
