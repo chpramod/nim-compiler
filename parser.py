@@ -605,8 +605,10 @@ def p_echoStmt(p):
     for expr in p[2]:
         if expr['type'] == 'CHARLIT' :
                 TAC.emit('printchar',expr['place'],'','')
-        else :
+        elif expr['type'] == 'INTLIT' :
             TAC.emit('print',expr['place'],'','')
+        elif expr['type'] == 'STRLIT' :
+            TAC.emit('printstr',expr['place'],'','')
 
 def p_importStmt(p):
     '''importStmt : IMPORT exprList
@@ -784,16 +786,7 @@ def p_asmStmt(p):
     '''asmStmt : ASM pragma strings
                 | ASM strings'''
 
-def p_strings(p):
-    '''strings : STRLIT
-                | RSTRLIT
-                | TRIPLESTRLIT'''
-    temp = TAC.createTemp()
-    TAC.emit('=',temp,p[1],'')
-    p[0]={
-    'type': 'STRING',
-    'place': temp
-    }
+
 
 def p_expr(p):
     '''expr : ifExpr
@@ -1722,7 +1715,8 @@ def p_symbol(p):
 
 def p_literal(p):# was INTLIT in place of INT
     '''literal : int
-                | char    '''
+                | char
+                | strings '''
                 # | INT8LIT
                 # | INT32LIT
                 # | INT16LIT
@@ -1736,6 +1730,7 @@ def p_literal(p):# was INTLIT in place of INT
                 # | NIL'''
  #boolean also added
     p[0]=p[1]
+
 def p_int(p):
     '''int : INTLIT
             | BOOLEAN'''
@@ -1771,7 +1766,26 @@ def p_char(p):
     'hasVal': 1
     }
 
-    print "p[0] in char", p[0]
+    # print "p[0] in char", p[0]
+
+
+def p_strings(p):
+    # '''strings : STRLIT
+    #             | RSTRLIT
+    #             | TRIPLESTRLIT'''
+
+    '''strings : STRLIT
+                | RSTRLIT
+                | TRIPLESTRLIT'''
+    temp = TAC.createTemp()
+    print "p[1] in strings = ", p[1]
+    TAC.emit('string',temp,p[1],'')
+    p[0]={
+    'type': 'STRLIT',
+    'place': temp,
+    'value': p[1],
+    'hasVal': 1
+    }
 
 # def p_par(p):
 
@@ -1915,6 +1929,9 @@ def p_typeKeyww(p):
         p[0]['type']='BOOLEAN'
     elif p[1]=='char':
         p[0]['type']='CHARLIT'
+    elif p[1]=='string':
+        p[0]['type']='STRLIT'
+
 
     # print 'hi'
     # print p[0]['type']
