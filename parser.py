@@ -174,7 +174,7 @@ def p_complexOrSimpleStmt(p):
 
 
 
-def p_simpleStmt(p):
+def p_simpleStmt(p):                            ## Scan manually added
     '''simpleStmt : returnStmt
                 | raiseStmt
                 | yieldStmt
@@ -184,10 +184,13 @@ def p_simpleStmt(p):
                 | pragmaStmt
                 | importStmt
                 | echoStmt
+                | scanStmt
                 | fromStmt
                 | includeStmt
                 | exprStmt
                 | incStmt'''
+
+
     p[0] = p[1]
     # if p[0]['type']!=None:
     #     msg_error(p,"Statements should not have return type")
@@ -609,6 +612,24 @@ def p_echoStmt(p):
             TAC.emit('print',expr['place'],'','')
         elif expr['type'] == 'STRLIT' :
             TAC.emit('printstr',expr['place'],'','')
+
+
+def p_scanStmt(p):
+    '''scanStmt : SCAN expr'''              # only one scan allowed
+    p[0] = {
+    'type': None,
+    'scan': p[2]
+    }
+    expr = p[2]
+
+    if expr['type'] == 'CHARLIT' :
+            TAC.emit('scantchar',expr['place'],'','')
+    elif expr['type'] == 'INTLIT' :
+        TAC.emit('scan',expr['place'],'','')
+    elif expr['type'] == 'STRLIT' :
+        TAC.emit('scanstr',expr['place'],'','')
+
+
 
 def p_importStmt(p):
     '''importStmt : IMPORT exprList
