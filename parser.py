@@ -483,6 +483,7 @@ def p_makeCondLabels1(p):
     p[0]=[label1,label2,label3]
     # print "in p_makeCondLabels1 p[-2] = ", p[-2]
     # TAC.emitif('ifgoto', 'eq', p[-2], 1, label1)
+    # print p[-2]
     TAC.emitif('ifgoto', 'eq', p[-2]['place'], 1, label1)
     TAC.emit('goto', label2, '', '')
     TAC.emit('label', label1, '', '')
@@ -1790,7 +1791,7 @@ def p_markerFuncLabel(p) :
     p[0] = p[-1]
     if p[0]['value'] in functionDict:
         msg_error(p,'Two functions with same name')
-    functionDict[p[0]['value']] = "DUMMY"
+    functionDict[p[0]['value']] = "INTLIT"
     TAC.emit('label', p[0]['value'],'','')
 
 
@@ -1821,7 +1822,7 @@ def p_markerRoutine(p) :
         for i in p[0]['varlist'] :
             temp = TAC.createTemp()
             # print "var name and var type = ",p[0]['varlist'][i]['varName'],p[0]['varlist'][i]['varType']
-            ST.addIdenInScope(newScope,p[0]['varlist'][i]['varName'],temp,p[0]['varlist'][i]['varType'],0)
+            ST.addIdenInScope(newScope,p[0]['varlist'][i]['varName'],temp,p[0]['varlist'][i]['varType'],1)
             if p[0]['varlist'][i]['varValue'] != None :
                 TAC.emit('=',temp,p[0]['varlist'][i]['varValue'],'')
 
