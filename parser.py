@@ -238,9 +238,13 @@ def p_exprStmt(p):
         return
 
     p[1]['hasVal'] = 1
-    ST.setidenAttr(p[1]['value'], 'hasVal', 1)
 
-    TAC.emit('=',p[1]['place'],p[2]['place'],'')
+    if (p[2]['type'] == 'STRLIT'):
+        ST.setidenAttr(p[1]['value'], 'hasVal', 1)
+        TAC.emit('string',p[1]['place'],p[2]['value'],'')
+    else :
+        ST.setidenAttr(p[1]['value'], 'hasVal', 1)
+        TAC.emit('=',p[1]['place'],p[2]['place'],'')
 
                                                          ## MUST BE DEALT using Symbol table
     # print "for checking type and value in exprstmt \n"              ## Assuming it computes only identifier = expr type only
@@ -620,13 +624,13 @@ def p_echoStmt(p):
             TAC.emit('goto',l2,'','')
             TAC.emit('label',l1,'','')
             strtemp = TAC.createTemp()
-            TAC.emit('string',strtemp,'"true"','')
-            TAC.emit('printstr',strtemp,'','')
+            # TAC.emit('string',strtemp,'"true"','')
+            TAC.emit('printstr','$trueString','','')
             TAC.emit('goto',l3,'','')
             TAC.emit('label',l2,'','')
             strtemp2 = TAC.createTemp()
-            TAC.emit('string',strtemp2,'"false"','')
-            TAC.emit('printstr',strtemp2,'','')
+            # TAC.emit('string',strtemp2,'"false"','')
+            TAC.emit('printstr','$falseString','','')
             TAC.emit('label',l3,'','')
 
 
@@ -1838,7 +1842,7 @@ def p_strings(p):
                 | RSTRLIT
                 | TRIPLESTRLIT'''
     temp = TAC.createTemp()
-    print "p[1] in strings = ", p[1]
+    # print "p[1] in strings = ", p[1]
     TAC.emit('string',temp,p[1],'')
     p[0]={
     'type': 'STRLIT',
@@ -2228,6 +2232,8 @@ def p_identColonEquals(p) :
      'value': None
     }
 
+    # print " p[4] in identcolonequal = ", p[4]
+
     p[0]['varlist'].append(p[1]['value'])
     for i in p[0]['varlist']:
         temp = TAC.createTemp()
@@ -2241,10 +2247,16 @@ def p_identColonEquals(p) :
             return
         for i in p[0]['varlist']:
             # ST.setidenAttr(i,'place',p[4]['place'])
-            place = ST.getIdenAttr(i,'place')
-            TAC.emit('=', place, p[4]['place'], '' )
-            ST.setidenAttr(i,'type',p[4]['type'])
-            ST.setidenAttr(i,'hasVal',1)
+            if p[4]['type'] == 'STRLIT' :
+                place = ST.getIdenAttr(i,'place')
+                TAC.emit('string', place, p[4]['value'], '' )
+                ST.setidenAttr(i,'type',p[4]['type'])
+                ST.setidenAttr(i,'hasVal',1)
+            else :
+                place = ST.getIdenAttr(i,'place')
+                TAC.emit('=', place, p[4]['place'], '' )
+                ST.setidenAttr(i,'type',p[4]['type'])
+                ST.setidenAttr(i,'hasVal',1)
 
     elif p[3]['type']!=None:
         if p[3]['size']!=None:
@@ -2256,11 +2268,21 @@ def p_identColonEquals(p) :
             for i in p[0]['varlist']:
                 ST.setidenAttr(i,'type',p[3]['type'])
     elif p[4]['type']!=None:
+
         for i in p[0]['varlist']:
-            place = ST.getIdenAttr(i,'place')
-            TAC.emit('=', place, p[4]['place'], '' )
-            ST.setidenAttr(i,'type',p[4]['type'])
-            ST.setidenAttr(i,'hasVal',1)
+
+            if p[4]['type'] == 'STRLIT' :
+                place = ST.getIdenAttr(i,'place')
+                TAC.emit('string', place, p[4]['value'], '' )
+                ST.setidenAttr(i,'type',p[4]['type'])
+                ST.setidenAttr(i,'hasVal',1)
+            else :
+                place = ST.getIdenAttr(i,'place')
+                TAC.emit('=', place, p[4]['place'], '' )
+                ST.setidenAttr(i,'type',p[4]['type'])
+                ST.setidenAttr(i,'hasVal',1)
+
+
     # print "debug in identColonEquals"
     # print ST.St[ST.curScope]['identifiers']
     # print " ^^\n"
