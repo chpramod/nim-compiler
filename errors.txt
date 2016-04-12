@@ -1,5 +1,15 @@
-+= not working
-cannot print strings
+negative value not yet! yeah wait for it! {SOLVED}
++= not working {SOLVED FOR NOW}
+check break and continue
+cannot print strings  { Now we can but we need to modify codegen accordingly }
+scanf                 {three different scanfs added scan, scanchar, scanstr , we still need to modify codegen for this}
 no 'for'
-inc stmt does not work
-we should improve error message to properly diff b/w semantic errors and perse errors
+inc stmt does not work {SOVLED}
+we should improve error message to properly diff b/w semantic errors and parse errors
+only standard strings are allowed, ''' triple strlit not allowed like this '''
+
+
+CODEGEN:
+array in RHS
+param passing
+a=foo() type statements
