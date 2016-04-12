@@ -1509,7 +1509,8 @@ def p_primary(p):
             for param in p[3]['params']:
                 TAC.emit('push',param,'','')
 
-            TAC.emit('call','',p[2]['value'],'')
+
+            TAC.emit('call','',p[2]['value'],temp)
             p[0] = p[2]
             p[0] = {
             'type': functionDict[p[2]['value']],
