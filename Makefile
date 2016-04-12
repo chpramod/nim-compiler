@@ -1,4 +1,8 @@
-all:
+all : 
+	make parse
+	make ass	
+
+ass:
 	python preprocess.py testinput.txt>testinput1.txt
 	python codegen.py testinput1.txt
 	as -32 AssCode.s -o output.o
