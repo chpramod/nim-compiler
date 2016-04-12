@@ -572,6 +572,12 @@ def generateAssCode(code):
 					fp.write("\tpushl $formatstr\n\tcall scanf\n")
 					fp.write("\tpopl dump\n")
 					fp.write("\tpopl dump\n")
+			elif line[1]=='printchar':                                          #printcar, $a
+				regmem.freeAll()
+				fp.write("\tmovl $1, %edx\n")
+				fp.write("\tmovl {0}, %ecx\n".format(line[2]))
+				fp.write("\tmovl $1, %ebx\n\tmovl $4, %eax\n\tint $0x80\n")
+				# fp.write("\tpopl dump\n")
 			elif line[1]=='array':
 				arrayCurrent=[line[2],line[3]]
 				arrayDef.append(arrayCurrent)
