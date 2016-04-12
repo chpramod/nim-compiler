@@ -1505,7 +1505,7 @@ def p_primary(p):
             msg_error(p,'Function not declared')
         else:
             temp = TAC.createTemp()
-            TAC.emit('call',temp,p[2]['value'],p[3]['params'])
+            TAC.emit('call','',p[2]['value'],p[3]['params'])
             p[0] = p[2]
             p[0] = {
             'type': functionDict[p[2]['value']],
