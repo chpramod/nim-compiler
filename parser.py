@@ -612,6 +612,25 @@ def p_echoStmt(p):
             TAC.emit('print',expr['place'],'','')
         elif expr['type'] == 'STRLIT' :
             TAC.emit('printstr',expr['place'],'','')
+        elif expr['type'] == 'BOOLEAN' :
+            l1 = TAC.newLabel()
+            l2 = TAC.newLabel()
+            l3 = TAC.newLabel()
+            TAC.emitif('ifgoto','eq','1',expr['place'],l1)
+            TAC.emit('goto',l2,'','')
+            TAC.emit('label',l1,'','')
+            strtemp = TAC.createTemp()
+            TAC.emit('string',strtemp,'"true"','')
+            TAC.emit('printstr',strtemp,'','')
+            TAC.emit('goto',l3,'','')
+            TAC.emit('label',l2,'','')
+            strtemp2 = TAC.createTemp()
+            TAC.emit('string',strtemp2,'"false"','')
+            TAC.emit('printstr',strtemp2,'','')
+            TAC.emit('label',l3,'','')
+
+
+
 
 
 def p_scanStmt(p):
@@ -622,7 +641,7 @@ def p_scanStmt(p):
     }
     expr = p[2]
 
-    
+
     ST.setidenAttr(expr['value'], 'hasVal', 1)
 
     if expr['type'] == 'CHARLIT' :
