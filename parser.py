@@ -174,7 +174,7 @@ def p_complexOrSimpleStmt(p):
 
 
 
-def p_simpleStmt(p):
+def p_simpleStmt(p):                            ## Scan manually added
     '''simpleStmt : returnStmt
                 | raiseStmt
                 | yieldStmt
@@ -184,10 +184,13 @@ def p_simpleStmt(p):
                 | pragmaStmt
                 | importStmt
                 | echoStmt
+                | scanStmt
                 | fromStmt
                 | includeStmt
                 | exprStmt
                 | incStmt'''
+
+
     p[0] = p[1]
     # if p[0]['type']!=None:
     #     msg_error(p,"Statements should not have return type")
@@ -226,7 +229,7 @@ def p_exprStmt(p):
 
 
     if p[1]['type'] != p[2]['type']:
-        print "##",p[1]['type'] ,"xx", p[2]
+        # print "##",p[1]['type'] ,"xx", p[2]
         msg_error(p,'type mismatch')
         return
 
@@ -603,7 +606,34 @@ def p_echoStmt(p):
     'echo': p[2]
     }
     for expr in p[2]:
-        TAC.emit('print',expr['place'],'','')
+        if expr['type'] == 'CHARLIT' :
+                TAC.emit('printchar',expr['place'],'','')
+        elif expr['type'] == 'INTLIT' :
+            TAC.emit('print',expr['place'],'','')
+        elif expr['type'] == 'STRLIT' :
+            TAC.emit('printstr',expr['place'],'','')
+
+
+def p_scanStmt(p):
+    '''scanStmt : SCAN expr'''              # only one scan allowed
+    p[0] = {
+    'type': None,
+    'scan': p[2]
+    }
+    expr = p[2]
+
+    
+    ST.setidenAttr(expr['value'], 'hasVal', 1)
+
+    if expr['type'] == 'CHARLIT' :
+            TAC.emit('scantchar',expr['place'],'','')
+    elif expr['type'] == 'INTLIT' :
+        TAC.emit('scan',expr['place'],'','')
+    elif expr['type'] == 'STRLIT' :
+        TAC.emit('scanstr',expr['place'],'','')
+
+
+
 
 def p_importStmt(p):
     '''importStmt : IMPORT exprList
@@ -745,7 +775,7 @@ def p_incStmt(p):
     'type': None,
     'increment': p[2]
     }
-    TAC.emit('incr',p[1]['place'],'','')
+    TAC.emit('incr',p[2]['place'],'','')
 
 def p_blockStmt(p):
     '''blockStmt : BLOCK symbol COLON suite
@@ -781,16 +811,7 @@ def p_asmStmt(p):
     '''asmStmt : ASM pragma strings
                 | ASM strings'''
 
-def p_strings(p):
-    '''strings : STRLIT
-                | RSTRLIT
-                | TRIPLESTRLIT'''
-    temp = TAC.createTemp()
-    TAC.emit('=',temp,p[1],'')
-    p[0]={
-    'type': 'STRING',
-    'place': temp
-    }
+
 
 def p_expr(p):
     '''expr : ifExpr
@@ -1493,19 +1514,29 @@ def p_primary(p):
             'array': ST.getIdenAttr(p[2]['value'],'place')+'['+p[3]['place']+']'
             }
 
+    # print " p[1] in primary", p[1]
+    if p[1]['value'] == '-' :
+        # print " reached primary where p[1] = - "
+        placeOfIdentOrLiteral = p[0]['place']
+        TAC.emit('-',placeOfIdentOrLiteral,'0',placeOfIdentOrLiteral)
+
 #shd be interPrefixOperator identOrLiteral interPrimarySuffix
 
 def p_interPrefixOperator(p):
-    '''interPrefixOperator : prefixOperator interPrefixOperator
+    # '''interPrefixOperator : prefixOperator interPrefixOperator               # Currently only one operator is allowed
+    #                         | empty '''
+
+    '''interPrefixOperator : prefixOperator
                             | empty '''
-    if len(p) == 2 :
+    if p[1]['type'] == None :
         p[0] = {
         'type': None,
         'value': None,
         'place': None
         }
     else :
-        msg_error(p,'currently interPrefixOperator -> empty')
+        p[0] = p[1]       ## p[1]['type'] = 'operator' and p[1]['value'] = operator symbol
+        # msg_error(p,'currently interPrefixOperator -> empty')  ## now our prefix operator can go to ! and - only
 
 def p_interPrimarySuffix(p):
     '''interPrimarySuffix : primarySuffix interPrimarySuffix
@@ -1673,6 +1704,8 @@ def p_primarySuffixInter(p):
 def p_prefixOperator(p):
     '''prefixOperator : operator'''
 
+    p[0]= p[1]
+
 def p_symbol(p):
     '''symbol : IDENTIFIER'''
 #                | ADDR'''
@@ -1706,7 +1739,9 @@ def p_symbol(p):
         }
 
 def p_literal(p):# was INTLIT in place of INT
-    '''literal : int'''
+    '''literal : int
+                | char
+                | strings '''
                 # | INT8LIT
                 # | INT32LIT
                 # | INT16LIT
@@ -1720,6 +1755,7 @@ def p_literal(p):# was INTLIT in place of INT
                 # | NIL'''
  #boolean also added
     p[0]=p[1]
+
 def p_int(p):
     '''int : INTLIT
             | BOOLEAN'''
@@ -1734,6 +1770,48 @@ def p_int(p):
     'place': temp,
     'hasVal': 1
     }
+
+def p_char(p):
+    '''char : CHARLIT '''
+
+    temp = TAC.createTemp()
+    # print "literal ---",temp,p[1], p.slice[1].type
+    # print "type of p[1]= ", type(p[1])
+    # print " using list to get char ", list(p[1]),list(p[1])[0]
+    # print "ASCII of p[1] = ", ord(list(p[1])[0])
+
+    strAscii = str(ord(p[1]))
+
+    TAC.emit('=',temp,strAscii,'')
+
+    p[0] = {
+    'type': p.slice[1].type,
+    'value': ord(p[1]),                 ## ord() gives ASCII
+    'place': temp,
+    'hasVal': 1
+    }
+
+    # print "p[0] in char", p[0]
+
+
+def p_strings(p):
+    # '''strings : STRLIT
+    #             | RSTRLIT
+    #             | TRIPLESTRLIT'''
+
+    '''strings : STRLIT
+                | RSTRLIT
+                | TRIPLESTRLIT'''
+    temp = TAC.createTemp()
+    print "p[1] in strings = ", p[1]
+    TAC.emit('string',temp,p[1],'')
+    p[0]={
+    'type': 'STRLIT',
+    'place': temp,
+    'value': p[1],
+    'hasVal': 1
+    }
+
 # def p_par(p):
 
 # def p_int(p):
@@ -1788,7 +1866,11 @@ def p_operator(p):
                 | NOT
                 | STATIC
                 | DOTDOT'''
-    p[0] = p[1]
+    p[0] = {
+    'value' : p[1],
+    'type' : 'operator'
+    }
+
 
 def p_routine(p):
     ''' routine :  identVis markerFuncLabel paramListColon markerRoutine EQUALS suite  '''
@@ -1870,6 +1952,11 @@ def p_typeKeyww(p):
         p[0]['type']='INTLIT'
     elif p[1]=='bool':
         p[0]['type']='BOOLEAN'
+    elif p[1]=='char':
+        p[0]['type']='CHARLIT'
+    elif p[1]=='string':
+        p[0]['type']='STRLIT'
+
 
     # print 'hi'
     # print p[0]['type']
