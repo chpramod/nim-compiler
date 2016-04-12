@@ -1505,7 +1505,11 @@ def p_primary(p):
             msg_error(p,'Function not declared')
         else:
             temp = TAC.createTemp()
-            TAC.emit('call','',p[2]['value'],p[3]['params'])
+            print "p[3] in primary =", p[3]
+            for param in p[3]['params']:
+                TAC.emit('push',param,'','')
+
+            TAC.emit('call','',p[2]['value'],'')
             p[0] = p[2]
             p[0] = {
             'type': functionDict[p[2]['value']],
@@ -1687,6 +1691,7 @@ def p_primarySuffix(p):
         p[0]['type'] = 'CALL'
         params = []
         if p[2]!=None:
+            print "p[2] in p_primarySuffix", p[2]
             for i in p[2]:
                 if i!=None:
                     if i['type']!=None:
@@ -1715,10 +1720,20 @@ def p_primarySuffixInter(p):
     ''' primarySuffixInter : exprColonEqExpr COMMA primarySuffixInter
                            | exprColonEqExpr  primarySuffixInter
                            | empty'''
+
+    print "len in primarySuffixInter", len(p)
+
     if len(p)==2:
         p[0] = [p[1]]
-    else:
+
+    elif len(p)==3 :
+        # print "p[1] and p[2] and p[3] in p_primarySuffixInter =", p[1],p[2]
         p[0] = [p[1]] + p[2]
+
+    elif len(p)==4 :
+        # print "p[1] and p[2] and p[3] in p_primarySuffixInter =", p[1],p[2]
+        p[0] = [p[1]] + p[3]
+
 
 def p_prefixOperator(p):
     '''prefixOperator : operator'''
