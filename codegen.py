@@ -454,30 +454,30 @@ def generateAssCode(code):
 						fp.write("\tcmpl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[3])))
 						regmem.freeRegister()
 						if (line[5].isdigit()):
-							fp.write("\tjle label%s\n"%(line[5]))
+							fp.write("\tjl label%s\n"%(line[5]))
 						else:
-							fp.write("\tjle %s\n"%(line[5]))
+							fp.write("\tjl %s\n"%(line[5]))
 					elif (line[3].startswith('$')):												#a<2
 						fp.write("\tcmpl $%s, %s\n" %(line[4],regmem.getRegister(line[3])))
 						regmem.freeRegister()
 						if (line[5].isdigit()):
-							fp.write("\tjle label%s\n"%(line[5]))
+							fp.write("\tjl label%s\n"%(line[5]))
 						else:
-							fp.write("\tjle %s\n"%(line[5]))
+							fp.write("\tjl %s\n"%(line[5]))
 					elif (line[4].startswith('$')):												#2<a
 						fp.write("\tcmpl %s, $%s\n" %(regmem.getRegister(line[4]),line[3]))
 						regmem.freeRegister()
 						if (line[5].isdigit()):
-							fp.write("\tjle label%s\n"%(line[5]))
+							fp.write("\tjl label%s\n"%(line[5]))
 						else:
-							fp.write("\tjle %s\n"%(line[5]))
+							fp.write("\tjl %s\n"%(line[5]))
 					else:																		#3<2
 						fp.write("\tcmpl $%s, $%s\n" %(line[4],line[3]))
 						regmem.freeRegister()
 						if (line[5].isdigit()):
-							fp.write("\tjle label%s\n"%(line[5]))
+							fp.write("\tjl label%s\n"%(line[5]))
 						else:
-							fp.write("\tjle %s\n"%(line[5]))
+							fp.write("\tjl %s\n"%(line[5]))
 				elif (line[2]=='gr'):
 					if (line[3].startswith('$') and line[4].startswith('$')):					#a>b				#ifgoto, geq, a, b, 2
 						fp.write("\tcmpl %s, %s\n" %(regmem.getRegister(line[4]),regmem.getRegister(line[3])))
