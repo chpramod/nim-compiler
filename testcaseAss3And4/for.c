@@ -11,7 +11,7 @@ int main(){
     return 0;
 }
 
-
+#ir code gen version
 var i:int=6
 while i<=8 and i>=6 and i!=7:
   if i>=0:

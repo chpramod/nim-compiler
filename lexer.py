@@ -28,6 +28,7 @@ reserved = {
     'div' : 'DIV' ,
     'do' : 'DO' ,
     'echo' : 'ECHO',
+    'scan' : 'SCAN' ,                            # manually added
     'elif' : 'ELIF' ,
     'else' : 'ELSE' ,
     'end' : 'END' ,
@@ -324,6 +325,9 @@ def generateIndentation(lexer):
     while True:
         if not tok:
             break      # No more input
+        if tok.type=="CHARLIT" :            # to get char only
+            tok.value = tok.value[1]
+
         if tok.type=="ELSE" or tok.type=="EXCEPT" or tok.type=="FINALLY" or tok.type=="OF" or tok.type == "ELIF":
             temp = tok_data[-1]
             if temp.type=="NEWLINE":

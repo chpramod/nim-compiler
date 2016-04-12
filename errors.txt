@@ -2,3 +2,4 @@
 cannot print strings
 no 'for'
 inc stmt does not work
+we should improve error message to properly diff b/w semantic errors and perse errors
