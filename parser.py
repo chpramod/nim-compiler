@@ -1526,14 +1526,14 @@ def p_primary(p):
             temp = TAC.createTemp()
             # print "p[3] in primary =", p[3]
             # reverseParams = p[3]['params'][::-1]
-            for param in  p[3]['params']:
-                TAC.emit('push',param,'','')
+            # for param in  p[3]['params']:
+            #     TAC.emit('push',param,'','')
 
 
-            TAC.emit('call','',p[2]['value'],temp)
+            TAC.emit('call',p[2]['value'],temp,p[3]['params'])
 
-            for param in p[3]['params']:
-                TAC.emit('pop','dump','','')
+            # for param in p[3]['params']:
+            #     TAC.emit('pop','dump','','')
 
             # print "p[2] in primary", p[2]
             # print "functionDict[p[2]['value']] in primary =", functionDict[p[2]['value']]
