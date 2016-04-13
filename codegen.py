@@ -775,7 +775,7 @@ def BasicBlocks(TAC,leaders):
 		for line in tempBlock:
 			for point in line:
 				if(point[0]=='$' and point not in variables):
-					print "#######*******",point
+					# print "#######*******",point
 					if (point!='$trueString' and point!='$falseString'):
 						variables.append(point)
 	return basicBlocks,variables
