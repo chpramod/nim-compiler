@@ -643,7 +643,8 @@ def generateAssCode(code):
 				arrayCurrent=[line[2],line[3]]
 				arrayDef.append(arrayCurrent)
 			elif line[1]=='string':
-				if len(line==3):
+				print "line length",len(line)
+				if len(line)==4:
 					stringCurrent=[line[2],line[3]]
 					stringDef.append(stringCurrent)
 				else:
@@ -806,6 +807,7 @@ print_num:\n\
 		fp.write("%sEnd:\n" % strings[0].replace("$",""))
 	for strings in stringDefEmp:
 		fp.write("%s:\n" % strings.replace("$",""))
+		variables.remove(strings)
 		fp.write("\t.space 100\n")
 		fp.write("%sEnd:\n" % strings.replace("$",""))
 	print "before variables",variables
@@ -820,7 +822,7 @@ print_num:\n\
 	fp.write("dump:\n\t.space 50\n")
 	fp.write("formatstr:\n\t.ascii \"\%d\"\n")
 	fp.write("formatstrchar:\n\t.ascii \"\%c\"\n")
-	fp.write("formatstrstr:\n\t.ascii \"\%c\"\n")
+	fp.write("formatstrstr:\n\t.ascii \"\%s\"\n")
 	fp.write("trueString:\n\t.ascii \"True\"\ntrueStringEnd:\n")
 	fp.write("falseString:\n\t.ascii \"False\"\nfalseStringEnd:\n")
 	fp.close()
