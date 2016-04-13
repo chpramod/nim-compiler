@@ -137,7 +137,7 @@ def t_OP8(t):
     return t
 
 def t_OP9(t):
-    r"\*|"r"/|"r"\\|"r"\%"
+    r"\*|"r"/|"r"\%"
     return t
 
 def t_OP10(t):
@@ -257,7 +257,7 @@ def t_RSTRLIT(t):
     return t
 
 def t_STRLIT(t):
-    r'"([^\n\\"]+|\\"|\\\\)*"'
+    r'"([^\n\"]+|\\"|\\\\)*"'
 
     return t
 
