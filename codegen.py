@@ -579,18 +579,16 @@ def generateAssCode(code):
 				regmem.freeAll()
 				line[4] = ast.literal_eval(line[4])
 				for var in variables:
-					fp.write("\tmovl {0}, %ebx\n".format(var[1:]))
-					fp.write("\tpushl %ebx\n")
+					if var not in line[4]:
+						fp.write("\tpushl {0}\n".format(var[1:]))
 				for var in line[4][::-1]:
-					fp.write("\tmovl {0}, %ebx\n".format(var[1:]))
-					fp.write("\tpushl %ebx\n")
+						fp.write("\tpushl {0}\n".format(var[1:]))
 				fp.write("\tcall {0}\n".format(line[2]))
 				for var in line[4]:
-					fp.write("\tpopl %ebx\n")
-					fp.write("\tmovl %ebx, {0}\n".format(var[1:]))
+						fp.write("\tpopl {0}\n".format(var[1:]))
 				for var in variables[::-1]:
-					fp.write("\tpopl %ebx\n")
-					fp.write("\tmovl %ebx, {0}\n".format(var[1:]))
+					if var not in line[4]:
+						fp.write("\tpopl {0}\n".format(var[1:]))
 				if len(line)>=4:
 					fp.write("\tmovl %eax, {0}\n".format(line[3][1:]))
 					regmem.setVarReg('%eax',line[3])
