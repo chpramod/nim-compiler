@@ -327,7 +327,7 @@ def p_whileStmt(p):
 
     p[0] = {
     'inline': False,
-    'type': p[1],
+    'type': None,
     'cond': p[3],
     'then': p[6]
     }
