@@ -20,6 +20,7 @@ def generateAssCode(code):
 	fp = open("AssCode.s",'w')
 	leaders=[]
 	arrayDef=[]
+	stringDef=[]
 	TAC = []
 	SymbolTable = dict()
 	totalLines=0
@@ -536,13 +537,13 @@ def generateAssCode(code):
 							fp.write("\tjne label%s\n"%(line[5]))
 						else:
 							fp.write("\tjne %s\n"%(line[5]))
-			elif line[1]=='call':                                                              #call foo
+			elif line[1]=='call':                                                              #call foo or call, foo, a
 				regmem.freeAll()
 				fp.write("\tcall {0}\n".format(line[2]))
 				if len(line)==4:
 					fp.write("\tmovl %eax, {0}\n".format(line[3][1:]))
 					regmem.setVarReg('%eax',line[3])
-			elif line[1]=='ret':
+			elif line[1]=='ret':                                                             #ret a
 				if len(line)==3:
 					regmem.freeReg('%eax')
 					fp.write("\tmovl {0}, %eax\n" .format(regmem.getRegister(line[2])))
@@ -578,9 +579,17 @@ def generateAssCode(code):
 				fp.write("\tmovl {0}, %ecx\n".format(line[2]))
 				fp.write("\tmovl $1, %ebx\n\tmovl $4, %eax\n\tint $0x80\n")
 				# fp.write("\tpopl dump\n")
+			elif line[1]=='printstr':
+				regmem.freeAll()
+				fp.write("\tmovl $({0}End-{0}), %edx\n".format(line[2][1:]))
+				fp.write("\tmovl {0}, %ecx\n".format(line[2]))
+				fp.write("\tmovl $1, %ebx\n\tmovl $4, %eax\n\tint $0x80\n")
 			elif line[1]=='array':
 				arrayCurrent=[line[2],line[3]]
 				arrayDef.append(arrayCurrent)
+			elif line[1]=='string':
+				stringCurrent=[line[2],line[3]]
+				stringDef.append(stringCurrent)
 			elif line[1]=='end':
 				fp.write("\tjmp endlabel\n")
 			elif line[1]=='incr':																#incr,a
@@ -729,6 +738,11 @@ print_num:\n\
 		fp.write("%s:\n" % arrays[0].replace("$",""))
 		variables.remove(arrays[0])
 		fp.write("\t.space %d\n"%(int(arrays[1])*4))
+	for strings in stringDef:
+		fp.write("%s:\n" % strings[0].replace("$",""))
+		variables.remove(strings[0])
+		fp.write("\t.ascii {0}\n".format(strings[1]))
+		fp.write("%sEnd:\n" % strings[0].replace("$",""))
 	for variable in variables:
 		if variable.find('[')!=-1:
 			variables.remove(variable)
@@ -737,6 +751,8 @@ print_num:\n\
 			fp.write("\t.long 0\n")
 	fp.write("dump:\n\t.space 50\n")
 	fp.write("formatstr:\n\t.ascii \"\%d\"\n")
+	fp.write("trueString:\n\t.ascii \"True\"\ntrueStringEnd:\n")
+	fp.write("falseString:\n\t.ascii \"False\"\nfalseStringEnd:\n")
 	fp.close()
 
 
@@ -759,7 +775,9 @@ def BasicBlocks(TAC,leaders):
 		for line in tempBlock:
 			for point in line:
 				if(point[0]=='$' and point not in variables):
-					variables.append(point)
+					print "#######*******",point
+					if (point!='$trueString' and point!='$falseString'):
+						variables.append(point)
 	return basicBlocks,variables
 
 def GenerateSymbolTable(basicBlocks,SymbolTable,variables):

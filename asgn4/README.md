@@ -25,6 +25,16 @@ To simulate the MIPS code on SPIM simulator, use the following command:
 
 	-	Bool (boolean `true` and `false`)
 
+	- char
+		define as,
+
+		var a:char = 'a'
+
+	- string
+	  define as,
+
+		var a:string = "abc"
+
 
 
 #	##Variable declaration and assignment##
