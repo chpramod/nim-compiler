@@ -620,7 +620,7 @@ def p_echoStmt(p):
             l1 = TAC.newLabel()
             l2 = TAC.newLabel()
             l3 = TAC.newLabel()
-            TAC.emitif('ifgoto','eq','1',expr['place'],l1)
+            TAC.emitif('ifgoto','eq',expr['place'],'1',l1)
             TAC.emit('goto',l2,'','')
             TAC.emit('label',l1,'','')
             strtemp = TAC.createTemp()
