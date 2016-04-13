@@ -775,7 +775,9 @@ def BasicBlocks(TAC,leaders):
 		for line in tempBlock:
 			for point in line:
 				if(point[0]=='$' and point not in variables):
-					variables.append(point)
+					print "#######*******",point
+					if (point!='$trueString' and point!='$falseString'):
+						variables.append(point)
 	return basicBlocks,variables
 
 def GenerateSymbolTable(basicBlocks,SymbolTable,variables):
