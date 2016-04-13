@@ -1,0 +1,9 @@
+goto, endfoo
+label, foo
+=, $t0, 2
+ret, $t0
+ret
+label, endfoo
+=, $t2, 1
+call, foo, $t2
+print, $t2

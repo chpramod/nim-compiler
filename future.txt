@@ -1,0 +1,15 @@
+Future:
+
+- let
+- type
+- addr
+- int8,int16...
+- float(any kind)
+- null
+- char and strings
+- string append, cut,..
+- We can implement 'table' and 'type'
+
+in codegen:
+- passing arguments
+- scan char, string

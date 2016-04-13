@@ -18,13 +18,8 @@ class regmemDescriptor():
                             'dirty'     : False
                             }
 
-    def getRegVal(self,reg):
-        return self.register[reg]
 
-    def setRegVar(self,reg,value):
-        self.register[reg]=value
-        self.variable[value]=reg
-
+# returns a register for variable temp
     def getRegister(self, temp):
         # pprint(self.registerList)
         # self.ST.printTable()
@@ -86,22 +81,7 @@ class regmemDescriptor():
         # print self.ST.lineno,self.currLine,temp,register
         return register
 
-    # def setReg(self,reg,value):
-    #     self.register[reg] = value
 
-    # def getLoc(self,var):
-    #     return self.variable[var]
-
-    def setLoc(self,var,value):
-        self.variable[var] = value
-
-    def setMem(self,location,value):
-        self.variable[location]=value
-
-    def emptyReg(self):
-        for i in self.register:
-            if(self.register[i]==None): return i
-        return None
 
     def resetRegisters(self):
         self.registerList = {'%eax' : None, '%ebx' : None, '%ecx' : None, '%edx' : None, '%esi' : None, '%edi' : None}
@@ -116,6 +96,7 @@ class regmemDescriptor():
     #     self.variableList[self.registerList[reg]]=None
     #     self.registerList[reg]=None
 
+# free any register currently associated with a variable which has no next use
     def freeRegister(self):
         # pprint (self.variableList)
         if self.ST.dest in self.variableList.keys() and self.ST.op not in nonDirtyOp:
@@ -129,10 +110,14 @@ class regmemDescriptor():
                     self.freeReg(self.variableList[var]['register'])
         # pprint(self.variableList)
 
+#free all reg's and also reset both variablelist and registerList
     def freeAll(self,flag=False):
         for reg in self.registerList:
             self.freeReg(reg,flag)
 
+
+# remove reg from associated variable's variableList and also make current register's variable to none
+# if flag is set TRUE also makes register's value =0
     def freeReg(self,reg,flag=False):
         # print "inside freeReg", reg
         if reg not in self.freeRegisters:
@@ -150,6 +135,8 @@ class regmemDescriptor():
             self.fp.write("\tXORL %s, %s\n" %(reg,reg))
         self.registerList[reg]=None
 
+
+# assigns reg to var and stores current value of var in reg
     def setReg(self,var,reg):
         # print "inside setReg", var, reg
         # print self.variableList
