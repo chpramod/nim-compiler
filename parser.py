@@ -1526,14 +1526,14 @@ def p_primary(p):
         else:
             temp = TAC.createTemp()
             # print "p[3] in primary =", p[3]
-            reverseParams = p[3]['params'][::-1]
-            for param in  reverseParams:
+            # reverseParams = p[3]['params'][::-1]
+            for param in  p[3]['params']:
                 TAC.emit('push',param,'','')
 
 
             TAC.emit('call','',p[2]['value'],temp)
 
-            for param in  reverseParams:
+            for param in p[3]['params']:
                 TAC.emit('pop','dump','','')
 
             # print "p[2] in primary", p[2]
@@ -1986,7 +1986,7 @@ def p_markerRoutine(p) :
         newScope = ST.getCurrentScope()
         # print "now new scope = ", newScope
 
-
+        global paramDict
         # print "p[0]['varlist']", p[0]['varlist']
         paramDict[p[-3]['value']]=[]
         for i in p[0]['varlist'] :
