@@ -331,15 +331,15 @@ def p_whileStartLabel(p):
     }
     TAC.emit('label',p[0]['start'],'','')
     break_label=p[0]['end']
-    continue_labe=p[0]['end']
+    continue_label=p[0]['start']
 
 def p_whileEndLabel(p):
     '''whileEndLabel : '''
-    global break_label,continue_labe
+    global break_label,continue_label
     TAC.emit('goto',p[-5]['start'],'','')
     TAC.emit('label',p[-5]['end'],'','')
     break_label=None
-    continue_labe=None
+    continue_label=None
 
 def p_identWithPragmaInter(p):
     '''identWithPragmaInter : COMMA identWithPragma identWithPragmaInter
@@ -788,7 +788,7 @@ def p_continueStmt(p):
         'continue': None
         }
     if continue_label==None:
-        msg_error(p,'Continue outside loop')
+        msg_error(p,'Continue can not be outsite loop')
     else:
         TAC.emit('goto',continue_label,'','')
 
@@ -1509,12 +1509,17 @@ def p_primary(p):
             msg_error(p,'Function not declared')
         else:
             temp = TAC.createTemp()
-            print "p[3] in primary =", p[3]
-            for param in p[3]['params']:
+            # print "p[3] in primary =", p[3]
+            reverseParams = p[3]['params'][::-1]
+            for param in  reverseParams:
                 TAC.emit('push',param,'','')
 
 
             TAC.emit('call','',p[2]['value'],temp)
+
+            for param in  reverseParams:
+                TAC.emit('pop','dump','','')
+
             p[0] = p[2]
             p[0] = {
             'type': functionDict[p[2]['value']],
