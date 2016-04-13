@@ -170,13 +170,11 @@ def p_complexOrSimpleStmt(p):
                             | LET variableSuite
                             | VAR variableSuite '''
 
-
     if len(p) > 2:
         p[0] = p[2]
-
-
-
-
+        if p[1] =='let':
+            for var in p[2]['varlist']:
+                TAC.fixedConsts.append(ST.getIdenAttr(var,'place'))
     else:
         p[0] = p[1]
                             ## bind and mixin are also not implemented
