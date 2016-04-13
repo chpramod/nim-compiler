@@ -5,6 +5,7 @@ import sys
 import pprint
 from symbolTable import *
 from regmem import *
+from sklearn.externals import joblib
 
 jumpLabels=["goto","ifgoto","call","label","ret"]
 reservedLabels = jumpLabels
@@ -24,6 +25,7 @@ def generateAssCode(code):
 	TAC = []
 	SymbolTable = dict()
 	totalLines=0
+	paramDict = joblib.load('paramDict.pkl')
 	with code as f:
 		for line in f:
 			totalLines+=1
@@ -107,6 +109,15 @@ def generateAssCode(code):
 			fp.write("label1:\n")
 		elif basicBlock[0][1]=='label':
 			fp.write("%s:\n" % basicBlock[0][2])
+			if basicBlock[0][2] in paramDict:
+				j = 4
+				if len(basicBlock[0][2])!=0:
+					regmem.freeReg('%edi')
+					for i in paramDict[basicBlock[0][2]]:
+						if i in variables:
+							fp.write("\tmovl {0}(%esp), %edi\n".format(j))
+							fp.write("\tmovl %edi, {0}\n".format(i[1:]))
+						j+=4
 		else:
 			fp.write("label%s:\n" % basicBlock[0][0])
 
@@ -117,6 +128,7 @@ def generateAssCode(code):
 			# pprint(line)
 			# pprint(regmem.variableList)
 			if line[1]=='=':
+				# print "###",line
 				if line[3].startswith('$'):
 					if line[2].endswith("]"):
 						regmem.freeReg('%eax')
@@ -124,9 +136,14 @@ def generateAssCode(code):
 						tempStr=line[2][1:tempIndex]
 						fp.write("\tmovl $({0}), %eax\n".format(tempStr))
 						tempStr=line[2][tempIndex+1:-1]
+						# print "***",tempStr
 						if tempStr.startswith('$'):									#a[b]=c
 							regmem.freeReg('%ebx')
-							regmem.setReg(tempStr[1:],'%ebx')
+							regmem.setReg(tempStr,'%ebx')
+							regmem.freeReg('%ebx')
+							fp.write("\timull $4, %ebx\n")
+							fp.write("\taddl %ebx, %eax\n")
+							fp.write("\tmovl {0}, (%eax)\n" .format(regmem.getRegister(line[3])))
 						else:                                                        #a[2]=b
 							fp.write("\tmovl {0}, {1}(%eax)\n" .format(regmem.getRegister(line[3]),4*int(tempStr)))
 					elif line[3].endswith("]"):                                      #b=a[2]
@@ -135,7 +152,16 @@ def generateAssCode(code):
 						tempStr=line[3][1:tempIndex]
 						fp.write("\tmovl $({0}), %eax\n".format(tempStr))
 						tempStr=line[3][tempIndex+1:-1]
-						fp.write("\tmovl {0}(%eax), {1}\n" .format(4*int(tempStr),regmem.getRegister(line[2])))
+						if tempStr.startswith('$'):									#a[b]=c
+							regmem.freeReg('%ebx')
+							regmem.setReg(tempStr,'%ebx')
+							regmem.freeReg('%ebx')
+							fp.write("\timull $4, %ebx\n")
+							fp.write("\taddl %ebx, %eax\n")
+							fp.write("\tmovl (%eax), {0}\n" .format(regmem.getRegister(line[2])))
+						else:                                                        #a[2]=b
+							fp.write("\tmovl {1}(%eax), {0}\n" .format(regmem.getRegister(line[2]),4*int(tempStr)))
+						# fp.write("\tmovl {0}(%eax), {1}\n" .format(4*int(tempStr),regmem.getRegister(line[2])))
 					else:
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))	#a=b
 				else:
@@ -537,6 +563,10 @@ def generateAssCode(code):
 							fp.write("\tjne label%s\n"%(line[5]))
 						else:
 							fp.write("\tjne %s\n"%(line[5]))
+			elif line[1]=='push':
+				fp.write("\tpushl {0}\n".format(line[2]))
+			elif line[1]=='pop':
+				fp.write("\tpopl {0}\n".format(line[2]))
 			elif line[1]=='call':                                                              #call foo or call, foo, a
 				regmem.freeAll()
 				fp.write("\tcall {0}\n".format(line[2]))
@@ -692,7 +722,7 @@ printIntNumber:\n\
     inc %ecx                #Increment to take negative\n\
     movl %ecx, %edi         #Save the ecx value\n\
     \n\
-    movl    $45, %eax   #print the - sign\n\
+    movl $45, %eax   #print the - sign\n\
     pushl   %eax  # add '-' character to the stack to print\n\
     movl $4, %eax\n\
     movl $1, %ebx\n\
@@ -734,20 +764,25 @@ print_num:\n\
 	movl $0, %ebx\n\
 	int $0x80\n")
 	fp.write("\n\n\n.section .data\n")
+	print "before array",variables
 	for arrays in arrayDef:
 		fp.write("%s:\n" % arrays[0].replace("$",""))
 		variables.remove(arrays[0])
 		fp.write("\t.space %d\n"%(int(arrays[1])*4))
+	print "before string",variables
 	for strings in stringDef:
 		fp.write("%s:\n" % strings[0].replace("$",""))
 		variables.remove(strings[0])
 		fp.write("\t.ascii {0}\n".format(strings[1]))
 		fp.write("%sEnd:\n" % strings[0].replace("$",""))
+	print "before variables",variables
+	toRemove=[]                #array refernces not removed currently, can in future using this list
 	for variable in variables:
 		if variable.find('[')!=-1:
-			variables.remove(variable)
+			toRemove.append(variable)
 		else:
 			fp.write("%s:\n" % variable.replace("$",""))
+			# print ("%s:\n" % variable.replace("$",""))
 			fp.write("\t.long 0\n")
 	fp.write("dump:\n\t.space 50\n")
 	fp.write("formatstr:\n\t.ascii \"\%d\"\n")
@@ -778,6 +813,7 @@ def BasicBlocks(TAC,leaders):
 					# print "#######*******",point
 					if (point!='$trueString' and point!='$falseString'):
 						variables.append(point)
+		print variables
 	return basicBlocks,variables
 
 def GenerateSymbolTable(basicBlocks,SymbolTable,variables):
