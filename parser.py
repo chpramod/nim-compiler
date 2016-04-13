@@ -663,7 +663,7 @@ def p_scanStmt(p):
     ST.setidenAttr(expr['value'], 'hasVal', 1)
 
     if expr['type'] == 'CHARLIT' :
-            TAC.emit('scantchar',expr['place'],'','')
+            TAC.emit('scanchar',expr['place'],'','')
     elif expr['type'] == 'INTLIT' :
         TAC.emit('scan',expr['place'],'','')
     elif expr['type'] == 'STRLIT' :
@@ -671,7 +671,7 @@ def p_scanStmt(p):
 
     if len(expr) == 5: #for array
         print "p[2] in scan if array", p[2]
-        TAC.emit('=',expr['array'],expr['place'],'')        
+        TAC.emit('=',expr['array'],expr['place'],'')
 
 
 def p_importStmt(p):
