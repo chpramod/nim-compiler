@@ -576,7 +576,7 @@ def p_MarkerExpr(p):
     }
     temp = TAC.createTemp()
     for expr in p[-2]:
-        TAC.emitif('ifgoto','!=',expr['place'],p[-4]['expr']['place'],p[0]['nextlabel'])
+        TAC.emitif('ifgoto','neq',expr['place'],p[-4]['expr']['place'],p[0]['nextlabel'])
 
 def p_OfMarkerEnd(p):
     '''OfMarkerEnd : '''
