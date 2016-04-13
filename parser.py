@@ -665,6 +665,7 @@ def p_scanStmt(p):
     elif expr['type'] == 'INTLIT' :
         TAC.emit('scan',expr['place'],'','')
     elif expr['type'] == 'STRLIT' :
+        TAC.emit('string',expr['place'],'','')
         TAC.emit('scanstr',expr['place'],'','')
 
     if len(expr) == 5: #for array
