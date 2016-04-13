@@ -1978,7 +1978,7 @@ def p_markerRoutine(p) :
         newScope = ST.getCurrentScope()
         # print "now new scope = ", newScope
 
-
+        global paramDict
         # print "p[0]['varlist']", p[0]['varlist']
         paramDict[p[-3]['value']]=[]
         for i in p[0]['varlist'] :
