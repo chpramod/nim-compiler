@@ -14,3 +14,4 @@ Future:
 in codegen:
 - passing arguments
 - scan char, string
+- buy hdmi to hdmi

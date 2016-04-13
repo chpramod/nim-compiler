@@ -734,20 +734,25 @@ print_num:\n\
 	movl $0, %ebx\n\
 	int $0x80\n")
 	fp.write("\n\n\n.section .data\n")
+	print "before array",variables
 	for arrays in arrayDef:
 		fp.write("%s:\n" % arrays[0].replace("$",""))
 		variables.remove(arrays[0])
 		fp.write("\t.space %d\n"%(int(arrays[1])*4))
+	print "before string",variables
 	for strings in stringDef:
 		fp.write("%s:\n" % strings[0].replace("$",""))
 		variables.remove(strings[0])
 		fp.write("\t.ascii {0}\n".format(strings[1]))
 		fp.write("%sEnd:\n" % strings[0].replace("$",""))
+	print "before variables",variables
+	toRemove=[]                #array refernces not removed currently, can in future using this list
 	for variable in variables:
 		if variable.find('[')!=-1:
-			variables.remove(variable)
+			toRemove.append(variable)
 		else:
 			fp.write("%s:\n" % variable.replace("$",""))
+			# print ("%s:\n" % variable.replace("$",""))
 			fp.write("\t.long 0\n")
 	fp.write("dump:\n\t.space 50\n")
 	fp.write("formatstr:\n\t.ascii \"\%d\"\n")
@@ -778,6 +783,7 @@ def BasicBlocks(TAC,leaders):
 					# print "#######*******",point
 					if (point!='$trueString' and point!='$falseString'):
 						variables.append(point)
+		print variables
 	return basicBlocks,variables
 
 def GenerateSymbolTable(basicBlocks,SymbolTable,variables):
