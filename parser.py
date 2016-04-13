@@ -667,7 +667,9 @@ def p_scanStmt(p):
     elif expr['type'] == 'STRLIT' :
         TAC.emit('scanstr',expr['place'],'','')
 
-
+    if len(expr) == 5: #for array
+        print "p[2] in scan if array", p[2]
+        TAC.emit('=',expr['array'],expr['place'],'')        
 
 
 def p_importStmt(p):
