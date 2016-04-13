@@ -9,6 +9,7 @@ Future:
 - char and strings
 - string append, cut,..
 - We can implement 'table' and 'type'
+- scan as var name: string = readLine(stdin
 
 in codegen:
 - passing arguments

@@ -1,16 +1,16 @@
 negative value not yet! yeah wait for it! {SOLVED}
 += not working {SOLVED FOR NOW}
 check break and continue
-cannot print strings  { Now we can but we need to modify codegen accordingly }
+cannot print strings  { SOLVED  Now we can but the method is wrong}
 scanf                 {three different scanfs added scan, scanchar, scanstr , we still need to modify codegen for this}
 no 'for'
 inc stmt does not work {SOVLED}
 we should improve error message to properly diff b/w semantic errors and parse errors
 only standard strings are allowed, ''' triple strlit not allowed like this '''
-
+echo '\n' does not work {SOLVED}
 
 CODEGEN:
 array in RHS
 param passing
 a=foo() type statements
-not used functions in regmem (PLAGARISM) 
+not used functions in regmem (PLAGARISM)
