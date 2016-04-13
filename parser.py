@@ -957,7 +957,7 @@ def p_arrowExpr(p):
     else:
         p[0] = {
         'place': 'undef',
-        'type': 'ERROR_TYPE'
+        'type': None
         }
         if p[1]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
             msg_error(p,'Unsupported type')
