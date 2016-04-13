@@ -609,6 +609,15 @@ def generateAssCode(code):
 					fp.write("\tpushl $formatstr\n\tcall scanf\n")
 					fp.write("\tpopl dump\n")
 					fp.write("\tpopl dump\n")
+			elif line[1]=='scanchar':
+					a=regmem.getRegister(line[2])                                                            #print a
+					print a
+					regmem.freeReg(a)
+					#fp.write("\tmovl {0}, {1}\n" .format(a,line[2][1:]))
+					fp.write("\tpushl {0}\n".format(line[2]))
+					fp.write("\tpushl $formatstrchar\n\tcall scanf\n")
+					fp.write("\tpopl dump\n")
+					fp.write("\tpopl dump\n")
 			elif line[1]=='printchar':                                          #printcar, $a
 				regmem.freeAll()
 				fp.write("\tmovl $1, %edx\n")
@@ -792,6 +801,7 @@ print_num:\n\
 			fp.write("\t.long 0\n")
 	fp.write("dump:\n\t.space 50\n")
 	fp.write("formatstr:\n\t.ascii \"\%d\"\n")
+	fp.write("formatstrchar:\n\t.ascii \"\%c\"\n")
 	fp.write("trueString:\n\t.ascii \"True\"\ntrueStringEnd:\n")
 	fp.write("falseString:\n\t.ascii \"False\"\nfalseStringEnd:\n")
 	fp.close()
