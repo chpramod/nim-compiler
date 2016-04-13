@@ -171,7 +171,7 @@ def p_complexOrSimpleStmt(p):
                             | VAR variableSuite '''
 
     if len(p) > 2:
-         p[0] = p[2]
+        p[0] = p[2]
         if p[1] =='let':
             for var in p[2]['varlist']:
                 TAC.fixedConsts.append(ST.getIdenAttr(var,'place'))
