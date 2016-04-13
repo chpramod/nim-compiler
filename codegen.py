@@ -5,6 +5,7 @@ import sys
 import pprint
 from symbolTable import *
 from regmem import *
+from sklearn.externals import joblib
 
 jumpLabels=["goto","ifgoto","call","label","ret"]
 reservedLabels = jumpLabels
@@ -24,6 +25,7 @@ def generateAssCode(code):
 	TAC = []
 	SymbolTable = dict()
 	totalLines=0
+	paramDict = joblib.load('paramDict.pkl')
 	with code as f:
 		for line in f:
 			totalLines+=1
@@ -107,6 +109,15 @@ def generateAssCode(code):
 			fp.write("label1:\n")
 		elif basicBlock[0][1]=='label':
 			fp.write("%s:\n" % basicBlock[0][2])
+			if basicBlock[0][2] in paramDict:
+				j = 4
+				if len(basicBlock[0][2])!=0:
+					regmem.freeReg('%edi')
+					for i in paramDict[basicBlock[0][2]]:
+						if i in variables:
+							fp.write("\tmovl {0}(%esp), %edi\n".format(j))
+							fp.write("\tmovl %edi, {0}\n".format(i[1:]))
+						j+=4
 		else:
 			fp.write("label%s:\n" % basicBlock[0][0])
 
@@ -537,6 +548,10 @@ def generateAssCode(code):
 							fp.write("\tjne label%s\n"%(line[5]))
 						else:
 							fp.write("\tjne %s\n"%(line[5]))
+			elif line[1]=='push':
+				fp.write("\tpushl {0}\n".format(line[2]))
+			elif line[1]=='pop':
+				fp.write("\tpopl {0}\n".format(line[2]))
 			elif line[1]=='call':                                                              #call foo or call, foo, a
 				regmem.freeAll()
 				fp.write("\tcall {0}\n".format(line[2]))

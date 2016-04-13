@@ -12,12 +12,14 @@ import st
 import lexer
 tokens = lexer.tokens
 import threeAC
+from sklearn.externals import joblib
 
 TAC = threeAC.ThreeAC()
 ST = st.St()
 identifier = {}
 identifierList = []
 functionDict = {}
+paramDict = {}
 break_label=None
 continue_label=None
 
@@ -1963,12 +1965,14 @@ def p_markerRoutine(p) :
 
 
         # print "p[0]['varlist']", p[0]['varlist']
+        paramDict[p[-3]['value']]=[]
         for i in p[0]['varlist'] :
             temp = TAC.createTemp()
             # print "var name and var type = ",p[0]['varlist'][i]['varName'],p[0]['varlist'][i]['varType']
             ST.addIdenInScope(newScope,p[0]['varlist'][i]['varName'],temp,p[0]['varlist'][i]['varType'],1)
             if p[0]['varlist'][i]['varValue'] != None :
                 TAC.emit('=',temp,p[0]['varlist'][i]['varValue'],'')
+            paramDict[p[-3]['value']].append(temp)
 
 
 def p_markerFuncLabelRet(p) :
@@ -2543,3 +2547,5 @@ if __name__ == "__main__":
     </tr>
 </table>''')
         i+=1
+    global paramDict
+    joblib.dump(paramDict,'paramDict.pkl')
