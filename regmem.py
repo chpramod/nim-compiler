@@ -1,5 +1,5 @@
 from pprint import pprint
-nonDirtyOp = ['print']
+nonDirtyOp = ['print','push']
 class regmemDescriptor():
     def __init__(self,registers,variables,fp):
         self.registerList = {} # stores content of registers i.e. variables

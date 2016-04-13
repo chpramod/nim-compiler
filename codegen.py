@@ -564,9 +564,15 @@ def generateAssCode(code):
 						else:
 							fp.write("\tjne %s\n"%(line[5]))
 			elif line[1]=='push':
-				fp.write("\tpushl {0}\n".format(line[2]))
+				if line[2]=='dump':
+					p.write("\tpushl {0}\n".format(line[2]))
+				else:
+					fp.write("\tpushl {0}\n".format(regmem.getRegister(line[2])))
 			elif line[1]=='pop':
-				fp.write("\tpopl {0}\n".format(line[2]))
+				if line[2]=='dump':
+					fp.write("\tpopl {0}\n".format(line[2]))
+				else:
+					fp.write("\tpopl {0}\n".format(regmem.getRegister(line[2])))
 			elif line[1]=='call':                                                              #call foo or call, foo, a
 				regmem.freeAll()
 				fp.write("\tcall {0}\n".format(line[2]))

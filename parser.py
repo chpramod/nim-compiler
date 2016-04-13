@@ -622,8 +622,6 @@ def p_echoStmt(p):
     'echo': p[2]
     }
     for expr in p[2]:
-        if expr['hasVal'] == 0:
-            msg_error(p," garbage value in echo")
         if expr['type'] == 'CHARLIT' :
                 TAC.emit('printchar',expr['place'],'','')
         elif expr['type'] == 'INTLIT' :
