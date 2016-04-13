@@ -55,8 +55,8 @@ def p_stmt(p):
 
     # print "printing stmt in stmt", p[0]
 
-    # if p[0]['type'] != None :
-    #     msg_error(p,"syntax error : stmt can not be of any type other than None")
+    if p[0]['type'] != None :
+        msg_error(p,"syntax error : stmt can not be of any type other than None")
 
 def p_stmtStar(p):                      # changed a bit
     '''stmtStar : stmt NEWLINE stmtStar
@@ -1534,6 +1534,8 @@ def p_primary(p):
             for param in  reverseParams:
                 TAC.emit('pop','dump','','')
 
+            # print "p[2] in primary", p[2]
+            # print "functionDict[p[2]['value']] in primary =", functionDict[p[2]['value']]
             p[0] = p[2]
             p[0] = {
             'type': functionDict[p[2]['value']],
@@ -1566,6 +1568,8 @@ def p_primary(p):
         # print " reached primary where p[1] = - "
         placeOfIdentOrLiteral = p[0]['place']
         TAC.emit('-',placeOfIdentOrLiteral,'0',placeOfIdentOrLiteral)
+
+    # print "finally p[0] in primary =", p[0]
 
 #shd be interPrefixOperator identOrLiteral interPrimarySuffix
 
@@ -1715,7 +1719,7 @@ def p_primarySuffix(p):
         p[0]['type'] = 'CALL'
         params = []
         if p[2]!=None:
-            print "p[2] in p_primarySuffix", p[2]
+            # print "p[2] in p_primarySuffix", p[2]
             for i in p[2]:
                 if i!=None:
                     if i['type']!=None:
@@ -1745,7 +1749,7 @@ def p_primarySuffixInter(p):
                            | exprColonEqExpr  primarySuffixInter
                            | empty'''
 
-    print "len in primarySuffixInter", len(p)
+    # print "len in primarySuffixInter", len(p)
 
     if len(p)==2:
         p[0] = [p[1]]
