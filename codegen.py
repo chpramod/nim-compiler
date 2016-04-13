@@ -22,6 +22,7 @@ def generateAssCode(code):
 	leaders=[]
 	arrayDef=[]
 	stringDef=[]
+	stringDefEmp=[]
 	TAC = []
 	SymbolTable = dict()
 	totalLines=0
@@ -611,13 +612,22 @@ def generateAssCode(code):
 					fp.write("\tpopl dump\n")
 			elif line[1]=='scanchar':
 					a=regmem.getRegister(line[2])                                                            #print a
-					print a
+					# print a
 					regmem.freeReg(a)
 					#fp.write("\tmovl {0}, {1}\n" .format(a,line[2][1:]))
 					fp.write("\tpushl {0}\n".format(line[2]))
-					fp.write("\tpushl $formatstrchar\n\tcall scanf\n")
+					fp.write("\tpushl $charformat\n\tcall scanf\n")
 					fp.write("\tpopl dump\n")
 					fp.write("\tpopl dump\n")
+			elif line[1]=='scanstr':
+					a=regmem.getRegister(line[2])                                                            #print a
+					# print a
+					regmem.freeReg(a)
+					#fp.write("\tmovl {0}, {1}\n" .format(a,line[2][1:]))
+					fp.write("\tpushl {0}\n".format(line[2]))
+					fp.write("\tpushl $strformat\n\tcall scanf\n")
+					fp.write("\tpopl dump\n")
+					fp.write("\tpopl dump\n")		
 			elif line[1]=='printchar':                                          #printcar, $a
 				regmem.freeAll()
 				fp.write("\tmovl $1, %edx\n")
@@ -633,8 +643,13 @@ def generateAssCode(code):
 				arrayCurrent=[line[2],line[3]]
 				arrayDef.append(arrayCurrent)
 			elif line[1]=='string':
-				stringCurrent=[line[2],line[3]]
-				stringDef.append(stringCurrent)
+				print "line length",len(line)
+				if len(line)==4:
+					stringCurrent=[line[2],line[3]]
+					stringDef.append(stringCurrent)
+				else:
+					stringCurrent=line[2]
+					stringDefEmp.append(stringCurrent)
 			elif line[1]=='end':
 				fp.write("\tjmp endlabel\n")
 			elif line[1]=='incr':																#incr,a
@@ -790,6 +805,11 @@ print_num:\n\
 		variables.remove(strings[0])
 		fp.write("\t.ascii {0}\n".format(strings[1]))
 		fp.write("%sEnd:\n" % strings[0].replace("$",""))
+	for strings in stringDefEmp:
+		fp.write("%s:\n" % strings.replace("$",""))
+		variables.remove(strings)
+		fp.write("\t.space 100\n")
+		fp.write("%sEnd:\n" % strings.replace("$",""))
 	print "before variables",variables
 	toRemove=[]                #array refernces not removed currently, can in future using this list
 	for variable in variables:
@@ -801,9 +821,10 @@ print_num:\n\
 			fp.write("\t.long 0\n")
 	fp.write("dump:\n\t.space 50\n")
 	fp.write("formatstr:\n\t.ascii \"\%d\"\n")
-	fp.write("formatstrchar:\n\t.ascii \"\%c\"\n")
 	fp.write("trueString:\n\t.ascii \"True\"\ntrueStringEnd:\n")
+	fp.write("charformat:\n\t.ascii \"\%c\"\n")
 	fp.write("falseString:\n\t.ascii \"False\"\nfalseStringEnd:\n")
+	fp.write("strformat:\n\t.ascii \"\%s\"\n")
 	fp.close()
 
 
