@@ -985,6 +985,7 @@ def p_assignExpr(p):
     '''assignExpr : orExpr interThree'''
     if p[2]['type']==None:
         p[0]=p[1]
+    p[0]['type'] = None       ## Special case
 
 
 def p_interThree(p):

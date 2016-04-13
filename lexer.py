@@ -117,7 +117,7 @@ def t_OP0(t):
     return t
 
 def t_OP1(t):
-    r"\+=|"r"\*=|"r"\/="
+    r"\+=|"r"\*=|"r"\/=|"r"\-="
     return t
 
 def t_OP2(t):
