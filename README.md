@@ -5,16 +5,9 @@ Nim-compiler is written by making use of the PLY (Python Lex-Yacc) package.
 
 
 ##Instructions to run
-To run, run the following command:
-
-	./compile test/NAME_OF_TEST_FILE.rb
-
-This will give a file NAME_OF_TEST_FILE.s in the root folder with the MIPS assembly code.
-
-To simulate the MIPS code on SPIM simulator, use the following command:
-
-	spim -file NAME_OF_TEST_FILE.s
-
+- Use makefile to run.
+	make parse to parse
+	make all to compile completely
 
 
 ##Language specifications:
@@ -54,6 +47,13 @@ To simulate the MIPS code on SPIM simulator, use the following command:
 			x = true
 
 		This will not work, as x is of type Int, a Bool to x is wrong.
+
+	- "let" can be used to create constants
+	 		e.g.
+			  let a = 5
+				now,
+				a = 6 is not allowed.
+				Value of a is fixed as 5
 
 
 
@@ -104,6 +104,12 @@ To simulate the MIPS code on SPIM simulator, use the following command:
 			while check-expr :
 				body
 
+ - #break and continue#
+    break is used to break the loop
+		contine is used  to go to start of loop without running the remaining code
+
+
+
 
 
 #	##Methods or Procs##
@@ -130,8 +136,22 @@ To simulate the MIPS code on SPIM simulator, use the following command:
 #	##Output##
 
 	-	'echo' is used to print on stdoutput
+	- a list of arguments can be printed as
+	- arguments can be int, string, char and bool
 
 		e.g.
 
 			a = 1
 			echo a
+
+	- a list of arguments can be printed as
+				echo a,"xyz \n", 1, 'g'
+
+# ## Input ##
+
+- scan, scanchar, scanstr are used to input int, char and strings respectively
+
+
+# ## Our features ##
+- Checks if some variable contains garbage value. We  assign a 'hasVal' to every variable which is 0 if  it contains garbage else 1.
+- Type checking is done. Shows error if there is any type mismatch.
