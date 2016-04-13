@@ -55,8 +55,8 @@ def p_stmt(p):
 
     # print "printing stmt in stmt", p[0]
 
-    if p[0]['type'] != None :
-        msg_error(p,"syntax error : stmt can not be of any type other than None")
+    # if p[0]['type'] != None :
+    #     msg_error(p,"syntax error : stmt can not be of any type other than None")
 
 def p_stmtStar(p):                      # changed a bit
     '''stmtStar : stmt NEWLINE stmtStar
@@ -202,8 +202,8 @@ def p_simpleStmt(p):                            ## Scan manually added
 
 
     p[0] = p[1]
-    # if p[0]['type']!=None:
-    #     msg_error(p,"Statements should not have return type")
+    if p[0]['type']!=None:
+        msg_error(p,"Statements should not have return type")
 
 ## we are not implementing exportStmt
 
@@ -985,6 +985,7 @@ def p_assignExpr(p):
     '''assignExpr : orExpr interThree'''
     if p[2]['type']==None:
         p[0]=p[1]
+    # p[0]['type'] = None       ## Special case
 
 
 def p_interThree(p):
