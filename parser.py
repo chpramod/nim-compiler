@@ -12,14 +12,12 @@ import st
 import lexer
 tokens = lexer.tokens
 import threeAC
-from sklearn.externals import joblib
 
 TAC = threeAC.ThreeAC()
 ST = st.St()
 identifier = {}
 identifierList = []
 functionDict = {}
-paramDict = {}
 break_label=None
 continue_label=None
 
@@ -55,8 +53,8 @@ def p_stmt(p):
 
     # print "printing stmt in stmt", p[0]
 
-    if p[0]['type'] != None :
-        msg_error(p,"syntax error : stmt can not be of any type other than None")
+    # if p[0]['type'] != None :
+    #     msg_error(p,"syntax error : stmt can not be of any type other than None")
 
 def p_stmtStar(p):                      # changed a bit
     '''stmtStar : stmt NEWLINE stmtStar
@@ -134,7 +132,7 @@ def p_variableSuite(p):                         # changed it too
     '''variableSuite : variable
               | NEWLINE INDGR variableStar INDLE'''
     if len(p) > 2:
-        p[0] = [p[1]] + p[3]
+        p[0] = p[3]
     else:
         p[0] = p[1]
 
@@ -170,9 +168,11 @@ def p_complexOrSimpleStmt(p):
                             | LET variableSuite
                             | VAR variableSuite '''
 
-
     if len(p) > 2:
         p[0] = p[2]
+        if p[1] =='let':
+            for var in p[2]['varlist']:
+                TAC.fixedConsts.append(ST.getIdenAttr(var,'place'))
 
 
 
@@ -343,15 +343,15 @@ def p_whileStartLabel(p):
     }
     TAC.emit('label',p[0]['start'],'','')
     break_label=p[0]['end']
-    continue_label=p[0]['start']
+    continue_labe=p[0]['end']
 
 def p_whileEndLabel(p):
     '''whileEndLabel : '''
-    global break_label,continue_label
+    global break_label,continue_labe
     TAC.emit('goto',p[-5]['start'],'','')
     TAC.emit('label',p[-5]['end'],'','')
     break_label=None
-    continue_label=None
+    continue_labe=None
 
 def p_identWithPragmaInter(p):
     '''identWithPragmaInter : COMMA identWithPragma identWithPragmaInter
@@ -622,10 +622,8 @@ def p_echoStmt(p):
     'echo': p[2]
     }
     for expr in p[2]:
-        if expr['hasVal'] == 0:
-            msg_error(p," garbage value in echo")
         if expr['type'] == 'CHARLIT' :
-            TAC.emit('printchar',expr['place'],'','')
+                TAC.emit('printchar',expr['place'],'','')
         elif expr['type'] == 'INTLIT' :
             TAC.emit('print',expr['place'],'','')
         elif expr['type'] == 'STRLIT' :
@@ -669,9 +667,7 @@ def p_scanStmt(p):
     elif expr['type'] == 'STRLIT' :
         TAC.emit('scanstr',expr['place'],'','')
 
-    if len(expr) == 5: #for array
-        print "p[2] in scan if array", p[2]
-        TAC.emit('=',expr['array'],expr['place'],'')        
+
 
 
 def p_importStmt(p):
@@ -804,7 +800,7 @@ def p_continueStmt(p):
         'continue': None
         }
     if continue_label==None:
-        msg_error(p,'Continue can not be outsite loop')
+        msg_error(p,'Continue outside loop')
     else:
         TAC.emit('goto',continue_label,'','')
 
@@ -1525,19 +1521,12 @@ def p_primary(p):
             msg_error(p,'Function not declared')
         else:
             temp = TAC.createTemp()
-            # print "p[3] in primary =", p[3]
-            # reverseParams = p[3]['params'][::-1]
-            for param in  p[3]['params']:
+            print "p[3] in primary =", p[3]
+            for param in p[3]['params']:
                 TAC.emit('push',param,'','')
 
 
             TAC.emit('call','',p[2]['value'],temp)
-
-            for param in p[3]['params']:
-                TAC.emit('pop','dump','','')
-
-            # print "p[2] in primary", p[2]
-            # print "functionDict[p[2]['value']] in primary =", functionDict[p[2]['value']]
             p[0] = p[2]
             p[0] = {
             'type': functionDict[p[2]['value']],
@@ -1570,8 +1559,6 @@ def p_primary(p):
         # print " reached primary where p[1] = - "
         placeOfIdentOrLiteral = p[0]['place']
         TAC.emit('-',placeOfIdentOrLiteral,'0',placeOfIdentOrLiteral)
-
-    # print "finally p[0] in primary =", p[0]
 
 #shd be interPrefixOperator identOrLiteral interPrimarySuffix
 
@@ -1721,7 +1708,7 @@ def p_primarySuffix(p):
         p[0]['type'] = 'CALL'
         params = []
         if p[2]!=None:
-            # print "p[2] in p_primarySuffix", p[2]
+            print "p[2] in p_primarySuffix", p[2]
             for i in p[2]:
                 if i!=None:
                     if i['type']!=None:
@@ -1751,7 +1738,7 @@ def p_primarySuffixInter(p):
                            | exprColonEqExpr  primarySuffixInter
                            | empty'''
 
-    # print "len in primarySuffixInter", len(p)
+    print "len in primarySuffixInter", len(p)
 
     if len(p)==2:
         p[0] = [p[1]]
@@ -1986,16 +1973,14 @@ def p_markerRoutine(p) :
         newScope = ST.getCurrentScope()
         # print "now new scope = ", newScope
 
-        global paramDict
+
         # print "p[0]['varlist']", p[0]['varlist']
-        paramDict[p[-3]['value']]=[]
         for i in p[0]['varlist'] :
             temp = TAC.createTemp()
             # print "var name and var type = ",p[0]['varlist'][i]['varName'],p[0]['varlist'][i]['varType']
             ST.addIdenInScope(newScope,p[0]['varlist'][i]['varName'],temp,p[0]['varlist'][i]['varType'],1)
             if p[0]['varlist'][i]['varValue'] != None :
                 TAC.emit('=',temp,p[0]['varlist'][i]['varValue'],'')
-            paramDict[p[-3]['value']].append(temp)
 
 
 def p_markerFuncLabelRet(p) :
@@ -2570,5 +2555,3 @@ if __name__ == "__main__":
     </tr>
 </table>''')
         i+=1
-    global paramDict
-    joblib.dump(paramDict,'paramDict.pkl')
