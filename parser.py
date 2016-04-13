@@ -23,6 +23,16 @@ paramDict = {}
 break_label=None
 continue_label=None
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 def p_start(p):
 #ignored extra
 #module = stmt ^* (';' / IND{=})
@@ -2359,12 +2369,12 @@ def p_error(p):
 	# global haltExecution
 	# haltExecution = True
     try:
-		print "Syntax Error near '"+str(p.stack[-1].value)+ "' in line "+str(p.stack[-1].lineno) + str(msg)
+		print bcolors.FAIL + "Syntax Error near '"+str(p.stack[-1].value).rstrip()+ "' in line "+str(p.stack[-1].lineno) + str(msg)+ bcolors.ENDC
     except:
 		try:
-			print "Syntax Error in line "+str(p.stack[-1].lineno) + str(msg)
+			print bcolors.FAIL + "Syntax Error in line "+str(p.stack[-1].lineno) + str(msg) + bcolors.ENDC
 		except:
-			print "Syntax Error" + str(msg)
+			print  bcolors.FAIL + "Syntax Error" + str(msg) + bcolors.ENDC
 
 	# sys.exit()
 
