@@ -117,6 +117,7 @@ def generateAssCode(code):
 			# pprint(line)
 			# pprint(regmem.variableList)
 			if line[1]=='=':
+				# print "###",line
 				if line[3].startswith('$'):
 					if line[2].endswith("]"):
 						regmem.freeReg('%eax')
@@ -124,9 +125,14 @@ def generateAssCode(code):
 						tempStr=line[2][1:tempIndex]
 						fp.write("\tmovl $({0}), %eax\n".format(tempStr))
 						tempStr=line[2][tempIndex+1:-1]
+						# print "***",tempStr
 						if tempStr.startswith('$'):									#a[b]=c
 							regmem.freeReg('%ebx')
-							regmem.setReg(tempStr[1:],'%ebx')
+							regmem.setReg(tempStr,'%ebx')
+							regmem.freeReg('%ebx')
+							fp.write("\timull $4, %ebx\n")
+							fp.write("\taddl %ebx, %eax\n")
+							fp.write("\tmovl {0}, (%eax)\n" .format(regmem.getRegister(line[3])))
 						else:                                                        #a[2]=b
 							fp.write("\tmovl {0}, {1}(%eax)\n" .format(regmem.getRegister(line[3]),4*int(tempStr)))
 					elif line[3].endswith("]"):                                      #b=a[2]
@@ -135,7 +141,16 @@ def generateAssCode(code):
 						tempStr=line[3][1:tempIndex]
 						fp.write("\tmovl $({0}), %eax\n".format(tempStr))
 						tempStr=line[3][tempIndex+1:-1]
-						fp.write("\tmovl {0}(%eax), {1}\n" .format(4*int(tempStr),regmem.getRegister(line[2])))
+						if tempStr.startswith('$'):									#a[b]=c
+							regmem.freeReg('%ebx')
+							regmem.setReg(tempStr,'%ebx')
+							regmem.freeReg('%ebx')
+							fp.write("\timull $4, %ebx\n")
+							fp.write("\taddl %ebx, %eax\n")
+							fp.write("\tmovl (%eax), {0}\n" .format(regmem.getRegister(line[2])))
+						else:                                                        #a[2]=b
+							fp.write("\tmovl {1}(%eax), {0}\n" .format(regmem.getRegister(line[2]),4*int(tempStr)))
+						# fp.write("\tmovl {0}(%eax), {1}\n" .format(4*int(tempStr),regmem.getRegister(line[2])))
 					else:
 						fp.write("\tmovl %s, %s\n" %(regmem.getRegister(line[3]),regmem.getRegister(line[2])))	#a=b
 				else:
@@ -692,7 +707,7 @@ printIntNumber:\n\
     inc %ecx                #Increment to take negative\n\
     movl %ecx, %edi         #Save the ecx value\n\
     \n\
-    movl    $45, %eax   #print the - sign\n\
+    movl $45, %eax   #print the - sign\n\
     pushl   %eax  # add '-' character to the stack to print\n\
     movl $4, %eax\n\
     movl $1, %ebx\n\
