@@ -12,5 +12,5 @@ proc foo(a:int):int =
     g = b + f
     return g
 var c:int
-c = foo(2)
+c = foo(6)
 echo c
