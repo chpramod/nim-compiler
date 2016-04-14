@@ -224,6 +224,7 @@ def p_exprStmt(p):
         }
 
     if p[2]['type'] == None :     ## for the case when exprstmt goes to simple_expr
+        
         p[0]=p[1]
         return
 
@@ -288,7 +289,7 @@ def p_exprStmtInter(p):
 
         # print "p[2] in exprstmtinter =", p[2]
 
-        if p[2]['type']=='ERROR_TYPE' :
+        if p[2]['type']==None :
             msg_error(p,'Unsupported type')
 
         else:
@@ -955,11 +956,8 @@ def p_arrowExpr(p):
     if len(p)==2:
         p[0] = p[1]
     else:
-        p[0] = {
-        'place': 'undef',
-        'type': None
-        }
-        if p[1]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+
+        if p[1]['type']==None or p[3]['type']==None:
             msg_error(p,'Unsupported type')
         elif p[1]['type']!=p[3]['type']:
             msg_error(p,'Type mismatch')
@@ -971,6 +969,11 @@ def p_arrowExpr(p):
         else:
             TAC.emit(p[2][0],p[1]['place'],p[1]['place'],p[3]['place'])
             p[0] = p[1]
+
+        p[0] = {
+        'place': 'undef',
+        'type': None
+        }
         # p[0] = {
         # 'type:' ("OP1" if len(p) > 2 else None),
         # 'value': p[1],
@@ -1002,7 +1005,7 @@ def p_orExpr(p): # Assuming Bitwise integer operations
     '''orExpr : andExpr interFour'''
     if p[2]['place']==None:
         p[0] = p[1]
-    elif p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
+    elif p[1]['type']==None or p[2]['type']==None:
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
@@ -1031,7 +1034,7 @@ def p_interFour(p):
         'place': None,
         'hasVal': 0
         }
-    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+    elif p[2]['type']==None or p[3]['type']==None:
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
@@ -1061,7 +1064,7 @@ def p_andExpr(p):
     '''andExpr : cmpExpr interFive'''
     if p[2]['place']==None:
         p[0] = p[1]
-    elif p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
+    elif p[1]['type']==None or p[2]['type']==None:
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
@@ -1089,7 +1092,7 @@ def p_interFive(p):
         'place': None,
         'hasVal': 0
         }
-    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+    elif p[2]['type']==None or p[3]['type']==None:
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
@@ -1117,7 +1120,7 @@ def p_cmpExpr(p):
     '''cmpExpr : sliceExpr interSix'''
     if p[2]['place']==None:
         p[0]=p[1]
-    elif p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
+    elif p[1]['type']==None or p[2]['type']==None:
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
@@ -1157,7 +1160,7 @@ def p_interSix(p):
         'place': None,
         'hasVal': 0
         }
-    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+    elif p[2]['type']==None or p[3]['type']==None:
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
@@ -1192,7 +1195,7 @@ def p_sliceExpr(p):           # ignored right now just like arrow
 
     if p[2]['place']==None:
         p[0] = p[1]
-    elif p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
+    elif p[1]['type']==None or p[2]['type']==None:
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
@@ -1225,7 +1228,7 @@ def p_interSeven(p):
         'place': None,
         'hasVal': 0
         }
-    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+    elif p[2]['type']==None or p[3]['type']==None:
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
@@ -1255,7 +1258,7 @@ def p_ampExpr(p):                           # ignored right now just like arrow
 
     if p[2]['place']==None:
         p[0] = p[1]
-    elif p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
+    elif p[1]['type']==None or p[2]['type']==None:
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
@@ -1288,7 +1291,7 @@ def p_interEight(p):
         'place': None,
         'hasVal' : 0
         }
-    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+    elif p[2]['type']==None or p[3]['type']==None:
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
@@ -1318,7 +1321,7 @@ def p_plusExpr(p):
 
     if p[2]['place']==None:
         p[0] = p[1]
-    elif p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
+    elif p[1]['type']==None or p[2]['type']==None:
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
@@ -1349,7 +1352,7 @@ def p_interNine(p):
         'place': None,
         'hasVal' : 0
         }
-    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+    elif p[2]['type']==None or p[3]['type']==None:
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
@@ -1380,7 +1383,7 @@ def p_mulExpr(p):
 
     if p[2]['place']==None:
         p[0] = p[1]
-    elif p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
+    elif p[1]['type']==None or p[2]['type']==None:
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
@@ -1410,7 +1413,7 @@ def p_interTen(p):
         'place': None,
         'hasVal' : 0
         }
-    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+    elif p[2]['type']==None or p[3]['type']==None:
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
@@ -1441,7 +1444,7 @@ def p_dollarExpr(p):
 
     if p[2]['place']==None:
         p[0] = p[1]
-    elif p[1]['type']=='ERROR_TYPE' or p[2]['type']=='ERROR_TYPE':
+    elif p[1]['type']==None or p[2]['type']==None:
         msg_error(p,'Unsupported type')
     elif p[1]['type']!=p[2]['type']:
         msg_error(p,'Type mismatch')
@@ -1472,7 +1475,7 @@ def p_interElev(p):
         'place': None,
         'hasVal' : 0
         }
-    elif p[2]['type']=='ERROR_TYPE' or p[3]['type']=='ERROR_TYPE':
+    elif p[2]['type']==None or p[3]['type']==None:
         msg_error(p,'Unsupported type')
     elif p[3]['place']==None:
         p[0] = {
@@ -1728,14 +1731,14 @@ def p_primarySuffix(p):
                         params.append(i['place'])
         p[0]['params'] = params
     elif p[1]=='.':
-        p[0]['type'] = 'ERROR_TYPE'
+        p[0]['type'] = None
         msg_error(p,'Objects not allowed')
     elif p[1]=='[':
         p[0]['type'] = 'ARRAY'
         if p[2]!=[] or p[2]!=[{}] or p[2]!= [[]]:
             if len(p[2])>1:
                 msg_error(p,"Ranges not allowed")
-            elif p[2][0]['type']==None or p[2][0]['type']=='ERROR_TYPE':
+            elif p[2][0]['type']==None or p[2][0]['type']==None:
                 msg_error(p,'Unsupported Type')
             else:
                 p[0]['place'] = p[2][0]['place']
