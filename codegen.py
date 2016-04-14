@@ -580,7 +580,8 @@ def generateAssCode(code):
 				line[4] = ast.literal_eval(line[4])
 				for var in variables:
 					if var not in line[4]:
-						fp.write("\tpushl {0}\n".format(var[1:]))
+						if not var.endswith(']'):
+							fp.write("\tpushl {0}\n".format(var[1:]))
 				for var in line[4][::-1]:
 						fp.write("\tpushl {0}\n".format(var[1:]))
 				fp.write("\tcall {0}\n".format(line[2]))
@@ -588,7 +589,8 @@ def generateAssCode(code):
 						fp.write("\tpopl {0}\n".format(var[1:]))
 				for var in variables[::-1]:
 					if var not in line[4]:
-						fp.write("\tpopl {0}\n".format(var[1:]))
+						if not var.endswith(']'):
+							fp.write("\tpopl {0}\n".format(var[1:]))
 				if len(line)>=4:
 					fp.write("\tmovl %eax, {0}\n".format(line[3][1:]))
 					regmem.setVarReg('%eax',line[3])
