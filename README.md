@@ -16,8 +16,8 @@ Nim-compiler is written by making use of the PLY (Python Lex-Yacc) package.
 
 	-	Int
 	-	Bool (boolean `true` and `false`)
-	-   char define as, var a:char = 'a'
-    -   string  define as, var a:string = "abc"
+	-   	char define as, var a:char = 'a'
+    	-   	string  define as, var a:string = "abc"
 
 ### Variable declaration and assignment
 
@@ -30,7 +30,7 @@ Nim-compiler is written by making use of the PLY (Python Lex-Yacc) package.
 			var x = 1
 			x = true
 		This will not work, as x is of type Int, a Bool to x is wrong.
-	- "let" can be used to create constants
+	- 	"let" can be used to create constants
 	 		e.g.
 			  let a = 5
 				now,
@@ -65,7 +65,7 @@ Nim-compiler is written by making use of the PLY (Python Lex-Yacc) package.
 				body
     -   break and continue 
         break is used to break the loop
-		contine is used  to go to start of loop without running the remaining code
+	contine is used  to go to start of loop without running the remaining code
 
 ### Methods or Procs
 	-	Definition
@@ -73,20 +73,20 @@ Nim-compiler is written by making use of the PLY (Python Lex-Yacc) package.
 				function body
 		e.g.
 		proc items(range: int) =
-  		var i:bool=false
+		var i:bool=false
   		while i :
-    		i+=1
-    		echo i
+			i+=1
+			echo i
 
 ### Output
 	- 'echo' is used to print on stdoutput
 	- a list of arguments can be printed as
 	- arguments can be int, string, char and bool
 		e.g.
-            a = 1
+            		a = 1
 			echo a
 	- a list of arguments can be printed as
-				echo a,"xyz \n", 1, 'g'
+		echo a,"xyz \n", 1, 'g'
 
 ### Input
 - scan, scanchar, scanstr are used to input int, char and strings respectively
