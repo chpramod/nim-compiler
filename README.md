@@ -4,13 +4,13 @@ Nim-compiler
 Nim-compiler is written by making use of the PLY (Python Lex-Yacc) package.
 
 
-##Instructions to run
+## Instructions to run
 - Use makefile to run.
 	make parse to parse
 	make all to compile completely
 
 
-##Language specifications:
+## Language specifications:
 
 #	##Basic data types##
 
